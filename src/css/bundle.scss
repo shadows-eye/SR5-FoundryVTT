@@ -50,7 +50,6 @@
             flex: 0;
         }
     }
-
     .flexrow {
         display: flex;
         flex-direction: row;
@@ -90,7 +89,62 @@
         @include rollable;
     }
 }
+.grid-col-span-1{
+    grid-column: span 1;
+    min-width: 7em;
+}
+.grid-col-span-2{
+    grid-column: span 2;
+}
+.grid-col-span-3{
+    grid-column: span 3;
+}
+.grid-col-span-4{
+    grid-column: span 4;
+}
+.grid-row-name{
+    min-width: 6em;
+}
+//Grid Template
+.card-grid {
+    display: grid;
+    gap: 0.5rem;  
+    //width: min(90%, 60rem);
+    //margin-inline: auto;
+}
 
+.card-grid.col-3{
+    grid-template-columns: auto auto auto;
+}
+
+.card-grid.col-4{
+    //grid-template-columns: minmax(3ch, 12ch) 10em minmax(6ch, 55ch) 15em;
+    grid-template-columns: auto auto auto auto;
+}
+
+.card-grid.col-5{
+    grid-template-columns: repeat(4, auto) 1rem;
+}
+
+.card-grid.col-6{
+    grid-template-columns: repeat(5, auto) 1rem;
+}
+.card-grid.col-9{
+    grid-template-columns: 4em repeat(6, 1fr) 1fr;
+}
+
+.card {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: subgrid;
+    //grid-template-columns: minmax(6ch, 20ch) 1fr;
+    grid-template-rows: min-content 1fr;
+    gap: 1em;
+    width: 1fr;
+}
+.portrait{
+    position:relative;
+}
 .align-items-center {
     align-items: center;
 }
@@ -448,7 +502,11 @@ input[type='text'].display {
             margin: 0 0.5em;
         }
     }
-
+    //New Grid Box Standard Div
+    .box{
+        justify-content: center;
+        gap: 20px;
+    }
     .no-break {
         white-space: nowrap;
     }
@@ -513,6 +571,7 @@ input[type='text'].display {
     .profile-img {
         padding: 0.25em;
         max-width: 100px;
+        min-width: 90px;
         //border-right: $groove;
         //border-bottom: $groove;
     }
@@ -659,6 +718,7 @@ input[type='text'].display {
         flex-flow: column;
         padding: 2px 4px;
         justify-content: space-around;
+        min-width: 6em;
 
         .block-line {
             display: flex;

@@ -1,15 +1,14 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
-    <header class="card-grid col-9">
-        <div class="grid-col-span-1">
+    <header class="flexrow">
         {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html'
             height='90px'
             width='90px'
         }}
-        </div>
-            <div class="grid-row-name">
+        <div class="flexcol flex-end">
+            <div class="block">
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
             </div>
-            <div class="grid-col-span-4 attributes smooth">
+            <div class="attributes smooth">
                 <div class="block">
                     {{#each system.track as |track id|}}
                         {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
@@ -34,10 +33,10 @@
                     {{/each}}
                 </div>
             </div>
-        <div class="grid-col-span-2"> {{> 'systems/shadowrun5e/dist/templates/actor/parts/Movement.html' }}
         </div>
-        <div class="grid-col-span-2">
+        <div class="flexcol flex-end">
             <div class="attributes center">
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/Movement.html' }}
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
             </div>
             <div class="attributes">

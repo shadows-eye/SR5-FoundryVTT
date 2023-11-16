@@ -143,6 +143,12 @@ input[type='text'].display {
     color: $white;
     background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)), url("assets/page.webp") repeat;
     border: 1px solid $dark;
+    .message-content.h2{
+        color: $yellow;
+    }
+    a.content-link{
+        background: none;
+    }
 }
 
 
