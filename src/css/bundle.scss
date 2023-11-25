@@ -497,6 +497,8 @@ input[type='text'].display {
 
     .scroll-area.left.light-border-right-skills {
         overflow-y: auto;
+        display: grid;
+        grid-template-columns: auto;
     }
     .list-item.item-section.wrap-collapsiblewrap-collapsible {
         height: 400px;
@@ -810,7 +812,7 @@ input[type='text'].display {
             justify-content: space-between;
             align-items: center;
             align-content: center;
-
+        
             .item-center {
                 display: flex;
                 flex-flow: row nowrap;
@@ -831,6 +833,12 @@ input[type='text'].display {
                 flex-flow: row nowrap;
                 justify-content: flex-end;
                 align-items: center;
+            }
+            &.grid-item-content4{
+                display: grid;
+                grid-template-columns: 12em 13em auto auto;
+                overflow-x: hidden;
+                overflow-y: auto;
             }
 
             .item-img {

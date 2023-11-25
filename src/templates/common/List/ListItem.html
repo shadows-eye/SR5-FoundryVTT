@@ -1,6 +1,5 @@
 <div class="{{#if itemHeader}}list-header{{else}}list-item{{/if}} {{itemCssClass}}" {{#if itemId}}data-item-id="{{itemId}}" data-item-type="{{itemType}}"{{/if}} {{#each itemData}}data-{{@key}}="{{this}}"{{/each}}>
-    <div class="list-item-content">
-        <div class="item-left">
+    <div class="list-item-content grid-item-content4">
             {{#if img}}
                 <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">                    
                     <img src="{{img}}" data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}" data-tooltip-direction="LEFT" height="24px" width="24px"/>
@@ -30,8 +29,6 @@
             >
                 {{name}}
             </div>
-        </div>
-        <div class="item-right">
             {{!-- Iterate over all right-side options --}}
             {{#each rightSide as |option id|}}
                 {{#if option.text}}
@@ -80,7 +77,6 @@
                     {{/each}}
                 </div>
             {{/if}}
-        </div>
     </div>
 
     {{#if hasDesc}}
