@@ -1,7 +1,6 @@
  <section class="license-section">   
-    <div class="list-item item-section">
-        <div class="list-item-content">
-            <div class="item-left">
+    <div class="list-item item-section sin">
+        <div class="list-item-content grid-col6">
                 <div class="item-text item-name-header">
                     {{localize "SR5.License"}}
                 </div>
@@ -11,57 +10,51 @@
                 <div class="item-text desc detail">
                     {{localize "SR5.Description"}}
                 </div>
-            </div>
-            <div class="item-right">
-                <div class="item-text item-icons rtg">
+                <div class="item-text item-icons icon">
                     <a class="add-new-license" data-tooltip="{{localize "SR5.Create" type=(localize "SR5.License")}}">
                         <i class="fas fa-plus"></i>
-                    </a>
+                    {{localize " add"}}</a>
                 </div>
-            </div>
-        </div>
-    </div>
-    {{#each system.licenses as |license id|}}
-    <div class="list-item">
-        <div class="list-item-content">
+                <div class="border-header">
+                </div>
+            {{#each system.licenses as |license id|}}
             
-                <div class="item-name-field">
-                    <input
-                        class="display left name-display"
+                    <div class="item-name-field">
+                        <input
+                            class="display left name-display"
+                            type="text"
+                            name="system.licenses.{{id}}.name"
+                            value="{{license.name}}"
+                            placeholder=""
+                        />
+                    </div>
+                
+                <div class="rtg-rate item-text">
+                    <input class="display rtg-rate"
+                        size="3"
                         type="text"
-                        name="system.licenses.{{id}}.name"
-                        value="{{license.name}}"
-                        placeholder=""
+                        name="system.licenses.{{id}}.rtg"
+                        value="{{license.rtg}}"
+                        data-dtype="Number"
+                        placeholder="0"
                     />
                 </div>
-            
-            <div class="rtg-rate item-text">
-                <input class="display rtg-rate"
-                    size="3"
-                    type="text"
-                    name="system.licenses.{{id}}.rtg"
-                    value="{{license.rtg}}"
-                    data-dtype="Number"
-                    placeholder="0"
-                />
-            </div>
-            <div class="item-text desc">
-                <input
-                    class="display desc-sin"
-                    type="text"
-                    name="system.licenses.{{id}}.description"
-                    value="{{license.description}}"
-                    placeholder='{{localize "SR5.Description"}}'
-                />
-            </div>
-            <div class="item-right">
-                <div class="item-text item-icons rtg">
-                    <a class="license-delete" data-tooltip="SR5.DeleteLicense" data-index="{{id}}">
-                        <i class="fas fa-trash"></i>
-                    </a>
+                <div class="item-text desc">
+                    <input
+                        class="display desc-sin"
+                        type="text"
+                        name="system.licenses.{{id}}.description"
+                        value="{{license.description}}"
+                        placeholder='{{localize "SR5.Description"}}'
+                    />
                 </div>
-            </div>
+
+                    <div class="item-text item-icons icon">
+                        <a class="license-delete" data-tooltip="SR5.DeleteLicense" data-index="{{id}}">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+            {{/each}}
         </div>
     </div>
-    {{/each}}
 </section>

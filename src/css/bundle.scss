@@ -57,7 +57,6 @@
         flex-wrap: wrap;
         justify-content: flex-start;
     }
-
     .nowrap {
         flex-wrap: nowrap;
     }
@@ -327,6 +326,9 @@ input[type='text'].display {
                 line-height: inherit;
                 vertical-align: middle;
                 text-align: center;
+                .display.desc-sin{
+                    text-align: left;
+                }
             }
         }
     }
@@ -797,11 +799,24 @@ input[type='text'].display {
             border-bottom: 1px solid $yellow;
             border-radius: 0.2em;
             padding-top: 5px;
+            &.sin{
+                border-bottom: none;
+            }
             &.sprite{
                 background: none;
             }
             &.faded {
                 color: $grey;
+            }
+            .border-header{
+                margin-left: -2em;
+                margin-right: -0.2em;
+                margin-bottom: 0.5em;
+                grid-column-start: 1;
+                grid-column-end: 9;
+                grid-row-start: 2;
+                grid-row-end: 2;
+                border-bottom: 1px solid $yellow;
             }
             // &:first-child {
             //     border-top: 1px solid $yellow;
@@ -815,6 +830,10 @@ input[type='text'].display {
             justify-content: space-between;
             align-items: center;
             align-content: center;
+            &.grid-col6{
+                display: grid;
+                grid-template-columns: auto auto auto auto auto auto auto auto;
+            }
 
             .item-center {
                 display: flex;
@@ -876,17 +895,22 @@ input[type='text'].display {
                 color: $grey;
                 font-size: 12px;
                 height: 100%;
+                &.icon{
+                    grid-column-start: 8;
+                }
             }
 
             .item-text {
-                width: 6em; // This will allow item header / line columns to align up.
+                width: 5em; // This will allow item header / line columns to align up.
                 margin: 0 0.1rem;
                 flex: 1 0 auto;
                 text-align: center;
                 height: 100%;
                 border: $light;
                 padding-right: 10px;
-
+                &.item-name-header{
+                    margin-left: -0.5em;
+                }
                 &.faded {
                     color: $grey;
                 }
@@ -941,7 +965,10 @@ input[type='text'].display {
                 }
 
                 &.desc {
-                    width: 16em;
+                    margin-left: -1.8em;
+                    width: 34em;
+                    grid-column-start: 4;
+                    grid-column-end: 7;
                 }
                 .content-inner{
                     color: $white;
@@ -1256,15 +1283,6 @@ input[type='text'].display {
 
 // Test new SIN Layout
 
-.license-section .list-item-content,
-.license-section .list-item.item-section .list-item-content {
-    display: flex !important;
-    flex-direction: row;
-    justify-content: flex-start !important;
-    margin: 0 !important;
-    padding: 1px !important;
-}
-
 /* New or updated rules */
 .license-section .item-text.rtg.rate,
 .license-section .rtg-rate.item-text {  /* Updated */
@@ -1277,10 +1295,12 @@ input[type='text'].display {
 .license-section .item-text.rtg.rate-header {
     max-width: 2em;
     margin-left: -1em;
+    grid-column-start: 3;
 }
 //Header detail
 .detail{
-    margin-left: 1em !important;
+    margin-left: -1em !important;
+    grid-column-start: 4;
 }
 //Rating width
 .license-section .list-item .rtg-rate.item-text {
@@ -1291,16 +1311,24 @@ input[type='text'].display {
     max-width: 1em;
 }
 .item-name-field {
-    max-width: 11em;  /* Set to your desired max width */
+    max-width: 100%;  /* Set to your desired max width */
+    grid-column-start: auto;
+    grid-column-end: 3;
+    grid-row-start: auto;
+    grid-row-end: auto;
+    margin-bottom: 0.2em;
 }
 
 .display.left.name-display {
-    width: 100%;  /* Takes the maximum width of the parent */
+    width: 16em;  /* Takes the maximum width of the parent */
     max-width: 100%;  /* Optional, ensures it doesn't go beyond parent */
 }
 // This class is only used for sin license descriptions and seems to be mostly a hack to get the description to better align with the license rating.
 .display.desc-sin {
     margin-left: 0.9em;
+}
+input.display.desc-sin{
+    text-align: left;
 }
 .license-section .list-item.item-section .item-left .item-text,
 .license-section .list-item .item-left .item-text.item-name-header {
@@ -1309,8 +1337,10 @@ input[type='text'].display {
 }
 
 .item-text.item-name-header {
-    /* Set to your desired width */
-    max-width: 11em;  /* Optional, ensures it doesn't go beyond the set width */
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 1;
+    grid-row-end: 1;
 }
 
 .license-section .list-item.item-section .item-text.rtg.rate,
@@ -1318,6 +1348,7 @@ input[type='text'].display {
     flex-basis: calc(25% - 1em);
     text-align: left;
     width: 22px;  /* Updated */
+    grid-column-start: 3;
 }
 
 .license-section .list-item.item-section .item-text.desc.detail,
@@ -1339,7 +1370,6 @@ input[type='text'].display {
 }
 
 .license-section .item-left {
-    display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
