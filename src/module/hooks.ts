@@ -378,7 +378,7 @@ ___________________
         // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
-        CONFIG.Item.compendiumIndexFields.push("system.description");
+        CONFIG.Item.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
 
         CONFIG.ActiveEffect.dataModels["base"] = ActiveEffectDM;
 

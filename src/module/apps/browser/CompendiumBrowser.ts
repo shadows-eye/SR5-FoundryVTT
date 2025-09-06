@@ -36,6 +36,10 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         return "Compendium Browser";
     }
 
+    override _attachFrameListeners() {
+        super._attachFrameListeners();
+        this.element.addEventListener("dragstart", this._onDrag.bind(this));
+    }
 
     override async _prepareContext(options: Parameters<AppV2["_prepareContext"]>[0]) {
         // Start with the base context from the parent class
@@ -50,5 +54,18 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
             entries: Array.from((await pack.getIndex()).values()),
             lastType: null,
         };
+    }
+
+    _onDrag(event: DragEvent) {
+        const target = event.target as HTMLElement | null;
+        const { uuid } = target?.closest<HTMLElement>("[data-uuid]")?.dataset ?? {};
+        if (!uuid) return;
+        const { type } = foundry.utils.parseUuid(uuid);
+
+        try {
+            event.dataTransfer?.setData("text/plain", JSON.stringify({ type, uuid }));
+        } catch (e) {
+            console.error(e);
+        }
     }
 }
