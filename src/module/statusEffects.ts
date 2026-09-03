@@ -15,11 +15,12 @@ const SRStatus = [
         id: 'sr5run',
         name: 'SR5.StatusEffects.Running',
         img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',
-        duration: { value: 1, units: 'rounds', expiry: DEFAULT_MOVEMENT_EXPIRY },
+        duration: { rounds: 1, expiry: DEFAULT_MOVEMENT_EXPIRY },
         system: {
             targets: [
                 {
                     id: 'penalty',
+                    name: 'penalty',
                     applyTo: 'test_all',
                     conditions: [
                         // Exclude defense and resist tests from the penalty.
@@ -31,6 +32,7 @@ const SRStatus = [
                 {
                     // +4 raw on melee attacks = net +2 after the general -2 penalty.
                     id: 'melee',
+                    name: 'melee',
                     applyTo: 'test_all',
                     conditions: [
                         { type: 'tests', mode: 'include', values: ['MeleeAttackTest'] },
@@ -39,6 +41,7 @@ const SRStatus = [
                 {
                     // -2 to a ranged/thrown attack made against this running actor (applies to the attacker's test).
                     id: 'targetRanged',
+                    name: 'targetRanged',
                     applyTo: 'test_target',
                     conditions: [
                         { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest'] },
@@ -56,11 +59,12 @@ const SRStatus = [
         id: 'sr5sprint',
         name: 'SR5.StatusEffects.Sprinting',
         img: 'systems/shadowrun5e/dist/icons/status-effects/sprint.svg',
-        duration: { value: 1, units: 'rounds', expiry: DEFAULT_MOVEMENT_EXPIRY },
+        duration: { rounds: 1, expiry: DEFAULT_MOVEMENT_EXPIRY },
         system: {
             targets: [
                 {
                     id: 'penalty',
+                    name: 'penalty',
                     applyTo: 'test_all',
                     conditions: [
                         { type: 'tests', mode: 'exclude', values: ['PhysicalDefenseTest', 'SuppressionDefenseTest', 'PhysicalResistTest'] },
@@ -70,6 +74,7 @@ const SRStatus = [
                 {
                     // +4 raw on melee attacks = net +2 after the general -2 penalty.
                     id: 'melee',
+                    name: 'melee',
                     applyTo: 'test_all',
                     conditions: [
                         { type: 'tests', mode: 'include', values: ['MeleeAttackTest'] },
@@ -78,6 +83,7 @@ const SRStatus = [
                 {
                     // -4 to a ranged/thrown attack made against this sprinting actor (applies to the attacker's test).
                     id: 'targetRanged',
+                    name: 'targetRanged',
                     applyTo: 'test_target',
                     conditions: [
                         { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest'] },
@@ -91,7 +97,17 @@ const SRStatus = [
             ],
         },
     },
-] as const satisfies CONFIG.StatusEffect[];
+    {
+        id: 'sr5jumpedIn',
+        name: 'SR5.StatusEffects.JumpedIn',
+        img: 'icons/svg/lock.svg',
+    },
+    {
+        id: 'sr5riggedVehicle',
+        name: 'SR5.StatusEffects.RiggedVehicle',
+        img: 'icons/importer/equipment/btls.svg',
+    },
+];
 
 export function getSRStatus(): CONFIG.StatusEffect[] {
     const expiry = getMovementExpiry();
@@ -99,5 +115,5 @@ export function getSRStatus(): CONFIG.StatusEffect[] {
     return SRStatus.map(status => ({
         ...status,
         duration: { ...status.duration, expiry },
-    }));
+    })) as CONFIG.StatusEffect[];
 }
