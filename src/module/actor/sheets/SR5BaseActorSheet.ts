@@ -37,6 +37,7 @@ import { SkillFieldType } from '@/module/types/template/Skills';
 import { CreateItemFlow } from '@/module/item/flows/CreateItemFlow';
 import { ActorSkillFlow } from '../flows/ActorSkillFlow';
 import { ModifiableValueType } from '@/module/types/template/Base';
+import { RaceFlow } from '@/module/flows/RaceFlow';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -878,6 +879,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     protected override async _onDropItem(event: DragEvent, item: SR5Item) {
         if (item.isType('skill') && item.system.type === 'set') {
             await SkillSetFlow.replaceSkillSet(this.actor, item);
+            return null;
+        }
+
+        if (item.isType('race')) {
+            await RaceFlow.promptAndApplyRaceItem(this.actor, item);
             return null;
         }
 

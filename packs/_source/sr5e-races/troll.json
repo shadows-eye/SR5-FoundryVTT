@@ -1,0 +1,68 @@
+{
+  "name": "Troll",
+  "type": "race",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "description": {
+      "value": "<p>Trolls are the largest metahumans, with horns, dermal deposits, and massive reach.</p>",
+      "chat": "",
+      "source": "SR5"
+    },
+    "importFlags": null,
+    "race": "Troll",
+    "label": "SR5.Character.Types.Troll",
+    "subtype": "metahuman",
+    "activeVariant": "Troll",
+    "metavariants": {
+      "Troll": {
+        "name": "Troll",
+        "label": "SR5.Character.Types.Troll",
+        "karma": 90,
+        "attributes": {
+          "body": {
+            "min": 5,
+            "max": 10,
+            "aug_max": 15
+          },
+          "agility": {
+            "min": 1,
+            "max": 5,
+            "aug_max": 7
+          },
+          "strength": {
+            "min": 5,
+            "max": 10,
+            "aug_max": 15
+          },
+          "logic": {
+            "min": 1,
+            "max": 5,
+            "aug_max": 7
+          },
+          "intuition": {
+            "min": 1,
+            "max": 5,
+            "aug_max": 7
+          },
+          "charisma": {
+            "min": 1,
+            "max": 4,
+            "aug_max": 6
+          }
+        },
+        "qualities": [],
+        "weapons": [],
+        "items": [],
+        "description": "Standard Troll metatype with thermographic vision, dermal deposits, and reach."
+      }
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "race0000000troll",
+  "_key": "!items!race0000000troll"
+}

@@ -1,0 +1,52 @@
+<div>
+    <div class="sheet-header race-sheet-header">
+        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{#if @root.isEditMode}}{{item.img}}{{else}}{{item.name}}{{/if}}"
+             {{#if @root.isEditMode}}
+                 data-edit="img"
+                 data-action="editImage"
+             {{/if}}
+        />
+        <div class="sheet-header-labels race-sheet-header-body">
+            <div class="race-sheet-header-main">
+                <div class="race-sheet-header-center">
+                    <div class="sheet-header-name">
+                        <span class="sheet-header-name-input">
+                            {{#if @root.isEditMode}}
+                                {{formInput fields.name value=item.name classes="sheet-name"
+                                            placeholder=(localize "SR5.Name") rootId=rootId}}
+                            {{else}}
+                                <input type="text" class="sheet-name" value="{{item.name}}" disabled>
+                            {{/if}}
+                        </span>
+                    </div>
+                    <div class="sheet-header-source race-sheet-header-source">
+                        <label>{{localize "SR5.Source"}}</label>
+                        {{#if @root.isEditMode}}
+                            {{formInput systemFields.description.fields.source value=source.system.description.source
+                                        classes="short" placeholder=(localize "SR5.Source") rootId=rootId}}
+                        {{else}}
+                            {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' system.description.source }}
+                        {{/if}}
+                    </div>
+                </div>
+                <div class="item-type-container race-header-meta">
+                    <div class="race-header-meta-row">
+                        <label>{{localize "SR5.Race.Subtype"}}</label>
+                        <span>
+                            {{formInput systemFields.subtype value=source.system.subtype localize=true
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </span>
+                    </div>
+                    <div class="race-header-meta-row">
+                        <label>{{localize "SR5.Race.ActiveVariant"}}</label>
+                        <select name="system.activeVariant" class="short" {{#if @root.isPlayMode}}disabled{{/if}}>
+                            {{#each variantOptions}}
+                                <option value="{{this.key}}" {{#if this.selected}}selected{{/if}}>{{this.label}} ({{this.karma}} {{localize "SR5.Karma"}})</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

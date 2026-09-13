@@ -33,7 +33,9 @@ export class CharacterPrep {
      * @param items
      */
     static prepareDerivedData(system: Actor.SystemOfType<'character'>, items: SR5Item[]) {
-        AttributesPrep.prepareAttributes(system);
+        const raceItem = items.find(i => i.isType('race'));
+        const ranges = raceItem?.system?.getActiveAttributeRanges ? raceItem.system.getActiveAttributeRanges() : undefined;
+        AttributesPrep.prepareAttributes(system, ranges);
         AttributesPrep.prepareEssence(system, items);
 
         // NPCPrep is reliant to be called after AttributesPrep.

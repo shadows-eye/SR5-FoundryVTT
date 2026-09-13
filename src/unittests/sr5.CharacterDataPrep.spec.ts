@@ -12,7 +12,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
 
     describe('CharacterDataPrep', () => {
         it('default attribute values', async () => {
-            const character = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
+            const character = await factory.createActor({ type: 'character', system: { metatype: 'human' } }, { skipDefaultRace: true });
 
             // Check for attribute min values;
             console.log('Physical attributes');

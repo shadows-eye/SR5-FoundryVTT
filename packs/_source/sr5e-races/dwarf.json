@@ -1,0 +1,58 @@
+{
+  "name": "Dwarf",
+  "type": "race",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "description": {
+      "value": "<p>Dwarves are shorter and stockier than humans, renowned for their endurance and strength.</p>",
+      "chat": "",
+      "source": "SR5"
+    },
+    "importFlags": null,
+    "race": "Dwarf",
+    "label": "SR5.Character.Types.Dwarf",
+    "subtype": "metahuman",
+    "activeVariant": "Dwarf",
+    "metavariants": {
+      "Dwarf": {
+        "name": "Dwarf",
+        "label": "SR5.Character.Types.Dwarf",
+        "karma": 50,
+        "attributes": {
+          "body": {
+            "min": 3,
+            "max": 8,
+            "aug_max": 12
+          },
+          "reaction": {
+            "min": 1,
+            "max": 5,
+            "aug_max": 7
+          },
+          "strength": {
+            "min": 3,
+            "max": 8,
+            "aug_max": 12
+          },
+          "willpower": {
+            "min": 2,
+            "max": 7,
+            "aug_max": 10
+          }
+        },
+        "qualities": [],
+        "weapons": [],
+        "items": [],
+        "description": "Standard Dwarf metatype with thermographic vision and increased pathogen resistance."
+      }
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "race0000000dwarf",
+  "_key": "!items!race0000000dwarf"
+}

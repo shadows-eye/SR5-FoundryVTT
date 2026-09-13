@@ -1,0 +1,39 @@
+<div class="create-metavariant-dialog-content">
+    <div class="form-group">
+        <label for="metavariant-name">{{localize "SR5.Name"}}</label>
+        <div class="form-fields">
+            <input type="text" id="metavariant-name" name="name" required placeholder="e.g. Dryad" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="metavariant-label">{{localize "SR5.Label"}}</label>
+        <div class="form-fields">
+            <input type="text" id="metavariant-label" name="label" placeholder="Display name (e.g. Dryade)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="metavariant-karma">{{localize "SR5.Karma"}}</label>
+        <div class="form-fields">
+            <input type="number" id="metavariant-karma" name="karma" value="0" step="1" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="metavariant-desc">{{localize "SR5.Description"}}</label>
+        <div class="form-fields">
+            <textarea id="metavariant-desc" name="description" rows="2" placeholder="Traits, notes, rule sources..."></textarea>
+        </div>
+    </div>
+
+    <fieldset class="attributes-fieldset">
+        <legend>{{localize "SR5.Attributes"}} ({{localize "SR5.Race.MinMax"}})</legend>
+        <div class="attribute-ranges-grid">
+            {{#each attributes}}
+            <div class="attribute-range-row">
+                <span class="attr-name">{{this.label}}</span>
+                <label>Min: <input type="number" name="attr_{{this.key}}_min" value="{{this.min}}" class="short skinny" /></label>
+                <label>Max: <input type="number" name="attr_{{this.key}}_max" value="{{this.max}}" class="short skinny" /></label>
+            </div>
+            {{/each}}
+        </div>
+    </fieldset>
+</div>

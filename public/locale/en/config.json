@@ -1806,7 +1806,38 @@
             "Sin": "SIN",
             "Spell": "Spell",
             "SpritePower": "Sprite Power",
-            "Weapon": "Weapon"
+            "Weapon": "Weapon",
+            "Race": "Race"
+        },
+        "Race": {
+            "ActiveVariant": "Active Metavariant",
+            "ChangeVariant": "Change Variant",
+            "SelectVariant": "Select Metavariant",
+            "SelectVariantPrompt": "Select the metavariant to apply to this character:",
+            "KarmaCost": "Karma Cost",
+            "Variants": "Metavariants",
+            "VariantName": "Variant Name",
+            "AddVariant": "Add Metavariant",
+            "CreateVariant": "Create Metavariant",
+            "DeleteVariant": "Delete Metavariant",
+            "GrantedQualities": "Granted Qualities",
+            "GrantedWeapons": "Granted Weapons",
+            "GrantedItems": "Granted Items",
+            "DropToGrant": "Drop item here to grant with this metavariant",
+            "AttributeRanges": "Attribute Ranges",
+            "Min": "Min",
+            "Max": "Max",
+            "AugMax": "Aug Max"
+        },
+        "RaceSubtypes": {
+            "metahuman": "Metahuman",
+            "metasapient": "Metasapient",
+            "shapeshifter": "Shapeshifter",
+            "infected": "Infected",
+            "critter": "Critter",
+            "spirit": "Spirit",
+            "sprite": "Sprite",
+            "other": "Other"
         },
         "Karma": "Karma",
         "KarmaManager": {

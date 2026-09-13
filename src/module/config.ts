@@ -52,7 +52,19 @@ export const SR5 = {
         spell: 'SR5.ItemTypes.Spell',
         sprite_power: 'SR5.ItemTypes.SpritePower',
         weapon: 'SR5.ItemTypes.Weapon',
-        call_in_action: 'TYPES.Item.call_in_action'
+        call_in_action: 'TYPES.Item.call_in_action',
+        race: 'SR5.ItemTypes.Race'
+    },
+
+    raceSubtypes: {
+        metahuman: 'SR5.RaceSubtypes.Metahuman',
+        metasapient: 'SR5.RaceSubtypes.Metasapient',
+        shapeshifter: 'SR5.RaceSubtypes.Shapeshifter',
+        infected: 'SR5.RaceSubtypes.Infected',
+        critter: 'SR5.RaceSubtypes.Critter',
+        spirit: 'SR5.RaceSubtypes.Spirit',
+        sprite: 'SR5.RaceSubtypes.Sprite',
+        other: 'SR5.RaceSubtypes.Other',
     },
 
     // All available attributes. These are available as testable attributes across all actor types.

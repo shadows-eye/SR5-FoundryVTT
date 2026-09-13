@@ -4,6 +4,8 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { NuyenManager } from '@/module/apps/actor/NuyenManager';
 import { KarmaManager } from '@/module/apps/actor/KarmaManager';
 import { ReputationManager } from '@/module/apps/actor/ReputationManager';
+import { MetavariantSelectionDialog } from '@/module/apps/dialogs/MetavariantSelectionDialog';
+import { SR5Item } from '@/module/item/SR5Item';
 
 
 export interface CharacterSheetData extends MatrixActorSheetData {
@@ -38,7 +40,8 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'critter_power',
             'call_in_action',
             'sprite_power',
-            'ritual'
+            'ritual',
+            'race'
         ];
     }
 
@@ -67,6 +70,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             openNuyenManager: SR5CharacterSheet.#openNuyenManager,
             openKarmaManager: SR5CharacterSheet.#openKarmaManager,
             openReputationManager: SR5CharacterSheet.#openReputationManager,
+            changeRaceVariant: SR5CharacterSheet.#changeRaceVariant,
         }
     }
 
@@ -234,6 +238,16 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
     static async #openReputationManager(this: SR5CharacterSheet) {
         const app = new ReputationManager(this.actor);
         await app.render(true);
+    }
+
+    static async #changeRaceVariant(this: SR5CharacterSheet, event: PointerEvent) {
+        event.preventDefault();
+        const raceItem = this.actor.items.find(i => i.isType('race')) as SR5Item<'race'> | undefined;
+        if (!raceItem) return;
+        const selected = await MetavariantSelectionDialog.promptSelection(raceItem);
+        if (selected && selected !== raceItem.system.activeVariant) {
+            await raceItem.update({ 'system.activeVariant': selected } as any);
+        }
     }
 
 }

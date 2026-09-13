@@ -1,4 +1,35 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    {{#if itemType.race.length}}
+        <div class="race-banner" style="margin-bottom: 0.75rem; padding: 0.5rem 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--color-border-dark, rgba(255, 255, 255, 0.1)); border-radius: 4px; display: flex; align-items: center; justify-content: space-between;">
+            {{#each itemType.race}}
+                <div style="display: flex; align-items: center; gap: 0.75rem;" data-item-id="{{this.id}}">
+                    <img src="{{this.img}}" style="width: 36px; height: 36px; border: none; object-fit: contain; cursor: pointer;" data-action="editItem" data-tooltip="SR5.EditItem" />
+                    <div>
+                        <div style="font-weight: bold; font-size: 1.05em; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>{{this.name}}</span>
+                            {{#if this.system.activeVariant}}
+                                <span style="font-size: 0.85em; font-weight: normal; opacity: 0.85;">— {{this.system.activeVariant}}</span>
+                            {{/if}}
+                        </div>
+                        <div style="font-size: 0.8em; opacity: 0.75; display: flex; gap: 0.75rem;">
+                            <span>{{localize "SR5.Subtype"}}: {{this.system.subtype}}</span>
+                            {{#if this.system.karma}}
+                                <span>{{localize "SR5.Labels.Karma"}}: {{this.system.karma}}</span>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.5rem;" data-item-id="{{this.id}}">
+                    <button type="button" class="sr5-button skinny" data-action="changeRaceVariant" data-tooltip="SR5.Race.ChangeVariant">
+                        <i class="fas fa-shuffle"></i> {{localize "SR5.Race.ChangeVariant"}}
+                    </button>
+                    <a data-action="editItem" data-tooltip="SR5.EditItem" style="display: flex; align-items: center; padding: 0 0.25rem;">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                </div>
+            {{/each}}
+        </div>
+    {{/if}}
     <div class="split-container">
         <div>
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/quality/header.hbs'

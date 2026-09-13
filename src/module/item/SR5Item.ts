@@ -32,6 +32,7 @@ import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
+import { RaceFlow } from '@/module/flows/RaceFlow';
 import { ModifiableValueType } from '../types/template/Base';
 import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
@@ -1583,6 +1584,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             UpdateSkillFlow.injectSkillCategoryDefaults(changed, this);
         }
 
+        if (this.isType('race') && this.actorOwner) {
+            await RaceFlow.onRaceUpdated(this.actorOwner, this as SR5Item<'race'>, changed);
+        }
+
         return super._preUpdate(...args);
     }
 
@@ -1591,6 +1596,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param args
      */
     override async _preDelete(...args: Parameters<Item['_preDelete']>) {
+        if (this.isType('race') && this.actorOwner) {
+            await RaceFlow.onRaceDeleted(this.actorOwner, this as SR5Item<'race'>);
+        }
         await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
     }

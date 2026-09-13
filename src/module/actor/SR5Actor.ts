@@ -156,8 +156,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const [data, options] = args;
         await super._preCreate(...args);
 
-        // Abort skill creation data injection when duplicating
+        // Abort default item injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
+
+        // Apply default race item if character actor
+        CreateActorFlow.addDefaultActorRace(this, data, options as SR5ActorCreateOptions | undefined);
+
         // Abort if a skillset was already assigned (e.g. during Chummer import)
         if (foundry.utils.getProperty(data, 'system.skillset')) return;
         // Abort when the creation request opted out of default skills

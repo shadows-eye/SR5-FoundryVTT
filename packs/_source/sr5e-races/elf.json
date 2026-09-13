@@ -1,0 +1,48 @@
+{
+  "name": "Elf",
+  "type": "race",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "description": {
+      "value": "<p>Elves are taller and more slender than humans, known for their agility and charisma.</p>",
+      "chat": "",
+      "source": "SR5"
+    },
+    "importFlags": null,
+    "race": "Elf",
+    "label": "SR5.Character.Types.Elf",
+    "subtype": "metahuman",
+    "activeVariant": "Elf",
+    "metavariants": {
+      "Elf": {
+        "name": "Elf",
+        "label": "SR5.Character.Types.Elf",
+        "karma": 40,
+        "attributes": {
+          "agility": {
+            "min": 2,
+            "max": 7,
+            "aug_max": 10
+          },
+          "charisma": {
+            "min": 3,
+            "max": 8,
+            "aug_max": 12
+          }
+        },
+        "qualities": [],
+        "weapons": [],
+        "items": [],
+        "description": "Standard Elf metatype with natural low-light vision and graceful physique."
+      }
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "race000000000elf",
+  "_key": "!items!race000000000elf"
+}

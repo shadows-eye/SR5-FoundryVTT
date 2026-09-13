@@ -130,6 +130,8 @@ import { Sin } from './types/item/Sin';
 import { Spell } from './types/item/Spell';
 import { SpritePower } from './types/item/SpritePower';
 import { Weapon } from './types/item/Weapon';
+import { Race } from './types/item/Race';
+import { SR5RaceSheet } from './item/sheets/SR5RaceSheet';
 
 import { SRStorage } from './storage/storage';
 import { MatrixICFlow } from './actor/flows/MatrixICFlow';
@@ -464,6 +466,7 @@ ___________________
         CONFIG.Item.dataModels["spell"] = Spell;
         CONFIG.Item.dataModels["sprite_power"] = SpritePower;
         CONFIG.Item.dataModels["weapon"] = Weapon;
+        CONFIG.Item.dataModels["race"] = Race;
 
         CONFIG.time.turnTime = SR.combat.TURN_TIME_SECONDS;
         CONFIG.time.roundTime = SR.combat.ROUND_TIME_SECONDS;
@@ -531,6 +534,11 @@ ___________________
             label: "SR5.SheetItem",
             makeDefault: true,
             types: ['skill']
+        });
+        foundry.documents.collections.Items.registerSheet(SYSTEM_NAME, SR5RaceSheet, {
+            label: "SR5.SheetItem",
+            makeDefault: true,
+            types: ['race']
         });
 
         // Register configs for embedded documents.

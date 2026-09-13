@@ -57,6 +57,7 @@ import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetect
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
+import { Race } from "./item/Race";
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -175,6 +176,7 @@ declare module "fvtt-types/configuration" {
             spell: typeof Spell;
             sprite_power: typeof SpritePower;
             weapon: typeof Weapon;
+            race: typeof Race;
         }
     }
 

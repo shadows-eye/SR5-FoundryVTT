@@ -1,0 +1,58 @@
+{
+  "name": "Ork",
+  "type": "race",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "description": {
+      "value": "<p>Orks possess heavy builds, prominent tusks, and exceptional physical fortitude.</p>",
+      "chat": "",
+      "source": "SR5"
+    },
+    "importFlags": null,
+    "race": "Ork",
+    "label": "SR5.Character.Types.Ork",
+    "subtype": "metahuman",
+    "activeVariant": "Ork",
+    "metavariants": {
+      "Ork": {
+        "name": "Ork",
+        "label": "SR5.Character.Types.Ork",
+        "karma": 50,
+        "attributes": {
+          "body": {
+            "min": 4,
+            "max": 9,
+            "aug_max": 13
+          },
+          "strength": {
+            "min": 3,
+            "max": 8,
+            "aug_max": 12
+          },
+          "logic": {
+            "min": 1,
+            "max": 5,
+            "aug_max": 7
+          },
+          "charisma": {
+            "min": 1,
+            "max": 5,
+            "aug_max": 7
+          }
+        },
+        "qualities": [],
+        "weapons": [],
+        "items": [],
+        "description": "Standard Ork metatype with low-light vision and rugged durability."
+      }
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "race000000000ork",
+  "_key": "!items!race000000000ork"
+}

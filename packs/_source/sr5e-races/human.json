@@ -1,0 +1,43 @@
+{
+  "name": "Human",
+  "type": "race",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "description": {
+      "value": "<p>Humans are the baseline metatype in the Sixth World.</p>",
+      "chat": "",
+      "source": "SR5"
+    },
+    "importFlags": null,
+    "race": "Human",
+    "label": "SR5.Character.Types.Human",
+    "subtype": "metahuman",
+    "activeVariant": "Human",
+    "metavariants": {
+      "Human": {
+        "name": "Human",
+        "label": "SR5.Character.Types.Human",
+        "karma": 0,
+        "attributes": {
+          "edge": {
+            "min": 2,
+            "max": 7,
+            "aug_max": 10
+          }
+        },
+        "qualities": [],
+        "weapons": [],
+        "items": [],
+        "description": "Baseline Human metatype."
+      }
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "race0000000human",
+  "_key": "!items!race0000000human"
+}

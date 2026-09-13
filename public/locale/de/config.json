@@ -1807,7 +1807,38 @@
             "Sin": "SIN",
             "Spell": "Zauberspruch",
             "SpritePower": "Spritekraft",
-            "Weapon": "Waffe"
+            "Weapon": "Waffe",
+            "Race": "Metaspezies"
+        },
+        "Race": {
+            "ActiveVariant": "Aktive Metavariante",
+            "ChangeVariant": "Variante wechseln",
+            "SelectVariant": "Metavariante wählen",
+            "SelectVariantPrompt": "Wähle die Metavariante für diesen Charakter:",
+            "KarmaCost": "Karmakosten",
+            "Variants": "Metavarianten",
+            "VariantName": "Name der Variante",
+            "AddVariant": "Metavariante hinzufügen",
+            "CreateVariant": "Metavariante erstellen",
+            "DeleteVariant": "Metavariante löschen",
+            "GrantedQualities": "Verliehene Vor-/Nachteile",
+            "GrantedWeapons": "Verliehene Waffen",
+            "GrantedItems": "Verliehene Gegenstände",
+            "DropToGrant": "Gegenstand hierher ziehen, um ihn dieser Metavariante zuzuordnen",
+            "AttributeRanges": "Attributsbereiche",
+            "Min": "Min",
+            "Max": "Max",
+            "AugMax": "Aug Max"
+        },
+        "RaceSubtypes": {
+            "metahuman": "Metamensch",
+            "metasapient": "Metasapient",
+            "shapeshifter": "Gestaltwandler",
+            "infected": "Infiziert",
+            "critter": "Kritter",
+            "spirit": "Geist",
+            "sprite": "Sprite",
+            "other": "Sonstiges"
         },
         "Karma": "Karma",
         "KarmaManager": {
