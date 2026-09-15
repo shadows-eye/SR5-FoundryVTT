@@ -120,6 +120,18 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return OverwatchStorage.setOverwatchScore(this, value);
     }
 
+    /**
+     * Get the resolved Race item for this actor, either embedded or via runtime UUID resolution.
+     */
+    get raceItem(): SR5Item<'race'> | null {
+        const embedded = this.items.find(i => i.isType('race')) as SR5Item<'race'> | undefined;
+        if (embedded) return embedded;
+        if ('raceUuid' in this.system && this.system.raceUuid) {
+            return (fromUuidSync(this.system.raceUuid as string) as SR5Item<'race'>) ?? null;
+        }
+        return null;
+    }
+
     static override migrateData(source: any) {
         Migrator.migrate("Actor", source);
         return super.migrateData(source);
@@ -158,9 +170,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // Abort default item injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
-
-        // Apply default race item if character actor
-        CreateActorFlow.addDefaultActorRace(this, data, options as SR5ActorCreateOptions | undefined);
 
         // Abort if a skillset was already assigned (e.g. during Chummer import)
         if (foundry.utils.getProperty(data, 'system.skillset')) return;

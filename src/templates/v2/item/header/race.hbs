@@ -31,19 +31,18 @@
                 </div>
                 <div class="item-type-container race-header-meta">
                     <div class="race-header-meta-row">
-                        <label>{{localize "SR5.Race.Subtype"}}</label>
+                        <label>{{localize "SR5.Race.BaseRace"}}</label>
                         <span>
-                            {{formInput systemFields.subtype value=source.system.subtype localize=true
-                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                            {{#if @root.isEditMode}}
+                                <select name="system.race" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Race.BaseRace'}}">
+                                    {{#each localizedRaces}}
+                                        <option value="{{@key}}" {{#if (eq @key @root.system.race)}}selected{{/if}}>{{this}}</option>
+                                    {{/each}}
+                                </select>
+                            {{else}}
+                                <input type="text" class="short" value="{{lookup localizedRaces system.race}}" disabled>
+                            {{/if}}
                         </span>
-                    </div>
-                    <div class="race-header-meta-row">
-                        <label>{{localize "SR5.Race.ActiveVariant"}}</label>
-                        <select name="system.activeVariant" class="short" {{#if @root.isPlayMode}}disabled{{/if}}>
-                            {{#each variantOptions}}
-                                <option value="{{this.key}}" {{#if this.selected}}selected{{/if}}>{{this.label}} ({{this.karma}} {{localize "SR5.Karma"}})</option>
-                            {{/each}}
-                        </select>
                     </div>
                 </div>
             </div>

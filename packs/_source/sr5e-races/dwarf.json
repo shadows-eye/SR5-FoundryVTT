@@ -1,7 +1,10 @@
 {
   "name": "Dwarf",
   "type": "race",
+  "flags": {},
   "img": "icons/svg/mystery-man.svg",
+  "effects": [],
+  "_id": "k0doU8BSHbT9uBiR",
   "system": {
     "description": {
       "value": "<p>Dwarves are shorter and stockier than humans, renowned for their endurance and strength.</p>",
@@ -9,50 +12,74 @@
       "source": "SR5"
     },
     "importFlags": null,
-    "race": "Dwarf",
-    "label": "SR5.Character.Types.Dwarf",
+    "race": "dwarf",
     "subtype": "metahuman",
-    "activeVariant": "Dwarf",
-    "metavariants": {
-      "Dwarf": {
-        "name": "Dwarf",
-        "label": "SR5.Character.Types.Dwarf",
-        "karma": 50,
-        "attributes": {
-          "body": {
-            "min": 3,
-            "max": 8,
-            "aug_max": 12
-          },
-          "reaction": {
-            "min": 1,
-            "max": 5,
-            "aug_max": 7
-          },
-          "strength": {
-            "min": 3,
-            "max": 8,
-            "aug_max": 12
-          },
-          "willpower": {
-            "min": 2,
-            "max": 7,
-            "aug_max": 10
-          }
-        },
-        "qualities": [],
-        "weapons": [],
-        "items": [],
-        "description": "Standard Dwarf metatype with thermographic vision and increased pathogen resistance."
+    "karma": 50,
+    "attributes": {
+      "body": {
+        "min": 3,
+        "max": 8,
+        "aug_max": 12
+      },
+      "agility": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "reaction": {
+        "min": 1,
+        "max": 5,
+        "aug_max": 7
+      },
+      "strength": {
+        "min": 3,
+        "max": 8,
+        "aug_max": 12
+      },
+      "willpower": {
+        "min": 2,
+        "max": 7,
+        "aug_max": 10
+      },
+      "logic": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "intuition": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "charisma": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "edge": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
       }
-    }
+    },
+    "qualities": [],
+    "weapons": [],
+    "items": []
   },
-  "effects": [],
-  "folder": null,
-  "flags": {},
   "ownership": {
     "default": 0
   },
-  "_id": "race0000000dwarf",
-  "_key": "!items!race0000000dwarf"
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": null,
+    "coreVersion": "14",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!k0doU8BSHbT9uBiR"
 }

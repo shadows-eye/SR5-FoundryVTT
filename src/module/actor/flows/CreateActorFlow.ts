@@ -1,20 +1,9 @@
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { SR5Actor } from '../SR5Actor';
 import { SkillSetFlow } from './SkillSetFlow';
-import { RacePresets } from '@/module/data/RacePresets';
-
-/**
- * SR5 specific options understood while an actor document is created.
- *
- * They're passed as part of the create operation and reach the document through
- * its _preCreate options:
- * `SR5Actor.create(data, { skipDefaultSkills: true })`
- */
 export interface SR5ActorCreateOptions {
     /** Skip applying the default skill set configured for the created actor type. */
     skipDefaultSkills?: boolean;
-    /** Skip applying the default race item configured for character actors. */
-    skipDefaultRace?: boolean;
 }
 
 /**
@@ -41,31 +30,6 @@ export const CreateActorFlow = {
         await SkillSetFlow.applySkillSetToActor(actor, skillSet, { useSource: true });
 
         console.debug(`Shadowrun 5e | Added skill set ${skillSet.name} to actor source data`);
-    },
-
-    /**
-     * Applies the default base Human race item when creating a character actor.
-     *
-     * @param actor Actor being created
-     * @param data Initial creation data
-     * @param options Additional creation options
-     */
-    addDefaultActorRace(actor: SR5Actor, data: Actor.CreateData, options?: SR5ActorCreateOptions) {
-        if (data.type !== 'character') return;
-        if (options?.skipDefaultRace) return;
-
-        // Abort if race item was already provided
-        const existingItems = Array.from(actor.items).map(item => item.toObject() as Item.CreateData);
-        const hasRace = existingItems.some(i => i.type === 'race') || (data.items && (data.items as any[]).some((i: any) => i.type === 'race'));
-        if (hasRace) return;
-
-        const defaultHuman = RacePresets.createDefaultHumanRaceItemData();
-        actor.updateSource({
-            items: [...existingItems, defaultHuman as Item.CreateData],
-            'system.metatype': 'Human'
-        } as any);
-
-        console.debug('Shadowrun 5e | Added default Human race to actor source data');
     },
 
     /** Get the default skill set for an actor type. */

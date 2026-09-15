@@ -1811,24 +1811,18 @@
             "Race": "Metaspezies"
         },
         "Race": {
-            "ActiveVariant": "Aktive Metavariante",
-            "ChangeVariant": "Variante wechseln",
-            "SelectVariant": "Metavariante wählen",
-            "SelectVariantPrompt": "Wähle die Metavariante für diesen Charakter:",
+            "BaseRace": "Hauptspezies",
+            "Subtype": "Unterart",
             "KarmaCost": "Karmakosten",
-            "Variants": "Metavarianten",
-            "VariantName": "Name der Variante",
-            "AddVariant": "Metavariante hinzufügen",
-            "CreateVariant": "Metavariante erstellen",
-            "DeleteVariant": "Metavariante löschen",
             "GrantedQualities": "Verliehene Vor-/Nachteile",
             "GrantedWeapons": "Verliehene Waffen",
             "GrantedItems": "Verliehene Gegenstände",
-            "DropToGrant": "Gegenstand hierher ziehen, um ihn dieser Metavariante zuzuordnen",
+            "DropToGrant": "Gegenstand hierher ziehen, um ihn dieser Metaspezies zuzuordnen",
             "AttributeRanges": "Attributsbereiche",
             "Min": "Min",
             "Max": "Max",
-            "AugMax": "Aug Max"
+            "AugMax": "Aug Max",
+            "ChangeRace": "Spezies wechseln"
         },
         "RaceSubtypes": {
             "metahuman": "Metamensch",
@@ -3693,7 +3687,8 @@
             "spell": "Zauberspruch",
             "sprite_power": "Spritekraft",
             "vehicle": "Vehicle",
-            "weapon": "Waffe"
+            "weapon": "Waffe",
+            "race": "Spezies"
         }
     }
 }

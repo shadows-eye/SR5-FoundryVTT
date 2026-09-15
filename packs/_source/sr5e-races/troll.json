@@ -1,7 +1,10 @@
 {
   "name": "Troll",
   "type": "race",
+  "flags": {},
   "img": "icons/svg/mystery-man.svg",
+  "effects": [],
+  "_id": "XILke7Ke55edRvGQ",
   "system": {
     "description": {
       "value": "<p>Trolls are the largest metahumans, with horns, dermal deposits, and massive reach.</p>",
@@ -9,60 +12,74 @@
       "source": "SR5"
     },
     "importFlags": null,
-    "race": "Troll",
-    "label": "SR5.Character.Types.Troll",
+    "race": "troll",
     "subtype": "metahuman",
-    "activeVariant": "Troll",
-    "metavariants": {
-      "Troll": {
-        "name": "Troll",
-        "label": "SR5.Character.Types.Troll",
-        "karma": 90,
-        "attributes": {
-          "body": {
-            "min": 5,
-            "max": 10,
-            "aug_max": 15
-          },
-          "agility": {
-            "min": 1,
-            "max": 5,
-            "aug_max": 7
-          },
-          "strength": {
-            "min": 5,
-            "max": 10,
-            "aug_max": 15
-          },
-          "logic": {
-            "min": 1,
-            "max": 5,
-            "aug_max": 7
-          },
-          "intuition": {
-            "min": 1,
-            "max": 5,
-            "aug_max": 7
-          },
-          "charisma": {
-            "min": 1,
-            "max": 4,
-            "aug_max": 6
-          }
-        },
-        "qualities": [],
-        "weapons": [],
-        "items": [],
-        "description": "Standard Troll metatype with thermographic vision, dermal deposits, and reach."
+    "karma": 90,
+    "attributes": {
+      "body": {
+        "min": 5,
+        "max": 10,
+        "aug_max": 15
+      },
+      "agility": {
+        "min": 1,
+        "max": 5,
+        "aug_max": 7
+      },
+      "reaction": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "strength": {
+        "min": 5,
+        "max": 10,
+        "aug_max": 15
+      },
+      "willpower": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "logic": {
+        "min": 1,
+        "max": 5,
+        "aug_max": 7
+      },
+      "intuition": {
+        "min": 1,
+        "max": 5,
+        "aug_max": 7
+      },
+      "charisma": {
+        "min": 1,
+        "max": 4,
+        "aug_max": 6
+      },
+      "edge": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
       }
-    }
+    },
+    "qualities": [],
+    "weapons": [],
+    "items": []
   },
-  "effects": [],
-  "folder": null,
-  "flags": {},
   "ownership": {
     "default": 0
   },
-  "_id": "race0000000troll",
-  "_key": "!items!race0000000troll"
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": null,
+    "coreVersion": "14",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!XILke7Ke55edRvGQ"
 }

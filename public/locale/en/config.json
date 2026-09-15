@@ -1810,24 +1810,18 @@
             "Race": "Race"
         },
         "Race": {
-            "ActiveVariant": "Active Metavariant",
-            "ChangeVariant": "Change Variant",
-            "SelectVariant": "Select Metavariant",
-            "SelectVariantPrompt": "Select the metavariant to apply to this character:",
+            "BaseRace": "Main Race",
+            "Subtype": "Subtype",
             "KarmaCost": "Karma Cost",
-            "Variants": "Metavariants",
-            "VariantName": "Variant Name",
-            "AddVariant": "Add Metavariant",
-            "CreateVariant": "Create Metavariant",
-            "DeleteVariant": "Delete Metavariant",
             "GrantedQualities": "Granted Qualities",
             "GrantedWeapons": "Granted Weapons",
             "GrantedItems": "Granted Items",
-            "DropToGrant": "Drop item here to grant with this metavariant",
+            "DropToGrant": "Drop item here to grant with this race",
             "AttributeRanges": "Attribute Ranges",
             "Min": "Min",
             "Max": "Max",
-            "AugMax": "Aug Max"
+            "AugMax": "Aug Max",
+            "ChangeRace": "Change Race"
         },
         "RaceSubtypes": {
             "metahuman": "Metahuman",
@@ -3649,7 +3643,8 @@
             "spell": "Spell",
             "sprite_power": "Sprite Power",
             "vehicle": "Vehicle",
-            "weapon": "Weapon"
+            "weapon": "Weapon",
+            "race": "Race"
         }
     }
 }

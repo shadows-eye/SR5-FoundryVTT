@@ -58,7 +58,7 @@ export class AttributesPrep {
         if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
         // Each attribute can have a unique value range.
-        const range = ranges ? ranges[name] : SR.attributes.ranges[name];
+        const range = ranges?.[name] ?? SR.attributes.ranges[name];
         if (range) {
             if (range.min != null && attribute.base < range.min) {
                 attribute.base = range.min;

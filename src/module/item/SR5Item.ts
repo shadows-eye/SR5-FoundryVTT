@@ -241,7 +241,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         const technology = this.getTechnologyData();
         if (technology)
-            TechnologyPrep.calculateAttributes(this.system.attributes!);
+            TechnologyPrep.calculateAttributes(this.system.attributes as any);
 
         if (this.isType('host'))
             HostPrep.prepareDerivedData(this.system);

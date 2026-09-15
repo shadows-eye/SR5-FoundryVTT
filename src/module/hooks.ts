@@ -423,7 +423,6 @@ ___________________
         CONFIG.Roll = SR5Roll;
 
         // Add Shadowrun configuration onto general Foundry config for module access.
-        // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
         CONFIG.Actor.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");

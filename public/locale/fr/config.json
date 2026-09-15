@@ -862,10 +862,35 @@
             "Sin": "SIN",
             "Spell": "Sort",
             "SpritePower": "Pouvoir de Sprite",
-            "Weapon": "Arme"
+            "Weapon": "Arme",
+            "Race": "Race"
+        },
+        "Race": {
+            "BaseRace": "Race principale",
+            "Subtype": "Sous-type",
+            "KarmaCost": "Coût en Karma",
+            "GrantedQualities": "Avantages accordés",
+            "GrantedWeapons": "Armes accordées",
+            "GrantedItems": "Objets accordés",
+            "DropToGrant": "Glisser un objet ici pour l'accorder avec cette race",
+            "AttributeRanges": "Plages d'attributs",
+            "Min": "Min",
+            "Max": "Max",
+            "AugMax": "Aug Max",
+            "ChangeRace": "Changer de race"
         },
         "Immunity": "Immunité",
         "ImmunityToNormalWeapons": "Immunité aux armes normales",
+        "RaceSubtypes": {
+            "metahuman": "Méta-humain",
+            "metasapient": "Méta-sapient",
+            "shapeshifter": "Changeur de forme",
+            "infected": "Infecté",
+            "critter": "Créature",
+            "spirit": "Esprit",
+            "sprite": "Sprite",
+            "other": "Autre"
+        },
         "Karma": "Karma",
         "KnockedDown": "Projeté au sol",
         "KnowledgeSkillAcademic": "Connaissances académiques",
@@ -1572,6 +1597,45 @@
         "StatusEffects": {
             "Running": "Course",
             "Sprinting": "Sprint"
+        }
+    },
+    "TYPES": {
+        "Actor": {
+            "character": "Personnage",
+            "ic": "CI",
+            "spirit": "Esprit",
+            "sprite": "Sprite",
+            "vehicle": "Véhicule/Drone"
+        },
+        "Item": {
+            "action": "Action",
+            "adept_power": "Pouvoir d'adepte",
+            "ammo": "Munitions",
+            "armor": "Armure",
+            "bioware": "Bioware",
+            "call_in_action": "Invoquer/Compiler",
+            "complex_form": "Forme complexe",
+            "contact": "Contact",
+            "critter_power": "Pouvoir de créature",
+            "cyberware": "Cyberware",
+            "device": "Appareil",
+            "echo": "Écho",
+            "equipment": "Équipement",
+            "grid": "Grille",
+            "host": "Hôte",
+            "lifestyle": "Mode de vie",
+            "metamagic": "Métamagie",
+            "modification": "Modification",
+            "program": "Programme",
+            "quality": "Qualité",
+            "ritual": "Rituel",
+            "sin": "SIN",
+            "skill": "Compétence",
+            "spell": "Sort",
+            "sprite_power": "Pouvoir de sprite",
+            "vehicle": "Véhicule",
+            "weapon": "Arme",
+            "race": "Race"
         }
     }
 }

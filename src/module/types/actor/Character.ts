@@ -9,7 +9,7 @@ import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueSchema, ValueMaxPair } from "../template/Base";
 import { Attributes, AttributeField, MatrixActorAttributes } from '../template/Attributes';
 import { CommonData, CharacterLimits, CreateModifiers, MagicData, ActorBase, CharacterValues, } from "./Common";
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField } = foundry.data.fields;
 
 const CharacterAttributes = () => ({
     ...Attributes(),
@@ -24,9 +24,9 @@ const CharacterData = () => ({
     // === Core Identity ===
     metatype: new StringField({
         required: true,
-        initial: "human",
-        choices: SR5.character.types
+        initial: "Human",
     }),
+    raceUuid: new DocumentUUIDField({ required: false, blank: true }),
     is_critter: new BooleanField(),
     is_npc: new BooleanField(),
     npc: new SchemaField({ is_grunt: new BooleanField() }),

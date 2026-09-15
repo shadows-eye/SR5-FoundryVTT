@@ -1,7 +1,10 @@
 {
   "name": "Elf",
   "type": "race",
+  "flags": {},
   "img": "icons/svg/mystery-man.svg",
+  "effects": [],
+  "_id": "8h12SU264mj8RveP",
   "system": {
     "description": {
       "value": "<p>Elves are taller and more slender than humans, known for their agility and charisma.</p>",
@@ -9,40 +12,74 @@
       "source": "SR5"
     },
     "importFlags": null,
-    "race": "Elf",
-    "label": "SR5.Character.Types.Elf",
+    "race": "elf",
     "subtype": "metahuman",
-    "activeVariant": "Elf",
-    "metavariants": {
-      "Elf": {
-        "name": "Elf",
-        "label": "SR5.Character.Types.Elf",
-        "karma": 40,
-        "attributes": {
-          "agility": {
-            "min": 2,
-            "max": 7,
-            "aug_max": 10
-          },
-          "charisma": {
-            "min": 3,
-            "max": 8,
-            "aug_max": 12
-          }
-        },
-        "qualities": [],
-        "weapons": [],
-        "items": [],
-        "description": "Standard Elf metatype with natural low-light vision and graceful physique."
+    "karma": 40,
+    "attributes": {
+      "body": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "agility": {
+        "min": 2,
+        "max": 7,
+        "aug_max": 10
+      },
+      "reaction": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "strength": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "willpower": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "logic": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "intuition": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "charisma": {
+        "min": 3,
+        "max": 8,
+        "aug_max": 12
+      },
+      "edge": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
       }
-    }
+    },
+    "qualities": [],
+    "weapons": [],
+    "items": []
   },
-  "effects": [],
-  "folder": null,
-  "flags": {},
   "ownership": {
     "default": 0
   },
-  "_id": "race000000000elf",
-  "_key": "!items!race000000000elf"
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": null,
+    "coreVersion": "14",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!8h12SU264mj8RveP"
 }

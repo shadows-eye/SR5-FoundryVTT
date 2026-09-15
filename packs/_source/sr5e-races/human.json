@@ -1,7 +1,10 @@
 {
   "name": "Human",
   "type": "race",
+  "flags": {},
   "img": "icons/svg/mystery-man.svg",
+  "effects": [],
+  "_id": "dncIKczU9rLT6iLQ",
   "system": {
     "description": {
       "value": "<p>Humans are the baseline metatype in the Sixth World.</p>",
@@ -9,35 +12,74 @@
       "source": "SR5"
     },
     "importFlags": null,
-    "race": "Human",
-    "label": "SR5.Character.Types.Human",
+    "race": "human",
     "subtype": "metahuman",
-    "activeVariant": "Human",
-    "metavariants": {
-      "Human": {
-        "name": "Human",
-        "label": "SR5.Character.Types.Human",
-        "karma": 0,
-        "attributes": {
-          "edge": {
-            "min": 2,
-            "max": 7,
-            "aug_max": 10
-          }
-        },
-        "qualities": [],
-        "weapons": [],
-        "items": [],
-        "description": "Baseline Human metatype."
+    "karma": 0,
+    "attributes": {
+      "body": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "agility": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "reaction": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "strength": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "willpower": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "logic": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "intuition": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "charisma": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "edge": {
+        "min": 2,
+        "max": 7,
+        "aug_max": 10
       }
-    }
+    },
+    "qualities": [],
+    "weapons": [],
+    "items": []
   },
-  "effects": [],
-  "folder": null,
-  "flags": {},
   "ownership": {
     "default": 0
   },
-  "_id": "race0000000human",
-  "_key": "!items!race0000000human"
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": null,
+    "coreVersion": "14",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!dncIKczU9rLT6iLQ"
 }

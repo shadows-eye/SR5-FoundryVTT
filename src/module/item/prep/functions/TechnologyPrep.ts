@@ -84,7 +84,7 @@ export const TechnologyPrep = {
 
         // Add device rating as attribute to allow for rolls with it.
         const rating = Number(technology.rating ?? 0);
-        const parts = new ModifiableValue(attributes.rating);
+        const parts = new ModifiableValue((attributes as any).rating);
         parts.add('SR5.Host.Rating', rating);
     },
 

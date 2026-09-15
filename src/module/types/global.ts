@@ -58,6 +58,13 @@ import ThermographicVisionDetectionMode from "../vision/thermographicVision/ther
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 import { Race } from "./item/Race";
+import { SR5 } from "../config";
+
+declare global {
+    interface CONFIG {
+        SR5: typeof SR5;
+    }
+}
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {

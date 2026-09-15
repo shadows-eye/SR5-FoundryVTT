@@ -53,7 +53,15 @@ export const SR5 = {
         sprite_power: 'SR5.ItemTypes.SpritePower',
         weapon: 'SR5.ItemTypes.Weapon',
         call_in_action: 'TYPES.Item.call_in_action',
-        race: 'SR5.ItemTypes.Race'
+        race: 'TYPES.Item.race'
+    },
+
+    races: {
+        human: 'SR5.Character.Types.Human',
+        elf: 'SR5.Character.Types.Elf',
+        dwarf: 'SR5.Character.Types.Dwarf',
+        ork: 'SR5.Character.Types.Ork',
+        troll: 'SR5.Character.Types.Troll',
     },
 
     raceSubtypes: {

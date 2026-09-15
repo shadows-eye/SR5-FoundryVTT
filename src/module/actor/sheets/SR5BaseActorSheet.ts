@@ -883,7 +883,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         if (item.isType('race')) {
-            await RaceFlow.promptAndApplyRaceItem(this.actor, item);
+            await RaceFlow.applyRaceToActor(this.actor, item);
             return null;
         }
 

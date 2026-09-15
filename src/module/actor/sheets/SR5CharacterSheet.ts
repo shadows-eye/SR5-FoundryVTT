@@ -4,7 +4,6 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { NuyenManager } from '@/module/apps/actor/NuyenManager';
 import { KarmaManager } from '@/module/apps/actor/KarmaManager';
 import { ReputationManager } from '@/module/apps/actor/ReputationManager';
-import { MetavariantSelectionDialog } from '@/module/apps/dialogs/MetavariantSelectionDialog';
 import { SR5Item } from '@/module/item/SR5Item';
 
 
@@ -70,7 +69,8 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             openNuyenManager: SR5CharacterSheet.#openNuyenManager,
             openKarmaManager: SR5CharacterSheet.#openKarmaManager,
             openReputationManager: SR5CharacterSheet.#openReputationManager,
-            changeRaceVariant: SR5CharacterSheet.#changeRaceVariant,
+            openRaceSheet: SR5CharacterSheet.#openRaceSheet,
+            removeRace: SR5CharacterSheet.#removeRace,
         }
     }
 
@@ -240,14 +240,19 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         await app.render(true);
     }
 
-    static async #changeRaceVariant(this: SR5CharacterSheet, event: PointerEvent) {
+    static async #openRaceSheet(this: SR5CharacterSheet, event: PointerEvent) {
         event.preventDefault();
-        const raceItem = this.actor.items.find(i => i.isType('race')) as SR5Item<'race'> | undefined;
-        if (!raceItem) return;
-        const selected = await MetavariantSelectionDialog.promptSelection(raceItem);
-        if (selected && selected !== raceItem.system.activeVariant) {
-            await raceItem.update({ 'system.activeVariant': selected } as any);
+        const raceItem = this.actor.raceItem;
+        if (raceItem?.sheet) {
+            raceItem.sheet.render(true);
         }
     }
 
+    static async #removeRace(this: SR5CharacterSheet, event: PointerEvent) {
+        event.preventDefault();
+        const raceItem = this.actor.items.find(i => i.isType('race')) as SR5Item<'race'> | undefined;
+        if (raceItem) {
+            await raceItem.delete();
+        }
+    }
 }

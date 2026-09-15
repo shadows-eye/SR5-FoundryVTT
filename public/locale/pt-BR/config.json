@@ -1102,7 +1102,32 @@
             "Sin": "SIN",
             "Spell": "Feitiço",
             "SpritePower": "Poder de Sprite",
-            "Weapon": "Arma"
+            "Weapon": "Arma",
+            "Race": "Raça"
+        },
+        "Race": {
+            "BaseRace": "Raça Principal",
+            "Subtype": "Subtipo",
+            "KarmaCost": "Custo de Carma",
+            "GrantedQualities": "Qualidades Concedidas",
+            "GrantedWeapons": "Armas Concedidas",
+            "GrantedItems": "Itens Concedidos",
+            "DropToGrant": "Solte o item aqui para conceder com esta raça",
+            "AttributeRanges": "Intervalos de Atributos",
+            "Min": "Mín",
+            "Max": "Máx",
+            "AugMax": "Máx Aumentado",
+            "ChangeRace": "Mudar Raça"
+        },
+        "RaceSubtypes": {
+            "metahuman": "Meta-humano",
+            "metasapient": "Meta-sapiente",
+            "shapeshifter": "Metamorfo",
+            "infected": "Infectado",
+            "critter": "Criatura",
+            "spirit": "Espírito",
+            "sprite": "Sprite",
+            "other": "Outro"
         },
         "Karma": "Carma",
         "Keybinding": {
@@ -2254,7 +2279,8 @@
             "spell": "Feitiço",
             "sprite_power": "Poder de Sprite",
             "vehicle": "Veículo",
-            "weapon": "Arma"
+            "weapon": "Arma",
+            "race": "Raça"
         }
     }
 }
