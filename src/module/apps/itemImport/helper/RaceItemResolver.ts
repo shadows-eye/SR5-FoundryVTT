@@ -19,10 +19,11 @@ export interface RacialItemFlag {
 /**
  * Helper to resolve and automatically import linked race items into standard import compendiums.
  *
- * - **Triggered on World Load**: In `hooks.ts` during the `ready` hook (only for GMs),
- *   it calls `RaceItemResolver.syncRaceCompendiumLinkedItems()`.
+ * - **Triggered on World Load & Bulk Import**: In `hooks.ts` during the `ready` hook (only for GMs),
+ *   and in `BulkImporter.ts` after parsing importers, it calls `RaceItemResolver.syncRaceCompendiumLinkedItems()`.
  * - **Scans Race Compendium**: It inspects the race items in `packs/sr5e-races` and extracts
- *   the items listed in `flags.shadowrun5e.racialItems`.
+ *   the items listed in `flags.shadowrun5e.racialItems` (Low-Light Vision, Thermographic Vision,
+ *   Resistance to Pathogens/Toxins, Dermal Deposits).
  * - **Checks Target Compendium**: It checks whether each item already exists in the standard
  *   empty import compendium (`world.sr5trait`). If already present, it skips it.
  * - **Imports Missing Linked Items via Chummer**: If missing, it resolves the Chummer quality

@@ -23,6 +23,7 @@ import { WareModImporter } from "../importer/WareModImporter";
 import { WeaponImporter } from "../importer/WeaponImporter";
 import { WeaponModImporter } from "../importer/WeaponModImporter";
 import { RaceImporter } from "../importer/RaceImporter";
+import { RaceItemResolver } from "../helper/RaceItemResolver";
 
 import AppV2 = foundry.applications.api.ApplicationV2;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -390,6 +391,12 @@ export class BulkImporter extends BaseClass {
                     BulkImporter.progress.idx++;
                     await this.render();
                 }
+            }
+
+            try {
+                await RaceItemResolver.syncRaceCompendiumLinkedItems();
+            } catch (err) {
+                console.error("Failed to sync race compendium linked items:", err);
             }
 
             // Lock all compendiums and update compendium order
