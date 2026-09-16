@@ -1,0 +1,51 @@
+<div>
+    <div class="sheet-header race-sheet-header">
+        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{#if @root.isEditMode}}{{item.img}}{{else}}{{item.name}}{{/if}}"
+             {{#if @root.isEditMode}}
+                 data-edit="img"
+                 data-action="editImage"
+             {{/if}}
+        />
+        <div class="sheet-header-labels race-sheet-header-body">
+            <div class="race-sheet-header-main">
+                <div class="race-sheet-header-center">
+                    <div class="sheet-header-name">
+                        <span class="sheet-header-name-input">
+                            {{#if @root.isEditMode}}
+                                {{formInput fields.name value=item.name classes="sheet-name"
+                                            placeholder=(localize "SR5.Name") rootId=rootId}}
+                            {{else}}
+                                <input type="text" class="sheet-name" value="{{item.name}}" disabled>
+                            {{/if}}
+                        </span>
+                    </div>
+                    <div class="sheet-header-source race-sheet-header-source">
+                        <label>{{localize "SR5.Source"}}</label>
+                        {{#if @root.isEditMode}}
+                            {{formInput systemFields.description.fields.source value=source.system.description.source
+                                        classes="short" placeholder=(localize "SR5.Source") rootId=rootId}}
+                        {{else}}
+                            {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' system.description.source }}
+                        {{/if}}
+                    </div>
+                </div>
+                <div class="item-type-container race-header-meta">
+                    <div class="race-header-meta-row">
+                        <label>{{localize "SR5.Race.BaseRace"}}</label>
+                        <span>
+                            {{#if @root.isEditMode}}
+                                <select name="system.race" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Race.BaseRace'}}">
+                                    {{#each localizedRaces}}
+                                        <option value="{{@key}}" {{#if (eq @key @root.system.race)}}selected{{/if}}>{{this}}</option>
+                                    {{/each}}
+                                </select>
+                            {{else}}
+                                <input type="text" class="short" value="{{lookup localizedRaces system.race}}" disabled>
+                            {{/if}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

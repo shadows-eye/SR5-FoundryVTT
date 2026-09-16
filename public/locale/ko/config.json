@@ -1807,7 +1807,32 @@
             "Sin": "SIN",
             "Spell": "주문",
             "SpritePower": "스프라이트 능력",
-            "Weapon": "무기"
+            "Weapon": "무기",
+            "Race": "종족"
+        },
+        "Race": {
+            "BaseRace": "주 종족",
+            "Subtype": "하위 유형",
+            "KarmaCost": "카르마 비용",
+            "GrantedQualities": "부여된 특징",
+            "GrantedWeapons": "부여된 무기",
+            "GrantedItems": "부여된 아이템",
+            "DropToGrant": "이 종족에 부여할 아이템을 여기에 드롭하세요",
+            "AttributeRanges": "능력치 범위",
+            "Min": "최소",
+            "Max": "최대",
+            "AugMax": "강화 최대",
+            "ChangeRace": "종족 변경"
+        },
+        "RaceSubtypes": {
+            "metahuman": "메타휴먼",
+            "metasapient": "메타새피언트",
+            "shapeshifter": "셰이프시프터",
+            "infected": "감염자",
+            "critter": "크리터",
+            "spirit": "정령",
+            "sprite": "스프라이트",
+            "other": "기타"
         },
         "Karma": "카르마",
         "KarmaManager": {
@@ -3618,7 +3643,8 @@
             "spell": "주문",
             "sprite_power": "스프라이트 능력",
             "vehicle": "탑승물",
-            "weapon": "무기"
+            "weapon": "무기",
+            "race": "종족"
         }
     }
 }

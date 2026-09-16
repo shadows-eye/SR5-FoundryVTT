@@ -22,6 +22,8 @@ import { WareImporter } from "../importer/WareImporter";
 import { WareModImporter } from "../importer/WareModImporter";
 import { WeaponImporter } from "../importer/WeaponImporter";
 import { WeaponModImporter } from "../importer/WeaponModImporter";
+import { MetatypeImporter } from "../importer/MetatypeImporter";
+import { MetatypeItemResolver } from "../helper/MetatypeItemResolver";
 
 import AppV2 = foundry.applications.api.ApplicationV2;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -156,6 +158,7 @@ export class BulkImporter extends BaseClass {
         new ArmorModImporter(),
         new ArmorImporter(),
         new ActionImporter(),
+        new MetatypeImporter(),
     ] as const satisfies readonly DataImporter[];
 
     /**
@@ -395,6 +398,12 @@ export class BulkImporter extends BaseClass {
                     BulkImporter.progress.idx++;
                     await this.render();
                 }
+            }
+
+            try {
+                await MetatypeItemResolver.syncRaceCompendiumLinkedItems();
+            } catch (err) {
+                console.error("Failed to sync race compendium linked items:", err);
             }
 
             // Lock all compendiums and update compendium order

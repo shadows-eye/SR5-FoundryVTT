@@ -25,6 +25,7 @@ import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
 import { ExtendedTestDueFlow } from './flows/ExtendedTestDueFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
+import { MetatypeItemResolver } from './apps/itemImport/helper/MetatypeItemResolver';
 import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
 import { ChangelogApplication } from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
@@ -130,6 +131,8 @@ import { Sin } from './types/item/Sin';
 import { Spell } from './types/item/Spell';
 import { SpritePower } from './types/item/SpritePower';
 import { Weapon } from './types/item/Weapon';
+import { Metatype } from './types/item/Metatype';
+import { SR5MetatypeSheet } from './item/sheets/SR5MetatypeSheet';
 
 import { SRStorage } from './storage/storage';
 import { MatrixICFlow } from './actor/flows/MatrixICFlow';
@@ -420,7 +423,6 @@ ___________________
         CONFIG.Roll = SR5Roll;
 
         // Add Shadowrun configuration onto general Foundry config for module access.
-        // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
         CONFIG.Actor.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
@@ -463,6 +465,7 @@ ___________________
         CONFIG.Item.dataModels["spell"] = Spell;
         CONFIG.Item.dataModels["sprite_power"] = SpritePower;
         CONFIG.Item.dataModels["weapon"] = Weapon;
+        CONFIG.Item.dataModels["metatype"] = Metatype;
 
         CONFIG.time.turnTime = SR.combat.TURN_TIME_SECONDS;
         CONFIG.time.roundTime = SR.combat.ROUND_TIME_SECONDS;
@@ -531,6 +534,11 @@ ___________________
             makeDefault: true,
             types: ['skill']
         });
+        foundry.documents.collections.Items.registerSheet(SYSTEM_NAME, SR5MetatypeSheet, {
+            label: "SR5.SheetItem",
+            makeDefault: true,
+            types: ['metatype']
+        });
 
         // Register configs for embedded documents.
         foundry.applications.apps.DocumentSheetConfig.unregisterSheet(ActiveEffect, 'core', foundry.applications.sheets.ActiveEffectConfig);
@@ -558,6 +566,8 @@ ___________________
             Migrator.BeginMigration();
 
             await WorldTimeFlow.initialize();
+
+            await MetatypeItemResolver.syncRaceCompendiumLinkedItems();
 
             if (ChangelogApplication.showApplication)
                 new ChangelogApplication().render(true);

@@ -52,7 +52,58 @@ export const SR5 = {
         spell: 'SR5.ItemTypes.Spell',
         sprite_power: 'SR5.ItemTypes.SpritePower',
         weapon: 'SR5.ItemTypes.Weapon',
-        call_in_action: 'TYPES.Item.call_in_action'
+        call_in_action: 'TYPES.Item.call_in_action',
+        metatype: 'TYPES.Item.metatype'
+    },
+
+    metatypes: {
+        human: 'SR5.Character.Types.Human',
+        elf: 'SR5.Character.Types.Elf',
+        dwarf: 'SR5.Character.Types.Dwarf',
+        ork: 'SR5.Character.Types.Ork',
+        troll: 'SR5.Character.Types.Troll',
+    },
+
+    metaSubtypes: {
+        metahuman: 'SR5.MetaSubtypes.metahuman',
+        metasapient: 'SR5.MetaSubtypes.metasapient',
+        shapeshifter: 'SR5.MetaSubtypes.shapeshifter',
+        infected: 'SR5.MetaSubtypes.infected',
+        critter: 'SR5.MetaSubtypes.critter',
+        spirit: 'SR5.MetaSubtypes.spirit',
+        sprite: 'SR5.MetaSubtypes.sprite',
+        other: 'SR5.MetaSubtypes.other',
+    },
+
+    metasapientTypes: {
+        centaur: 'SR5.MetasapientTypes.Centaur',
+        naga: 'SR5.MetasapientTypes.Naga',
+        pixie: 'SR5.MetasapientTypes.Pixie',
+        sasquatch: 'SR5.MetasapientTypes.Sasquatch',
+    },
+
+    shapeshifterTypes: {
+        bovine: 'SR5.ShapeshifterTypes.Bovine',
+        canine: 'SR5.ShapeshifterTypes.Canine',
+        equine: 'SR5.ShapeshifterTypes.Equine',
+        falconine: 'SR5.ShapeshifterTypes.Falconine',
+        leonine: 'SR5.ShapeshifterTypes.Leonine',
+        lupine: 'SR5.ShapeshifterTypes.Lupine',
+        pantherine: 'SR5.ShapeshifterTypes.Pantherine',
+        tigrine: 'SR5.ShapeshifterTypes.Tigrine',
+        ursine: 'SR5.ShapeshifterTypes.Ursine',
+        vulpine: 'SR5.ShapeshifterTypes.Vulpine',
+    },
+
+    infectedTypes: {
+        banshee: 'SR5.InfectedTypes.Banshee',
+        dzoonooqua: 'SR5.InfectedTypes.DzooNooQua',
+        fomoraig: 'SR5.InfectedTypes.Fomoraig',
+        ghoul: 'SR5.InfectedTypes.Ghoul',
+        goblin: 'SR5.InfectedTypes.Goblin',
+        nosferatu: 'SR5.InfectedTypes.Nosferatu',
+        vampire: 'SR5.InfectedTypes.Vampire',
+        wendigo: 'SR5.InfectedTypes.Wendigo',
     },
 
     // All available attributes. These are available as testable attributes across all actor types.

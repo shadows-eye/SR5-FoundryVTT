@@ -5,6 +5,7 @@ import { NuyenManager } from '@/module/apps/actor/NuyenManager';
 import { KarmaManager } from '@/module/apps/actor/KarmaManager';
 import { ReputationManager } from '@/module/apps/actor/ReputationManager';
 import { isElementInstance } from '@/module/utils/dom';
+import { SR5Item } from '@/module/item/SR5Item';
 
 
 export interface CharacterSheetData extends MatrixActorSheetData {
@@ -39,7 +40,8 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'critter_power',
             'call_in_action',
             'sprite_power',
-            'ritual'
+            'ritual',
+            'metatype'
         ];
     }
 
@@ -68,6 +70,12 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             openNuyenManager: SR5CharacterSheet.#openNuyenManager,
             openKarmaManager: SR5CharacterSheet.#openKarmaManager,
             openReputationManager: SR5CharacterSheet.#openReputationManager,
+            manageKarma: SR5CharacterSheet.#openKarmaManager,
+            manageReputation: SR5CharacterSheet.#openReputationManager,
+            openMetatypeSheet: SR5CharacterSheet.#openMetatypeSheet,
+            removeMetatype: SR5CharacterSheet.#removeMetatype,
+            openRaceSheet: SR5CharacterSheet.#openMetatypeSheet,
+            removeRace: SR5CharacterSheet.#removeMetatype,
         }
     }
 
@@ -237,4 +245,19 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         await app.render(true);
     }
 
+    static async #openMetatypeSheet(this: SR5CharacterSheet, event: PointerEvent) {
+        event.preventDefault();
+        const metatypeItem = this.actor.metatypeItem;
+        if (metatypeItem?.sheet) {
+            metatypeItem.sheet.render(true);
+        }
+    }
+
+    static async #removeMetatype(this: SR5CharacterSheet, event: PointerEvent) {
+        event.preventDefault();
+        const metatypeItem = this.actor.items.find(i => i.isType('metatype'));
+        if (metatypeItem) {
+            await metatypeItem.delete();
+        }
+    }
 }

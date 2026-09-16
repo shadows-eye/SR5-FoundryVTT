@@ -1,4 +1,35 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    {{#if itemType.race.length}}
+        <div class="race-banner">
+            {{#each itemType.race}}
+                <div class="race-banner-info" data-item-id="{{this.id}}">
+                    <img src="{{this.img}}" data-action="openRaceSheet" data-tooltip="SR5.EditItem" />
+                    <div>
+                        <div class="race-banner-title">
+                            <span>{{this.name}}</span>
+                            {{#if this.system.race}}
+                                <span class="race-base-type">({{localizeTypeOr this.system.race @root.config.races}})</span>
+                            {{/if}}
+                        </div>
+                        <div class="race-banner-details">
+                            <span>{{localize "SR5.Subtype"}}: {{localize (concat 'SR5.RaceSubtypes.' this.system.subtype)}}</span>
+                            {{#if this.system.karma}}
+                                <span>{{localize "SR5.Labels.Karma"}}: {{this.system.karma}}</span>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+                <div class="race-banner-actions" data-item-id="{{this.id}}">
+                    <a data-action="openRaceSheet" data-tooltip="SR5.EditItem">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a data-action="removeRace" data-tooltip="SR5.Delete">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            {{/each}}
+        </div>
+    {{/if}}
     <div class="split-container">
         <div>
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/quality/header.hbs'

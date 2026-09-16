@@ -32,6 +32,7 @@ import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
+import { MetatypeFlow } from '@/module/flows/MetatypeFlow';
 import { ModifiableValueType } from '../types/template/Base';
 import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
@@ -239,8 +240,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         super.prepareDerivedData();
 
         const technology = this.getTechnologyData();
-        if (technology)
-            TechnologyPrep.calculateAttributes(this.system.attributes!);
+        if (technology && this.isType('device'))
+            TechnologyPrep.calculateAttributes(this.system.attributes);
 
         if (this.isType('host'))
             HostPrep.prepareDerivedData(this.system);
@@ -1583,6 +1584,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             UpdateSkillFlow.injectSkillCategoryDefaults(changed, this);
         }
 
+        if (this.isType('metatype') && this.actorOwner) {
+            await MetatypeFlow.onMetatypeUpdated(this.actorOwner, this, changed);
+        }
+
         return super._preUpdate(...args);
     }
 
@@ -1591,6 +1596,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param args
      */
     override async _preDelete(...args: Parameters<Item['_preDelete']>) {
+        if (this.isType('metatype') && this.actorOwner) {
+            await MetatypeFlow.onMetatypeDeleted(this.actorOwner, this);
+        }
         await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
     }

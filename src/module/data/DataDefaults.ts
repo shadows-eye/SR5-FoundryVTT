@@ -46,6 +46,7 @@ import { CorrectionLog, Sanitizer } from "../sanitizer/Sanitizer";
 
 import DataSchema = foundry.data.fields.DataSchema;
 import { Skill } from "../types/item/Skill";
+import { Metatype } from "../types/item/Metatype";
 const { SchemaField } = foundry.data.fields;
 
 const systemMap = {
@@ -81,6 +82,7 @@ const systemMap = {
     spell: Spell,
     sprite_power: SpritePower,
     weapon: Weapon,
+    metatype: Metatype,
 } as const;
 
 export type SystemEntityType = keyof typeof systemMap;

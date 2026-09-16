@@ -1808,7 +1808,32 @@
             "Sin": "SIN",
             "Spell": "Zauberspruch",
             "SpritePower": "Spritekraft",
-            "Weapon": "Waffe"
+            "Weapon": "Waffe",
+            "Race": "Metaspezies"
+        },
+        "Race": {
+            "BaseRace": "Hauptspezies",
+            "Subtype": "Unterart",
+            "KarmaCost": "Karmakosten",
+            "GrantedQualities": "Verliehene Vor-/Nachteile",
+            "GrantedWeapons": "Verliehene Waffen",
+            "GrantedItems": "Verliehene Gegenstände",
+            "DropToGrant": "Gegenstand hierher ziehen, um ihn dieser Metaspezies zuzuordnen",
+            "AttributeRanges": "Attributsbereiche",
+            "Min": "Min",
+            "Max": "Max",
+            "AugMax": "Aug Max",
+            "ChangeRace": "Spezies wechseln"
+        },
+        "RaceSubtypes": {
+            "metahuman": "Metamensch",
+            "metasapient": "Metasapient",
+            "shapeshifter": "Gestaltwandler",
+            "infected": "Infiziert",
+            "critter": "Kritter",
+            "spirit": "Geist",
+            "sprite": "Sprite",
+            "other": "Sonstiges"
         },
         "Karma": "Karma",
         "KarmaManager": {
@@ -3663,7 +3688,8 @@
             "spell": "Zauberspruch",
             "sprite_power": "Spritekraft",
             "vehicle": "Vehicle",
-            "weapon": "Waffe"
+            "weapon": "Waffe",
+            "race": "Spezies"
         }
     }
 }

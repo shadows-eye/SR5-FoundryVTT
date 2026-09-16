@@ -120,6 +120,27 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return OverwatchStorage.setOverwatchScore(this, value);
     }
 
+    /**
+     * Get the resolved Metatype item for this actor, either embedded or via runtime UUID resolution.
+     */
+    get metatypeItem(): SR5Item<'metatype'> | null {
+        if (!this.isType('character')) return null;
+        const embedded = this.items.find(i => i.isType('metatype'));
+        if (embedded) return embedded;
+        const uuid = this.system.metatypeUuid || this.system.raceUuid;
+        if (uuid) {
+            const doc = fromUuidSync(uuid);
+            if (doc instanceof SR5Item && doc.isType('metatype')) {
+                return doc;
+            }
+        }
+        return null;
+    }
+
+    get raceItem(): SR5Item<'metatype'> | null {
+        return this.metatypeItem;
+    }
+
     static override migrateData(source: any) {
         Migrator.migrate("Actor", source);
         return super.migrateData(source);
@@ -156,8 +177,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const [data, options] = args;
         await super._preCreate(...args);
 
-        // Abort skill creation data injection when duplicating
+        // Abort default item injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
+
         // Abort if a skillset was already assigned (e.g. during Chummer import)
         if (foundry.utils.getProperty(data, 'system.skillset')) return;
         // Abort when the creation request opted out of default skills

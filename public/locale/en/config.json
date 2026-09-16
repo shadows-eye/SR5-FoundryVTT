@@ -1815,7 +1815,70 @@
             "Sin": "SIN",
             "Spell": "Spell",
             "SpritePower": "Sprite Power",
-            "Weapon": "Weapon"
+            "Weapon": "Weapon",
+            "Race": "Race"
+        },
+        "Race": {
+            "BaseRace": "Main Race",
+            "Subtype": "Subtype",
+            "KarmaCost": "Karma Cost",
+            "GrantedQualities": "Granted Qualities",
+            "GrantedWeapons": "Granted Weapons",
+            "GrantedItems": "Granted Items",
+            "DropToGrant": "Drop item here to grant with this race",
+            "AttributeRanges": "Attribute Ranges",
+            "Min": "Min",
+            "Max": "Max",
+            "AugMax": "Aug Max",
+            "ChangeRace": "Change Race"
+        },
+        "RaceSubtypes": {
+            "metahuman": "Metahuman",
+            "metasapient": "Metasapient",
+            "shapeshifter": "Shapeshifter",
+            "infected": "Infected",
+            "critter": "Critter",
+            "spirit": "Spirit",
+            "sprite": "Sprite",
+            "other": "Other"
+        },
+        "MetaSubtypes": {
+            "metahuman": "Metahuman",
+            "metasapient": "Metasapient",
+            "shapeshifter": "Shapeshifter",
+            "infected": "Infected",
+            "critter": "Critter",
+            "spirit": "Spirit",
+            "sprite": "Sprite",
+            "other": "Other"
+        },
+        "MetasapientTypes": {
+            "Centaur": "Centaur",
+            "Naga": "Naga",
+            "Pixie": "Pixie",
+            "Sasquatch": "Sasquatch"
+        },
+        "ShapeshifterTypes": {
+            "Bovine": "Bovine",
+            "Canine": "Canine",
+            "Equine": "Equine",
+            "Falconine": "Falconine",
+            "Leonine": "Leonine",
+            "Lupine": "Lupine",
+            "Pantherine": "Pantherine",
+            "Tigrine": "Tigrine",
+            "Ursine": "Ursine",
+            "Vulpine": "Vulpine"
+        },
+        "InfectedTypes": {
+            "Banshee": "Banshee",
+            "DzooNooQua": "Dzoo-Noo-Qua",
+            "Fomoraig": "Fomoraig",
+            "Ghoul": "Ghoul",
+            "Goblin": "Goblin",
+            "Nosferatu": "Nosferatu",
+            "Vampire": "Vampire",
+            "Wendigo": "Wendigo"
         },
         "Karma": "Karma",
         "KarmaManager": {
@@ -3627,7 +3690,8 @@
             "spell": "Spell",
             "sprite_power": "Sprite Power",
             "vehicle": "Vehicle",
-            "weapon": "Weapon"
+            "weapon": "Weapon",
+            "race": "Race"
         }
     }
 }

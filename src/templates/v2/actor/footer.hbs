@@ -2,14 +2,40 @@
     <div class="list-item">
         {{#if (eq actor.type 'character')}}
             {{#if @root.isEditMode}}
-                <div class="basic-row">
-                    <label data-tooltip="{{systemFields.metatype.hint}}">{{systemFields.metatype.label}}</label>
-                    <span>
-                        {{formInput systemFields.metatype value=source.system.metatype rootId=rootId localize=true classes="short thicc" }}
-                    </span>
-                </div>
+                {{#if system.is_npc}}
+                    <div class="basic-row">
+                        <label data-tooltip="{{systemFields.metatype.hint}}">{{systemFields.metatype.label}}</label>
+                        <span>
+                            {{formInput systemFields.metatype value=source.system.metatype rootId=rootId choices=config.character.types localize=true classes="short thicc"}}
+                        </span>
+                    </div>
+                {{else}}
+                    <div class="basic-row race-drop-slot">
+                        <label>{{localize "TYPES.Item.race"}}</label>
+                        <span class="race-slot-display flexrow align-center gap-1" data-tooltip="{{localize 'SR5.Race.ChangeRace'}}">
+                            {{#if actor.raceItem}}
+                                <a data-action="openRaceSheet" class="flexrow align-center gap-1">
+                                    <img src="{{actor.raceItem.img}}" width="20" height="20" style="border:none;" />
+                                    <strong>{{actor.raceItem.name}}</strong>
+                                </a>
+                                <a data-action="removeRace" data-tooltip="SR5.Delete"><i class="fa-solid fa-times text-danger"></i></a>
+                            {{else}}
+                                <span class="text-muted">{{system.metatype}}</span>
+                            {{/if}}
+                        </span>
+                    </div>
+                {{/if}}
             {{else if (not system.is_critter)}}
-                <label>{{localizeOb system.metatype config.character.types}}</label>
+                <label>
+                    {{#if (and (not system.is_npc) actor.raceItem)}}
+                        <a data-action="openRaceSheet" class="flexrow align-center gap-1" data-tooltip="{{localize 'SR5.Race.BaseRace'}}: {{localizeOb actor.raceItem.system.race config.races}}">
+                            <img src="{{actor.raceItem.img}}" width="18" height="18" style="border:none;" />
+                            {{actor.raceItem.name}}
+                        </a>
+                    {{else}}
+                        {{localizeOb system.metatype config.character.types}}
+                    {{/if}}
+                </label>
             {{/if}}
 
             {{#if @root.isPlayMode}}
