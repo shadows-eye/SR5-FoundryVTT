@@ -3,7 +3,7 @@
   "type": "metatype",
   "flags": {
     "shadowrun5e": {
-      "racialItems": [
+      "metaTypesItems": [
         {
           "foundryUuid": "Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N",
           "chummerId": "02e76a38-304e-4a0e-93a3-ad2938306afc",

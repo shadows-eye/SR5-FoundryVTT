@@ -342,7 +342,8 @@
     }
 }
 
-// Race banner shown on actor sheet (bio tab)
+// Metatype banner shown on actor sheet (bio tab)
+.metatype-banner,
 .race-banner {
     margin-bottom: vars.$medium-distance;
     padding: vars.$small-distance vars.$medium-distance;
@@ -353,6 +354,7 @@
     align-items: center;
     justify-content: space-between;
 
+    .metatype-banner-info,
     .race-banner-info {
         display: flex;
         align-items: center;
@@ -366,6 +368,7 @@
             cursor: pointer;
         }
 
+        .metatype-banner-title,
         .race-banner-title {
             font-weight: bold;
             font-size: 1.05em;
@@ -374,6 +377,7 @@
             gap: vars.$small-distance;
             color: vars.$white;
 
+            .metatype-base-type,
             .race-base-type {
                 font-size: 0.85em;
                 font-weight: normal;
@@ -381,6 +385,7 @@
             }
         }
 
+        .metatype-banner-details,
         .race-banner-details {
             font-size: 0.8em;
             color: vars.$silver;
@@ -389,6 +394,7 @@
         }
     }
 
+    .metatype-banner-actions,
     .race-banner-actions {
         display: flex;
         gap: vars.$small-distance;
@@ -404,6 +410,7 @@
                 color: vars.$yellow;
             }
 
+            &[data-action="removeMetatype"],
             &[data-action="removeRace"] {
                 color: vars.$fLightRed;
 

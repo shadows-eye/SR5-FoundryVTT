@@ -231,6 +231,7 @@ declare module "fvtt-types/configuration" {
                 grantedByRace?: string;
                 grantedCategory?: string;
                 metatypeItems?: Array<{ id: string; name: string; type: string; chummerId?: string; foundryUuid?: string; category?: string }>;
+                metaTypesItems?: Array<{ id: string; name: string; type: string; chummerId?: string; foundryUuid?: string; category?: string }>;
                 racialItems?: Array<{ id: string; name: string; type: string; chummerId?: string; foundryUuid?: string; category?: string }>;
             };
         };

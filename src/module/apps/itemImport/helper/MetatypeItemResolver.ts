@@ -9,20 +9,22 @@ import { Constants } from '../importer/Constants';
 
 const { fromUuid } = foundry.utils;
 
-export interface RacialItemFlag {
+export interface MetatypeItemFlag {
     foundryUuid: string;
     chummerId: string;
     name: string;
     category?: string;
 }
 
+export type RacialItemFlag = MetatypeItemFlag;
+
 /**
  * Helper to resolve and automatically import linked metatype items into standard import compendiums.
  *
  * - **Triggered on World Load & Bulk Import**: In `hooks.ts` during the `ready` hook (only for GMs),
- *   and in `BulkImporter.ts` after parsing importers, it calls `MetatypeItemResolver.syncRaceCompendiumLinkedItems()`.
+ *   and in `BulkImporter.ts` after parsing importers, it calls `MetatypeItemResolver.syncMetatypeCompendiumLinkedItems()`.
  * - **Scans Metatype Compendium**: It inspects the metatype items in `packs/sr5e-metatypes` and extracts
- *   the items listed in `flags.shadowrun5e.racialItems` (Low-Light Vision, Thermographic Vision,
+ *   the items listed in `flags.shadowrun5e.metaTypesItems` (Low-Light Vision, Thermographic Vision,
  *   Resistance to Pathogens/Toxins, Dermal Deposits).
  * - **Checks Target Compendium**: It checks whether each item already exists in the standard
  *   empty import compendium (`world.sr5trait`). If already present, it skips it.
@@ -33,7 +35,7 @@ export interface RacialItemFlag {
 export class MetatypeItemResolver {
     private static fullQualitiesXml: string | null = null;
 
-    public static async syncRaceCompendiumLinkedItems(): Promise<void> {
+    public static async syncMetatypeCompendiumLinkedItems(): Promise<void> {
         const metatypePack = game.packs.get('shadowrun5e.sr5e-metatypes')
             || game.packs.get('sr5e-metatypes')
             || game.packs.get('shadowrun5e.sr5e-races')
@@ -41,16 +43,18 @@ export class MetatypeItemResolver {
         if (!metatypePack) return;
 
         const metatypeDocs = await metatypePack.getDocuments();
-        const itemsToResolve: RacialItemFlag[] = [];
+        const itemsToResolve: MetatypeItemFlag[] = [];
 
         for (const doc of metatypeDocs) {
             if (!(doc instanceof SR5Item)) continue;
-            const racialItems = doc.flags?.shadowrun5e?.racialItems || doc.flags?.shadowrun5e?.metatypeItems;
-            if (!racialItems || !Array.isArray(racialItems)) continue;
+            const items = doc.flags?.shadowrun5e?.metaTypesItems
+                || doc.flags?.shadowrun5e?.metatypeItems
+                || doc.flags?.shadowrun5e?.racialItems;
+            if (!items || !Array.isArray(items)) continue;
 
-            for (const item of racialItems) {
+            for (const item of items) {
                 if (!item.foundryUuid) continue;
-                itemsToResolve.push(item as RacialItemFlag);
+                itemsToResolve.push(item as MetatypeItemFlag);
             }
         }
 
@@ -63,7 +67,9 @@ export class MetatypeItemResolver {
         }
     }
 
-    public static async ensureItemImported(item: RacialItemFlag): Promise<void> {
+    public static syncRaceCompendiumLinkedItems = MetatypeItemResolver.syncMetatypeCompendiumLinkedItems;
+
+    public static async ensureItemImported(item: MetatypeItemFlag): Promise<void> {
         const targetId = item.foundryUuid.split('.').pop();
         if (!targetId) return;
 

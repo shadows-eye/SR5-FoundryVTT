@@ -183,7 +183,7 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.metatypeUuid, null);
         });
 
-        it('Base metatype items have empty descriptions and proper racialItems flags', async () => {
+        it('Base metatype items have empty descriptions and proper metaTypesItems flags', async () => {
             const trollData: Item.CreateData<'metatype'> = {
                 name: 'Troll',
                 type: 'metatype',
@@ -202,7 +202,7 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
                 },
                 flags: {
                     shadowrun5e: {
-                        racialItems: [
+                        metaTypesItems: [
                             {
                                 id: 'vtuieKxvSSfRyB2N',
                                 foundryUuid: 'Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N',
@@ -230,7 +230,7 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(trollItem.system.qualities[0], 'Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N');
             assert.strictEqual(trollItem.system.qualities[1], 'Compendium.world.sr5trait.Item.fydCbpyhuL0u6dfL');
 
-            const flags = trollItem.flags?.shadowrun5e?.racialItems;
+            const flags = trollItem.flags?.shadowrun5e?.metaTypesItems;
             assert.isArray(flags);
             assert.lengthOf(flags!, 2);
             assert.strictEqual(flags![0].chummerId, '02e76a38-304e-4a0e-93a3-ad2938306afc');

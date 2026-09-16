@@ -1,29 +1,29 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-    {{#if itemType.race.length}}
-        <div class="race-banner">
-            {{#each itemType.race}}
-                <div class="race-banner-info" data-item-id="{{this.id}}">
-                    <img src="{{this.img}}" data-action="openRaceSheet" data-tooltip="SR5.EditItem" />
+    {{#if itemType.metatype.length}}
+        <div class="metatype-banner">
+            {{#each itemType.metatype}}
+                <div class="metatype-banner-info" data-item-id="{{this.id}}">
+                    <img src="{{this.img}}" data-action="openMetatypeSheet" data-tooltip="SR5.EditItem" />
                     <div>
-                        <div class="race-banner-title">
+                        <div class="metatype-banner-title">
                             <span>{{this.name}}</span>
-                            {{#if this.system.race}}
-                                <span class="race-base-type">({{localizeTypeOr this.system.race @root.config.races}})</span>
+                            {{#if this.system.metatype}}
+                                <span class="metatype-base-type">({{localizeTypeOr this.system.metatype @root.config.metatypes}})</span>
                             {{/if}}
                         </div>
-                        <div class="race-banner-details">
-                            <span>{{localize "SR5.Subtype"}}: {{localize (concat 'SR5.RaceSubtypes.' this.system.subtype)}}</span>
+                        <div class="metatype-banner-details">
+                            <span>{{localize "SR5.Subtype"}}: {{localize (concat 'SR5.MetaSubtypes.' this.system.subtype)}}</span>
                             {{#if this.system.karma}}
                                 <span>{{localize "SR5.Labels.Karma"}}: {{this.system.karma}}</span>
                             {{/if}}
                         </div>
                     </div>
                 </div>
-                <div class="race-banner-actions" data-item-id="{{this.id}}">
-                    <a data-action="openRaceSheet" data-tooltip="SR5.EditItem">
+                <div class="metatype-banner-actions" data-item-id="{{this.id}}">
+                    <a data-action="openMetatypeSheet" data-tooltip="SR5.EditItem">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <a data-action="removeRace" data-tooltip="SR5.Delete">
+                    <a data-action="removeMetatype" data-tooltip="SR5.Delete">
                         <i class="fas fa-trash"></i>
                     </a>
                 </div>

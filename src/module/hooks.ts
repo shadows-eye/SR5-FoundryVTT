@@ -567,7 +567,7 @@ ___________________
 
             await WorldTimeFlow.initialize();
 
-            await MetatypeItemResolver.syncRaceCompendiumLinkedItems();
+            await MetatypeItemResolver.syncMetatypeCompendiumLinkedItems();
 
             if (ChangelogApplication.showApplication)
                 new ChangelogApplication().render(true);

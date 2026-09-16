@@ -3,7 +3,7 @@
   "type": "metatype",
   "flags": {
     "shadowrun5e": {
-      "racialItems": []
+      "metaTypesItems": []
     }
   },
   "img": "icons/svg/mystery-man.svg",

@@ -10,15 +10,15 @@
                         </span>
                     </div>
                 {{else}}
-                    <div class="basic-row race-drop-slot">
-                        <label>{{localize "TYPES.Item.race"}}</label>
-                        <span class="race-slot-display flexrow align-center gap-1" data-tooltip="{{localize 'SR5.Race.ChangeRace'}}">
-                            {{#if actor.raceItem}}
-                                <a data-action="openRaceSheet" class="flexrow align-center gap-1">
-                                    <img src="{{actor.raceItem.img}}" width="20" height="20" style="border:none;" />
-                                    <strong>{{actor.raceItem.name}}</strong>
+                    <div class="basic-row metatype-drop-slot">
+                        <label>{{localize "TYPES.Item.metatype"}}</label>
+                        <span class="metatype-slot-display flexrow align-center gap-1" data-tooltip="{{localize 'SR5.Metatype.ChangeMetatype'}}">
+                            {{#if actor.metatypeItem}}
+                                <a data-action="openMetatypeSheet" class="flexrow align-center gap-1">
+                                    <img src="{{actor.metatypeItem.img}}" width="20" height="20" style="border:none;" />
+                                    <strong>{{actor.metatypeItem.name}}</strong>
                                 </a>
-                                <a data-action="removeRace" data-tooltip="SR5.Delete"><i class="fa-solid fa-times text-danger"></i></a>
+                                <a data-action="removeMetatype" data-tooltip="SR5.Delete"><i class="fa-solid fa-times text-danger"></i></a>
                             {{else}}
                                 <span class="text-muted">{{system.metatype}}</span>
                             {{/if}}
@@ -27,10 +27,10 @@
                 {{/if}}
             {{else if (not system.is_critter)}}
                 <label>
-                    {{#if (and (not system.is_npc) actor.raceItem)}}
-                        <a data-action="openRaceSheet" class="flexrow align-center gap-1" data-tooltip="{{localize 'SR5.Race.BaseRace'}}: {{localizeOb actor.raceItem.system.race config.races}}">
-                            <img src="{{actor.raceItem.img}}" width="18" height="18" style="border:none;" />
-                            {{actor.raceItem.name}}
+                    {{#if (and (not system.is_npc) actor.metatypeItem)}}
+                        <a data-action="openMetatypeSheet" class="flexrow align-center gap-1" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}: {{localizeOb actor.metatypeItem.system.metatype config.metatypes}}">
+                            <img src="{{actor.metatypeItem.img}}" width="18" height="18" style="border:none;" />
+                            {{actor.metatypeItem.name}}
                         </a>
                     {{else}}
                         {{localizeOb system.metatype config.character.types}}

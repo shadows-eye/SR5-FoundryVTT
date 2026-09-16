@@ -401,9 +401,9 @@ export class BulkImporter extends BaseClass {
             }
 
             try {
-                await MetatypeItemResolver.syncRaceCompendiumLinkedItems();
+                await MetatypeItemResolver.syncMetatypeCompendiumLinkedItems();
             } catch (err) {
-                console.error("Failed to sync race compendium linked items:", err);
+                console.error("Failed to sync metatype compendium linked items:", err);
             }
 
             // Lock all compendiums and update compendium order
