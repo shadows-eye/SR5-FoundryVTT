@@ -1,13 +1,30 @@
 {
   "name": "Dwarf",
   "type": "race",
-  "flags": {},
+  "flags": {
+    "shadowrun5e": {
+      "racialItems": [
+        {
+          "foundryUuid": "Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N",
+          "chummerId": "02e76a38-304e-4a0e-93a3-ad2938306afc",
+          "name": "Thermographic Vision",
+          "category": "quality"
+        },
+        {
+          "foundryUuid": "Compendium.world.sr5trait.Item.RLIafbng3xgFpxEr",
+          "chummerId": "139ca69c-e9d3-4540-a4c6-b8c778e70185",
+          "name": "Resistance to Pathogens/Toxins",
+          "category": "quality"
+        }
+      ]
+    }
+  },
   "img": "icons/svg/mystery-man.svg",
   "effects": [],
   "_id": "k0doU8BSHbT9uBiR",
   "system": {
     "description": {
-      "value": "<p>Dwarves are shorter and stockier than humans, renowned for their endurance and strength.</p>",
+      "value": "",
       "chat": "",
       "source": "SR5"
     },
@@ -62,7 +79,10 @@
         "aug_max": 9
       }
     },
-    "qualities": [],
+    "qualities": [
+      "Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N",
+      "Compendium.world.sr5trait.Item.RLIafbng3xgFpxEr"
+    ],
     "weapons": [],
     "items": []
   },

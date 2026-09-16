@@ -183,6 +183,56 @@ export const shadowrunRaceItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.raceUuid, null);
         });
 
+        it('Base race items have empty descriptions and proper racialItems flags', async () => {
+            const trollData = {
+                name: 'Troll',
+                type: 'race',
+                system: {
+                    description: { value: '', chat: '', source: 'SR5' },
+                    race: 'troll',
+                    subtype: 'metahuman',
+                    karma: 90,
+                    attributes: { body: { min: 5, max: 10, aug_max: 15 } },
+                    qualities: [
+                        'Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N',
+                        'Compendium.world.sr5trait.Item.fydCbpyhuL0u6dfL'
+                    ],
+                    weapons: [],
+                    items: [],
+                },
+                flags: {
+                    shadowrun5e: {
+                        racialItems: [
+                            {
+                                foundryUuid: 'Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N',
+                                chummerId: '02e76a38-304e-4a0e-93a3-ad2938306afc',
+                                name: 'Thermographic Vision',
+                                category: 'quality'
+                            },
+                            {
+                                foundryUuid: 'Compendium.world.sr5trait.Item.fydCbpyhuL0u6dfL',
+                                chummerId: '72d1d797-4b61-4fbd-97b7-ffb8ea9ddf36',
+                                name: 'Dermal Deposits',
+                                category: 'quality'
+                            }
+                        ]
+                    }
+                }
+            };
+
+            const trollItem = await factory.createItem(trollData as any) as SR5Item<'race'>;
+            assert.strictEqual(trollItem.system.description.value, '', 'Race description should remain empty');
+            assert.lengthOf(trollItem.system.qualities, 2);
+            assert.strictEqual(trollItem.system.qualities[0], 'Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N');
+            assert.strictEqual(trollItem.system.qualities[1], 'Compendium.world.sr5trait.Item.fydCbpyhuL0u6dfL');
+
+            const flags = (trollItem.flags as any)?.shadowrun5e?.racialItems;
+            assert.isArray(flags);
+            assert.lengthOf(flags, 2);
+            assert.strictEqual(flags[0].chummerId, '02e76a38-304e-4a0e-93a3-ad2938306afc');
+            assert.strictEqual(flags[1].chummerId, '72d1d797-4b61-4fbd-97b7-ffb8ea9ddf36');
+        });
+
         it('NPC grunt metatype applies metatype modifiers to attributes', async () => {
             const grunt = await factory.createActor({
                 type: 'character',

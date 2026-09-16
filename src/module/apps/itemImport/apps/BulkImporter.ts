@@ -22,6 +22,7 @@ import { WareImporter } from "../importer/WareImporter";
 import { WareModImporter } from "../importer/WareModImporter";
 import { WeaponImporter } from "../importer/WeaponImporter";
 import { WeaponModImporter } from "../importer/WeaponModImporter";
+import { RaceImporter } from "../importer/RaceImporter";
 
 import AppV2 = foundry.applications.api.ApplicationV2;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -152,6 +153,7 @@ export class BulkImporter extends BaseClass {
         new ArmorModImporter(),
         new ArmorImporter(),
         new ActionImporter(),
+        new RaceImporter(),
     ] as const satisfies readonly DataImporter[];
 
     /**

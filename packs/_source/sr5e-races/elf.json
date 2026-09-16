@@ -1,13 +1,24 @@
 {
   "name": "Elf",
   "type": "race",
-  "flags": {},
+  "flags": {
+    "shadowrun5e": {
+      "racialItems": [
+        {
+          "foundryUuid": "Compendium.world.sr5trait.Item.i61WxQUa89ZPeHCf",
+          "chummerId": "8ec5c9bb-aeb9-42f2-a436-a60f764adfe4",
+          "name": "Low-Light Vision",
+          "category": "quality"
+        }
+      ]
+    }
+  },
   "img": "icons/svg/mystery-man.svg",
   "effects": [],
   "_id": "8h12SU264mj8RveP",
   "system": {
     "description": {
-      "value": "<p>Elves are taller and more slender than humans, known for their agility and charisma.</p>",
+      "value": "",
       "chat": "",
       "source": "SR5"
     },
@@ -62,7 +73,9 @@
         "aug_max": 9
       }
     },
-    "qualities": [],
+    "qualities": [
+      "Compendium.world.sr5trait.Item.i61WxQUa89ZPeHCf"
+    ],
     "weapons": [],
     "items": []
   },

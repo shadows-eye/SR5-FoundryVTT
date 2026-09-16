@@ -25,6 +25,7 @@ import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
 import { ExtendedTestDueFlow } from './flows/ExtendedTestDueFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
+import { RaceItemResolver } from './apps/itemImport/helper/RaceItemResolver';
 import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
 import { ChangelogApplication } from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
@@ -566,6 +567,8 @@ ___________________
             Migrator.BeginMigration();
 
             await WorldTimeFlow.initialize();
+
+            await RaceItemResolver.syncRaceCompendiumLinkedItems();
 
             if (ChangelogApplication.showApplication)
                 new ChangelogApplication().render(true);

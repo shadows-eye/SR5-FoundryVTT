@@ -1,13 +1,17 @@
 {
   "name": "Human",
   "type": "race",
-  "flags": {},
+  "flags": {
+    "shadowrun5e": {
+      "racialItems": []
+    }
+  },
   "img": "icons/svg/mystery-man.svg",
   "effects": [],
   "_id": "dncIKczU9rLT6iLQ",
   "system": {
     "description": {
-      "value": "<p>Humans are the baseline metatype in the Sixth World.</p>",
+      "value": "",
       "chat": "",
       "source": "SR5"
     },
