@@ -865,21 +865,24 @@
             "Spell": "Sort",
             "SpritePower": "Pouvoir de Sprite",
             "Weapon": "Arme",
-            "Race": "Race"
+            "Metatype": "Métatype"
         },
-        "Race": {
-            "BaseRace": "Race principale",
+        "Metatype": {
+            "label": "Métatype",
+            "BaseMetatype": "Métatype de base",
+            "Category": "Catégorie",
             "Subtype": "Sous-type",
+            "Subsubtype": "Sous-variante",
             "KarmaCost": "Coût en Karma",
             "GrantedQualities": "Avantages accordés",
             "GrantedWeapons": "Armes accordées",
             "GrantedItems": "Objets accordés",
-            "DropToGrant": "Glisser un objet ici pour l'accorder avec cette race",
+            "DropToGrant": "Glisser un objet ici pour l'accorder avec ce métatype",
             "AttributeRanges": "Plages d'attributs",
             "Min": "Min",
             "Max": "Max",
             "AugMax": "Aug Max",
-            "ChangeRace": "Changer de race"
+            "ChangeMetatype": "Changer de métatype"
         },
         "Immunity": "Immunité",
         "ImmunityToNormalWeapons": "Immunité aux armes normales",
@@ -987,7 +990,6 @@
         "MeatSpaceInit": "Init. terrestre",
         "MeleeWeaponAttack": "Attaque arme de mélée",
         "MentalLimit": "Limite Mentale",
-        "Metatype": "Métatype",
         "MigrationComplete": "Migration Complète",
         "MigrationUpdateCompendiumNoUpdateActor": "A cause de limitations techniques avec FoundryVTT, le pack compendium d'acteurs ne peuvent pas être mis à jour. Vous devez mettre à jour ce pack manuellement.",
         "MigrationUpdateCompendiumUpdateMessage": "Chaque compendium pack du monde qui existe ont été mis à jour",
@@ -1637,7 +1639,7 @@
             "sprite_power": "Pouvoir de sprite",
             "vehicle": "Véhicule",
             "weapon": "Arme",
-            "race": "Race"
+            "metatype": "Métatype"
         }
     }
 }

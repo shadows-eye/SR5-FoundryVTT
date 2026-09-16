@@ -1,14 +1,14 @@
 <div>
-    <div class="sheet-header race-sheet-header">
+    <div class="sheet-header metatype-sheet-header">
         <img class="sheet-image" src="{{item.img}}" data-tooltip="{{#if @root.isEditMode}}{{item.img}}{{else}}{{item.name}}{{/if}}"
              {{#if @root.isEditMode}}
                  data-edit="img"
                  data-action="editImage"
              {{/if}}
         />
-        <div class="sheet-header-labels race-sheet-header-body">
-            <div class="race-sheet-header-main">
-                <div class="race-sheet-header-center">
+        <div class="sheet-header-labels metatype-sheet-header-body">
+            <div class="metatype-sheet-header-main">
+                <div class="metatype-sheet-header-center">
                     <div class="sheet-header-name">
                         <span class="sheet-header-name-input">
                             {{#if @root.isEditMode}}
@@ -19,7 +19,7 @@
                             {{/if}}
                         </span>
                     </div>
-                    <div class="sheet-header-source race-sheet-header-source">
+                    <div class="sheet-header-source metatype-sheet-header-source">
                         <label>{{localize "SR5.Source"}}</label>
                         {{#if @root.isEditMode}}
                             {{formInput systemFields.description.fields.source value=source.system.description.source
@@ -29,21 +29,61 @@
                         {{/if}}
                     </div>
                 </div>
-                <div class="item-type-container race-header-meta">
-                    <div class="race-header-meta-row">
-                        <label>{{localize "SR5.Race.BaseRace"}}</label>
+                <div class="item-type-container metatype-header-meta">
+                    {{!-- Category (subtype: metahuman, shapeshifter, infected, metasapient, etc.) --}}
+                    <div class="metatype-header-meta-row">
+                        <label>{{localize "SR5.Metatype.Category"}}</label>
                         <span>
                             {{#if @root.isEditMode}}
-                                <select name="system.race" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Race.BaseRace'}}">
-                                    {{#each localizedRaces}}
-                                        <option value="{{@key}}" {{#if (eq @key @root.system.race)}}selected{{/if}}>{{this}}</option>
+                                <select name="system.subtype" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Metatype.Category'}}">
+                                    {{#each localizedMetaSubtypes}}
+                                        <option value="{{@key}}" {{#if (eq @key @root.system.subtype)}}selected{{/if}}>{{this}}</option>
                                     {{/each}}
                                 </select>
                             {{else}}
-                                <input type="text" class="short" value="{{lookup localizedRaces system.race}}" disabled>
+                                <input type="text" class="short" value="{{lookup localizedMetaSubtypes system.subtype}}" disabled>
                             {{/if}}
                         </span>
                     </div>
+
+                    {{!-- Base Metatype (metatype: human, elf, dwarf, ork, troll) --}}
+                    <div class="metatype-header-meta-row">
+                        <label>{{localize "SR5.Metatype.BaseMetatype"}}</label>
+                        <span>
+                            {{#if @root.isEditMode}}
+                                <select name="system.metatype" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">
+                                    {{#each localizedMetatypes}}
+                                        <option value="{{@key}}" {{#if (eq @key @root.system.metatype)}}selected{{/if}}>{{this}}</option>
+                                    {{/each}}
+                                </select>
+                            {{else}}
+                                <input type="text" class="short" value="{{lookup localizedMetatypes system.metatype}}" disabled>
+                            {{/if}}
+                        </span>
+                    </div>
+
+                    {{!-- Subvariant (subsubtype: Centaur, Naga, Lupine, etc., if applicable or set) --}}
+                    {{#if (or hasSubsubtypes system.subsubtype)}}
+                        <div class="metatype-header-meta-row">
+                            <label>{{localize "SR5.Metatype.Subsubtype"}}</label>
+                            <span>
+                                {{#if @root.isEditMode}}
+                                    {{#if hasSubsubtypes}}
+                                        <select name="system.subsubtype" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Metatype.Subsubtype'}}">
+                                            <option value="">—</option>
+                                            {{#each subsubtypes}}
+                                                <option value="{{@key}}" {{#if (eq @key @root.system.subsubtype)}}selected{{/if}}>{{this}}</option>
+                                            {{/each}}
+                                        </select>
+                                    {{else}}
+                                        <input type="text" name="system.subsubtype" class="short" value="{{system.subsubtype}}" />
+                                    {{/if}}
+                                {{else}}
+                                    <input type="text" class="short" value="{{#if hasSubsubtypes}}{{lookup subsubtypes system.subsubtype}}{{else}}{{system.subsubtype}}{{/if}}" disabled>
+                                {{/if}}
+                            </span>
+                        </div>
+                    {{/if}}
                 </div>
             </div>
         </div>

@@ -1,27 +1,26 @@
 @use 'sass:color';
 @use '../config/variables' as vars;
 
-.sr5v2.item.race-sheet,
-.sr5v2.item.race,
-.sr5v2.race-sheet,
-.race-sheet {
+.sr5v2.item.metatype-sheet,
+.sr5v2.item.metatype,
+.metatype-sheet {
     // Header layout
-    .race-sheet-header {
+    .metatype-sheet-header {
         align-items: flex-end;
     }
 
-    .race-sheet-header-body {
+    .metatype-sheet-header-body {
         justify-content: space-between;
     }
 
-    .race-sheet-header-main {
+    .metatype-sheet-header-main {
         display: flex;
         flex-flow: row nowrap;
         align-items: flex-start;
         gap: vars.$large-distance;
     }
 
-    .race-sheet-header-center {
+    .metatype-sheet-header-center {
         flex: 1 1 auto;
         min-width: 0;
         display: flex;
@@ -34,7 +33,7 @@
             min-width: 0;
         }
 
-        .race-sheet-header-source {
+        .metatype-sheet-header-source {
             display: flex;
             flex-flow: row nowrap;
             align-items: center;
@@ -55,21 +54,23 @@
         }
     }
 
-    .race-header-meta {
+    .metatype-header-meta {
+        display: flex;
+        flex-direction: column;
         justify-content: flex-start;
         align-items: stretch;
-        flex: 0 0 14rem;
+        flex: 0 0 16rem;
         gap: vars.$small-distance;
         padding: 0 vars.$large-distance;
 
-        .race-header-meta-row {
+        .metatype-header-meta-row {
             display: flex;
             flex-flow: row nowrap;
             align-items: center;
-            gap: vars.$large-distance;
+            gap: vars.$small-distance;
 
             label {
-                flex: 0 0 5rem;
+                flex: 0 0 6.5rem;
                 white-space: nowrap;
                 font-size: 0.85rem;
                 font-weight: bold;
@@ -89,13 +90,23 @@
                     border-radius: vars.$radius;
                     font-size: 0.85rem;
                     text-align: center;
+                    padding: 0.15rem 0.3rem;
+                    height: 1.6rem;
+
+                    &:disabled {
+                        background: vars.$dark2;
+                        border: 1px solid vars.$dark;
+                        color: vars.$white;
+                        opacity: 0.95;
+                        cursor: default;
+                    }
                 }
             }
         }
     }
 
     // Top meta bar (Karma Cost)
-    .race-meta-bar {
+    .metatype-meta-bar {
         display: flex;
         align-items: center;
         gap: vars.$large-distance;
@@ -105,7 +116,7 @@
         border-radius: vars.$radius;
         margin-bottom: vars.$medium-distance;
 
-        .race-meta-field {
+        .metatype-meta-field {
             display: flex;
             align-items: center;
             gap: vars.$medium-distance;
@@ -159,13 +170,13 @@
     }
 
     // Neat 2-Column Attribute Grid
-    .race-attribute-grid {
+    .metatype-attribute-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: vars.$small-distance vars.$medium-distance;
         margin-bottom: vars.$medium-distance;
 
-        .race-attribute-row {
+        .metatype-attribute-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -343,8 +354,7 @@
 }
 
 // Metatype banner shown on actor sheet (bio tab)
-.metatype-banner,
-.race-banner {
+.metatype-banner {
     margin-bottom: vars.$medium-distance;
     padding: vars.$small-distance vars.$medium-distance;
     background: vars.$fadedBlack;
@@ -354,8 +364,7 @@
     align-items: center;
     justify-content: space-between;
 
-    .metatype-banner-info,
-    .race-banner-info {
+    .metatype-banner-info {
         display: flex;
         align-items: center;
         gap: vars.$large-distance;
@@ -368,8 +377,7 @@
             cursor: pointer;
         }
 
-        .metatype-banner-title,
-        .race-banner-title {
+        .metatype-banner-title {
             font-weight: bold;
             font-size: 1.05em;
             display: flex;
@@ -377,16 +385,14 @@
             gap: vars.$small-distance;
             color: vars.$white;
 
-            .metatype-base-type,
-            .race-base-type {
+            .metatype-base-type {
                 font-size: 0.85em;
                 font-weight: normal;
                 color: vars.$silver;
             }
         }
 
-        .metatype-banner-details,
-        .race-banner-details {
+        .metatype-banner-details {
             font-size: 0.8em;
             color: vars.$silver;
             display: flex;
@@ -394,8 +400,7 @@
         }
     }
 
-    .metatype-banner-actions,
-    .race-banner-actions {
+    .metatype-banner-actions {
         display: flex;
         gap: vars.$small-distance;
 
@@ -410,8 +415,7 @@
                 color: vars.$yellow;
             }
 
-            &[data-action="removeMetatype"],
-            &[data-action="removeRace"] {
+            &[data-action="removeMetatype"] {
                 color: vars.$fLightRed;
 
                 &:hover {
@@ -421,4 +425,3 @@
         }
     }
 }
-

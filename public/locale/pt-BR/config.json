@@ -1112,23 +1112,26 @@
             "Spell": "Feitiço",
             "SpritePower": "Poder de Sprite",
             "Weapon": "Arma",
-            "Race": "Raça"
+            "Metatype": "Metatipo"
         },
-        "Race": {
-            "BaseRace": "Raça Principal",
+        "Metatype": {
+            "label": "Metatipo",
+            "BaseMetatype": "Metatipo Principal",
+            "Category": "Categoria",
             "Subtype": "Subtipo",
+            "Subsubtype": "Subvariante",
             "KarmaCost": "Custo de Carma",
             "GrantedQualities": "Qualidades Concedidas",
             "GrantedWeapons": "Armas Concedidas",
             "GrantedItems": "Itens Concedidos",
-            "DropToGrant": "Solte o item aqui para conceder com esta raça",
+            "DropToGrant": "Solte o item aqui para conceder com este metatipo",
             "AttributeRanges": "Intervalos de Atributos",
             "Min": "Mín",
             "Max": "Máx",
             "AugMax": "Máx Aumentado",
-            "ChangeRace": "Mudar Raça"
+            "ChangeMetatype": "Mudar Metatipo"
         },
-        "RaceSubtypes": {
+        "MetaSubtypes": {
             "metahuman": "Meta-humano",
             "metasapient": "Meta-sapiente",
             "shapeshifter": "Metamorfo",
@@ -1293,7 +1296,6 @@
         "MentalLimit": "Limite Mental",
         "Metamagic": "Metamagia",
         "Metamagics": "Metamagias",
-        "Metatype": "Metatipo",
         "MigrationComplete": "Migração Completa",
         "MigrationUpdateCompendiumNoUpdateActor": "Devido a limitações técnicas dentro do FoundryVTT, os pacotes de compêndio de atores não podem ser atualizados neste momento. Você terá que atualizar esses pacotes manualmente.",
         "MigrationUpdateCompendiumUpdateMessage": "Quaisquer pacotes de compêndio do mundo que existam no mundo também foram atualizados",
@@ -2289,7 +2291,7 @@
             "sprite_power": "Poder de Sprite",
             "vehicle": "Veículo",
             "weapon": "Arma",
-            "race": "Raça"
+            "metatype": "Metatipo"
         }
     }
 }

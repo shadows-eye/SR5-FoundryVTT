@@ -1,9 +1,9 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="scrollable">
         {{!-- Karma Cost Bar --}}
-        <div class="race-meta-bar">
-            <div class="race-meta-field">
-                <label>{{localize "SR5.Race.KarmaCost"}}:</label>
+        <div class="metatype-meta-bar">
+            <div class="metatype-meta-field">
+                <label>{{localize "SR5.Metatype.KarmaCost"}}:</label>
                 {{#if @root.isEditMode}}
                     <input type="number" name="system.karma" value="{{source.system.karma}}" class="compact-number-input" min="0" />
                 {{else}}
@@ -14,28 +14,28 @@
 
         {{!-- Attribute Ranges in a Neat 2-Column Grid --}}
         <div class="attribute-ranges-section">
-            <h3>{{localize "SR5.Race.AttributeRanges"}}</h3>
-            <div class="race-attribute-grid">
+            <h3>{{localize "SR5.Metatype.AttributeRanges"}}</h3>
+            <div class="metatype-attribute-grid">
                 {{#each attributesList}}
-                <div class="race-attribute-row">
+                <div class="metatype-attribute-row">
                     <span class="attr-label" data-tooltip="{{this.label}}">{{this.label}}</span>
                     {{#if @root.isEditMode}}
                         <div class="attr-inputs">
-                            <div class="attr-input-group" data-tooltip="{{localize 'SR5.Race.Min'}}">
-                                <span class="sub-label">{{localize 'SR5.Race.Min'}}</span>
+                            <div class="attr-input-group" data-tooltip="{{localize 'SR5.Metatype.Min'}}">
+                                <span class="sub-label">{{localize 'SR5.Metatype.Min'}}</span>
                                 <input type="number" name="system.attributes.{{this.key}}.min" value="{{this.min}}" class="compact-cell" min="1" max="30" />
                             </div>
-                            <div class="attr-input-group" data-tooltip="{{localize 'SR5.Race.Max'}}">
-                                <span class="sub-label">{{localize 'SR5.Race.Max'}}</span>
+                            <div class="attr-input-group" data-tooltip="{{localize 'SR5.Metatype.Max'}}">
+                                <span class="sub-label">{{localize 'SR5.Metatype.Max'}}</span>
                                 <input type="number" name="system.attributes.{{this.key}}.max" value="{{this.max}}" class="compact-cell" min="1" max="30" />
                             </div>
-                            <div class="attr-input-group" data-tooltip="{{localize 'SR5.Race.AugMax'}}">
-                                <span class="sub-label">{{localize 'SR5.Race.AugMax'}}</span>
+                            <div class="attr-input-group" data-tooltip="{{localize 'SR5.Metatype.AugMax'}}">
+                                <span class="sub-label">{{localize 'SR5.Metatype.AugMax'}}</span>
                                 <input type="number" name="system.attributes.{{this.key}}.aug_max" value="{{this.aug_max}}" class="compact-cell" min="1" max="45" />
                             </div>
                         </div>
                     {{else}}
-                        <div class="attr-range-display" data-tooltip="{{localize 'SR5.Race.Min'}}: {{this.min}} | {{localize 'SR5.Race.Max'}}: {{this.max}} | {{localize 'SR5.Race.AugMax'}}: {{this.aug_max}}">
+                        <div class="attr-range-display" data-tooltip="{{localize 'SR5.Metatype.Min'}}: {{this.min}} | {{localize 'SR5.Metatype.Max'}}: {{this.max}} | {{localize 'SR5.Metatype.AugMax'}}: {{this.aug_max}}">
                             <span class="range-part">{{this.min}}</span>
                             <span class="range-sep">/</span>
                             <span class="range-part">{{this.max}}</span>
@@ -49,7 +49,7 @@
 
         {{!-- Granted Items / Qualities / Weapons --}}
         <div class="granted-section">
-            <h3>{{localize "SR5.Race.GrantedQualities"}}</h3>
+            <h3>{{localize "SR5.Metatype.GrantedQualities"}}</h3>
             <div class="drop-zone" data-drop-category="qualities">
                 {{#if resolvedQualities.length}}
                     <div class="granted-items-list">
@@ -61,16 +61,16 @@
                                     <a data-action="removeGrantedUuid" data-category="qualities" data-uuid="{{this.uuid}}" data-tooltip="SR5.Delete">
                                         <i class="fa-solid fa-times"></i>
                                     </a>
-                                {{/if}}
+                                    {{/if}}
                             </div>
                         {{/each}}
                     </div>
                 {{else}}
-                    <p class="text-muted">{{localize "SR5.Race.DropToGrant"}}</p>
+                    <p class="text-muted">{{localize "SR5.Metatype.DropToGrant"}}</p>
                 {{/if}}
             </div>
 
-            <h3>{{localize "SR5.Race.GrantedWeapons"}}</h3>
+            <h3>{{localize "SR5.Metatype.GrantedWeapons"}}</h3>
             <div class="drop-zone" data-drop-category="weapons">
                 {{#if resolvedWeapons.length}}
                     <div class="granted-items-list">
@@ -87,11 +87,11 @@
                         {{/each}}
                     </div>
                 {{else}}
-                    <p class="text-muted">{{localize "SR5.Race.DropToGrant"}}</p>
+                    <p class="text-muted">{{localize "SR5.Metatype.DropToGrant"}}</p>
                 {{/if}}
             </div>
 
-            <h3>{{localize "SR5.Race.GrantedItems"}}</h3>
+            <h3>{{localize "SR5.Metatype.GrantedItems"}}</h3>
             <div class="drop-zone" data-drop-category="items">
                 {{#if resolvedItems.length}}
                     <div class="granted-items-list">
@@ -108,7 +108,7 @@
                         {{/each}}
                     </div>
                 {{else}}
-                    <p class="text-muted">{{localize "SR5.Race.DropToGrant"}}</p>
+                    <p class="text-muted">{{localize "SR5.Metatype.DropToGrant"}}</p>
                 {{/if}}
             </div>
         </div>

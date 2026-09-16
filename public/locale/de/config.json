@@ -1809,23 +1809,48 @@
             "Spell": "Zauberspruch",
             "SpritePower": "Spritekraft",
             "Weapon": "Waffe",
-            "Race": "Metaspezies"
+            "Metatype": "Metatyp"
         },
-        "Race": {
-            "BaseRace": "Hauptspezies",
+        "Metatype": {
+            "label": "Metatyp",
+            "BaseMetatype": "Hauptspezies",
+            "Category": "Kategorie",
             "Subtype": "Unterart",
+            "Subsubtype": "Subvariante",
             "KarmaCost": "Karmakosten",
             "GrantedQualities": "Verliehene Vor-/Nachteile",
             "GrantedWeapons": "Verliehene Waffen",
             "GrantedItems": "Verliehene Gegenstände",
-            "DropToGrant": "Gegenstand hierher ziehen, um ihn dieser Metaspezies zuzuordnen",
+            "DropToGrant": "Gegenstand hierher ziehen, um ihn diesem Metatyp zuzuordnen",
             "AttributeRanges": "Attributsbereiche",
             "Min": "Min",
             "Max": "Max",
             "AugMax": "Aug Max",
-            "ChangeRace": "Spezies wechseln"
+            "ChangeMetatype": "Metatyp wechseln",
+            "FIELDS": {
+                "metatype": {
+                    "label": "Hauptspezies",
+                    "hint": "Basis-Metatyp"
+                },
+                "subtype": {
+                    "label": "Kategorie",
+                    "hint": "Metatyp-Kategorie"
+                },
+                "subsubtype": {
+                    "label": "Subvariante",
+                    "hint": "Spezifische Spezies, Stamm oder Tiergestalt"
+                },
+                "karma": {
+                    "label": "Karmakosten",
+                    "hint": "Karmakosten für diesen Metatyp"
+                },
+                "attributes": {
+                    "label": "Attributsbereiche",
+                    "hint": "Min, Max und Aug Max Attributswerte"
+                }
+            }
         },
-        "RaceSubtypes": {
+        "MetaSubtypes": {
             "metahuman": "Metamensch",
             "metasapient": "Metasapient",
             "shapeshifter": "Gestaltwandler",
@@ -1834,6 +1859,34 @@
             "spirit": "Geist",
             "sprite": "Sprite",
             "other": "Sonstiges"
+        },
+        "MetasapientTypes": {
+            "Centaur": "Zentaur",
+            "Naga": "Naga",
+            "Pixie": "Pixie",
+            "Sasquatch": "Sasquatch"
+        },
+        "ShapeshifterTypes": {
+            "Bovine": "Bovin",
+            "Canine": "Canin",
+            "Equine": "Equin",
+            "Falconine": "Falconin",
+            "Leonine": "Leonin",
+            "Lupine": "Lupin",
+            "Pantherine": "Pantherin",
+            "Tigrine": "Tigrin",
+            "Ursine": "Ursin",
+            "Vulpine": "Vulpin"
+        },
+        "InfectedTypes": {
+            "Banshee": "Banshee",
+            "DzooNooQua": "Dzoo-Noo-Qua",
+            "Fomoraig": "Fomoraig",
+            "Ghoul": "Ghul",
+            "Goblin": "Goblin",
+            "Nosferatu": "Nosferatu",
+            "Vampire": "Vampir",
+            "Wendigo": "Wendigo"
         },
         "Karma": "Karma",
         "KarmaManager": {
@@ -2117,7 +2170,6 @@
         },
         "Metamagic": "Metamagie",
         "Metamagics": "Metamagie",
-        "Metatype": "Metatyp",
         "MigrationComplete": "Migration vollständig",
         "MigrationUpdateCompendiumNoUpdateActor": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kompendien vom Typ Acteur manuell aktualisiert werden.",
         "MigrationUpdateCompendiumUpdateMessage": "Alle in der Welt vorhandenen Kompendiumpakete wurden aktualisiert",
@@ -3689,7 +3741,7 @@
             "sprite_power": "Spritekraft",
             "vehicle": "Vehicle",
             "weapon": "Waffe",
-            "race": "Spezies"
+            "metatype": "Metatyp"
         }
     }
 }
