@@ -105,6 +105,63 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(ranges.agility.aug_max, 10);
         });
 
+        it('Switching from Troll to Elf resets attributes to 0 and applies Elf attribute changes', async () => {
+            const character = await factory.createActor({ type: 'character' });
+
+            const trollData: Item.CreateData<'metatype'> = {
+                name: 'Troll',
+                type: 'metatype',
+                system: {
+                    metatype: 'troll',
+                    subtype: 'metahuman',
+                    karma: 90,
+                    attributes: {
+                        body: { min: 5, max: 10, aug_max: 15 },
+                        strength: { min: 5, max: 10, aug_max: 15 },
+                        agility: { min: 1, max: 5, aug_max: 8 },
+                        charisma: { min: 1, max: 4, aug_max: 6 },
+                    },
+                    qualities: [],
+                    weapons: [],
+                    items: [],
+                },
+            };
+
+            const elfData: Item.CreateData<'metatype'> = {
+                name: 'Elf',
+                type: 'metatype',
+                system: {
+                    metatype: 'elf',
+                    subtype: 'metahuman',
+                    karma: 40,
+                    attributes: {
+                        body: { min: 1, max: 6, aug_max: 9 },
+                        strength: { min: 1, max: 6, aug_max: 9 },
+                        agility: { min: 2, max: 7, aug_max: 10 },
+                        charisma: { min: 3, max: 8, aug_max: 12 },
+                    },
+                    qualities: [],
+                    weapons: [],
+                    items: [],
+                },
+            };
+
+            // 1. Apply Troll
+            await MetatypeFlow.applyMetatypeToActor(character, trollData);
+            assert.strictEqual(character.system.attributes.body.base, 5);
+            assert.strictEqual(character.system.attributes.strength.base, 5);
+            assert.strictEqual(character.system.attributes.agility.base, 1);
+            assert.strictEqual(character.system.attributes.charisma.base, 1);
+
+            // 2. Switch to Elf: attributes should reset to 0 and apply Elf minimums
+            await MetatypeFlow.applyMetatypeToActor(character, elfData);
+            assert.strictEqual(character.system.metatype, 'Elf');
+            assert.strictEqual(character.system.attributes.body.base, 1, 'Body should reset from Troll 5 to Elf min 1');
+            assert.strictEqual(character.system.attributes.strength.base, 1, 'Strength should reset from Troll 5 to Elf min 1');
+            assert.strictEqual(character.system.attributes.agility.base, 2, 'Agility should update to Elf min 2');
+            assert.strictEqual(character.system.attributes.charisma.base, 3, 'Charisma should update to Elf min 3');
+        });
+
         it('Granted traits (qualities, weapons, items) are stored as UUIDs, granted on actor, and cleaned up on deletion', async () => {
             // Create trait items that represent metatype enhancements
             const lowLightQuality = await factory.createItem({
@@ -151,6 +208,10 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             const character = await factory.createActor({ type: 'character' });
             await MetatypeFlow.applyMetatypeToActor(character, metatypeItem);
 
+            // Verify base attributes meet racial minimums
+            assert.isAtLeast(character.system.attributes.body.value, 5, 'Body should meet Troll racial minimum of 5');
+            assert.isAtLeast(character.system.attributes.strength.value, 5, 'Strength should meet Troll racial minimum of 5');
+
             // Verify granted items are copied to the actor
             const grantedQuality = character.items.find(i => i.isType('quality') && i.name === 'Low-Light Vision');
             const grantedWeapon = character.items.find(i => i.isType('weapon') && i.name === 'Troll Horns');
@@ -181,6 +242,7 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             const remainingMetatypes = character.items.filter(i => i.isType('metatype'));
             assert.strictEqual(remainingMetatypes.length, 0, 'Metatype item should be deleted');
             assert.strictEqual(character.system.metatypeUuid, null);
+            assert.strictEqual(character.system.attributes.body.base, 0);
         });
 
         it('Base metatype items have empty descriptions and proper metaTypesItems flags', async () => {

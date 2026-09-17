@@ -31,6 +31,7 @@ export const preloadHandlebarsTemplates = async () => {
             'item/header',
             'item/tabs/details/skill',
             'item/footer/skill',
+            'item/footer/metatype',
             'common/generic-data-properties',
             'list-items/connect-network-icon',
             'list-items/connected-icons-toggle',

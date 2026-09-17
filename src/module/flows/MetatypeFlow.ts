@@ -1,5 +1,8 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
+import { MetatypeItemResolver, MetatypeItemFlag } from '../apps/itemImport/helper/MetatypeItemResolver';
+import { Constants } from '../apps/itemImport/importer/Constants';
+import { SR5 } from '../config';
 
 const { fromUuid } = foundry.utils;
 
@@ -41,13 +44,34 @@ export class MetatypeFlow {
         // 3. Resolve and create granted items from UUIDs
         await this.grantAndLinkMetatypeItems(actor, newMetatypeItem);
 
-        // 4. Synchronize actor metatype and metatypeUuid
-        await actor.update({
-            system: {
-                metatype: newMetatypeItem.name,
-                metatypeUuid: sourceUuid || newMetatypeItem.uuid,
+        // 4. Synchronize actor metatype, metatypeUuid, and apply metatype attributes
+        const updateData: Record<string, unknown> = {
+            'system.metatype': newMetatypeItem.name,
+            'system.metatypeUuid': sourceUuid || newMetatypeItem.uuid,
+        };
+
+        // When switching metatypes, reset character attributes to 0 before applying the new metatype minimums
+        const ranges = newMetatypeItem.system.getActiveAttributeRanges();
+        const attributesToReset = new Set<string>([
+            ...SR5.physicalAttributes,
+            ...SR5.mentalAttributes,
+            'edge',
+            ...Object.keys(ranges),
+        ]);
+
+        for (const attr of attributesToReset) {
+            if (attr !== 'essence' && attr in actor.system.attributes) {
+                updateData[`system.attributes.${attr}.base`] = 0;
             }
-        });
+        }
+
+        for (const [attr, range] of Object.entries(ranges)) {
+            if (range.min != null && attr in actor.system.attributes) {
+                updateData[`system.attributes.${attr}.base`] = range.min;
+            }
+        }
+
+        await actor.update(updateData);
 
         return newMetatypeItem;
     }
@@ -64,8 +88,61 @@ export class MetatypeFlow {
         const resolveItemData = async (uuid: string, category: 'quality' | 'weapon' | 'item') => {
             if (!uuid) return null;
             try {
-                const doc = await fromUuid(uuid);
-                if (doc instanceof foundry.abstract.Document) {
+                let doc: SR5Item | null = null;
+                const found = await fromUuid(uuid);
+                if (found instanceof SR5Item) {
+                    doc = found;
+                }
+
+                // If direct UUID resolution fails, fallback to direct compendium pack loading
+                if (!doc && uuid.startsWith('Compendium.')) {
+                    const parts = uuid.slice(11).split('.');
+                    const packId = `${parts[0]}.${parts[1]}`;
+                    const targetId = parts[parts.length - 1];
+                    const pack = game.packs.get(packId);
+                    if (pack && targetId) {
+                        const packDoc = await pack.getDocument(targetId);
+                        if (packDoc instanceof SR5Item) {
+                            doc = packDoc;
+                        }
+                    }
+                }
+
+                // If still not found, check metadata flags or compendium search
+                if (!doc) {
+                    const flags = metatypeItem.flags?.shadowrun5e?.metaTypesItems;
+                    const metaFlag = Array.isArray(flags)
+                        ? flags.find(f => f.foundryUuid === uuid || f.chummerId === uuid)
+                        : undefined;
+
+                    if (metaFlag) {
+                        await MetatypeItemResolver.ensureItemImported(metaFlag as MetatypeItemFlag);
+                        if (metaFlag.foundryUuid) {
+                            const imported = await fromUuid(metaFlag.foundryUuid);
+                            if (imported instanceof SR5Item) {
+                                doc = imported;
+                            }
+                        }
+
+                        if (!doc && metaFlag.name) {
+                            const compKey = (category === 'weapon' ? 'Weapon' : category === 'item' ? 'Gear' : 'Quality');
+                            const compConfig = Constants.MAP_COMPENDIUM_KEY[compKey];
+                            const pack = game.packs.get(`world.${compConfig.pack}`);
+                            if (pack) {
+                                await pack.getIndex();
+                                const entry = pack.index.find(e => e.name?.toLowerCase() === metaFlag.name.toLowerCase());
+                                if (entry?._id) {
+                                    const entryDoc = await pack.getDocument(entry._id);
+                                    if (entryDoc instanceof SR5Item) {
+                                        doc = entryDoc;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (doc instanceof SR5Item) {
                     const data = doc.toObject() as Item.CreateData;
                     delete data._id;
                     data._stats = {
@@ -81,7 +158,6 @@ export class MetatypeFlow {
                         shadowrun5e: {
                             ...(data.flags?.shadowrun5e || {}),
                             grantedByMetatype: metatypeItem.id ?? undefined,
-                            grantedByRace: metatypeItem.id ?? undefined,
                             grantedCategory: category,
                         },
                     };
@@ -147,8 +223,7 @@ export class MetatypeFlow {
             const isDirectUuidMatch = allTrackedUuids.has(item.uuid);
             const sourceId = item._stats?.compendiumSource || item.flags?.core?.sourceId;
             const isSourceMatch = !!sourceId && allTrackedUuids.has(sourceId);
-            const isFlagMatch = item.flags?.shadowrun5e?.grantedByMetatype === metatypeItem.id
-                || item.flags?.shadowrun5e?.grantedByRace === metatypeItem.id;
+            const isFlagMatch = item.flags?.shadowrun5e?.grantedByMetatype === metatypeItem.id;
 
             if (isDirectUuidMatch || isSourceMatch || isFlagMatch) {
                 idsToDelete.push(item.id);
@@ -163,9 +238,9 @@ export class MetatypeFlow {
     /**
      * Handle updates to a metatype item: synchronizes metatype name if name changed.
      */
-    static async onMetatypeUpdated(actor: SR5Actor, metatypeItem: SR5Item<'metatype'>, changed: Record<string, any>) {
+    static async onMetatypeUpdated(actor: SR5Actor, metatypeItem: SR5Item<'metatype'>, changed: Record<string, unknown>) {
         if (!actor.isType('character')) return;
-        if (changed.name && changed.name !== actor.system.metatype) {
+        if (typeof changed.name === 'string' && changed.name !== actor.system.metatype) {
             await actor.update({ system: { metatype: changed.name } });
         }
     }
@@ -178,24 +253,19 @@ export class MetatypeFlow {
 
         await this.cleanupMetatypeGrantedItems(actor, metatypeItem);
 
-        const currentUuid = actor.system.metatypeUuid || actor.system.raceUuid;
+        const currentUuid = actor.system.metatypeUuid;
         if (currentUuid === metatypeItem.uuid || actor.system.metatype === metatypeItem.name) {
-            await actor.update({
-                system: {
-                    metatypeUuid: null,
-                    raceUuid: null,
-                    metatype: '',
+            const updateData: Record<string, unknown> = {
+                'system.metatypeUuid': null,
+                'system.metatype': '',
+            };
+            const attributesToReset = [...SR5.physicalAttributes, ...SR5.mentalAttributes, 'edge'];
+            for (const attr of attributesToReset) {
+                if (attr in actor.system.attributes) {
+                    updateData[`system.attributes.${attr}.base`] = 0;
                 }
-            });
+            }
+            await actor.update(updateData);
         }
     }
-
-    // Backwards-compatible aliases
-    static applyRaceToActor = MetatypeFlow.applyMetatypeToActor;
-    static grantAndLinkRaceItems = MetatypeFlow.grantAndLinkMetatypeItems;
-    static cleanupRaceGrantedItems = MetatypeFlow.cleanupMetatypeGrantedItems;
-    static onRaceUpdated = MetatypeFlow.onMetatypeUpdated;
-    static onRaceDeleted = MetatypeFlow.onMetatypeDeleted;
 }
-
-export const RaceFlow = MetatypeFlow;

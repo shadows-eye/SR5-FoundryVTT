@@ -1,16 +1,5 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="scrollable">
-        {{!-- Karma Cost Bar --}}
-        <div class="metatype-meta-bar">
-            <div class="metatype-meta-field">
-                <label>{{localize "SR5.Metatype.KarmaCost"}}:</label>
-                {{#if @root.isEditMode}}
-                    <input type="number" name="system.karma" value="{{source.system.karma}}" class="compact-number-input" min="0" />
-                {{else}}
-                    <span class="badge badge-karma">{{system.karma}} {{localize "SR5.Karma"}}</span>
-                {{/if}}
-            </div>
-        </div>
 
         {{!-- Attribute Ranges in a Neat 2-Column Grid --}}
         <div class="attribute-ranges-section">

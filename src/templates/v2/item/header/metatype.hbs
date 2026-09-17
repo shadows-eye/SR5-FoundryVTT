@@ -30,59 +30,19 @@
                     </div>
                 </div>
                 <div class="item-type-container metatype-header-meta">
-                    {{!-- Category (subtype: metahuman, shapeshifter, infected, metasapient, etc.) --}}
-                    <div class="metatype-header-meta-row">
-                        <label>{{localize "SR5.Metatype.Category"}}</label>
-                        <span>
-                            {{#if @root.isEditMode}}
-                                <select name="system.subtype" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Metatype.Category'}}">
-                                    {{#each localizedMetaSubtypes}}
-                                        <option value="{{@key}}" {{#if (eq @key @root.system.subtype)}}selected{{/if}}>{{this}}</option>
-                                    {{/each}}
-                                </select>
-                            {{else}}
-                                <input type="text" class="short" value="{{lookup localizedMetaSubtypes system.subtype}}" disabled>
-                            {{/if}}
-                        </span>
-                    </div>
-
-                    {{!-- Base Metatype (metatype: human, elf, dwarf, ork, troll) --}}
-                    <div class="metatype-header-meta-row">
-                        <label>{{localize "SR5.Metatype.BaseMetatype"}}</label>
-                        <span>
-                            {{#if @root.isEditMode}}
+                    {{#if @root.isEditMode}}
+                        <div class="metatype-header-meta-row">
+                            <label>{{localize "SR5.Metatype.BaseMetatype"}}</label>
+                            <span>
                                 <select name="system.metatype" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">
                                     {{#each localizedMetatypes}}
                                         <option value="{{@key}}" {{#if (eq @key @root.system.metatype)}}selected{{/if}}>{{this}}</option>
                                     {{/each}}
                                 </select>
-                            {{else}}
-                                <input type="text" class="short" value="{{lookup localizedMetatypes system.metatype}}" disabled>
-                            {{/if}}
-                        </span>
-                    </div>
-
-                    {{!-- Subvariant (subsubtype: Centaur, Naga, Lupine, etc., if applicable or set) --}}
-                    {{#if (or hasSubsubtypes system.subsubtype)}}
-                        <div class="metatype-header-meta-row">
-                            <label>{{localize "SR5.Metatype.Subsubtype"}}</label>
-                            <span>
-                                {{#if @root.isEditMode}}
-                                    {{#if hasSubsubtypes}}
-                                        <select name="system.subsubtype" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Metatype.Subsubtype'}}">
-                                            <option value="">—</option>
-                                            {{#each subsubtypes}}
-                                                <option value="{{@key}}" {{#if (eq @key @root.system.subsubtype)}}selected{{/if}}>{{this}}</option>
-                                            {{/each}}
-                                        </select>
-                                    {{else}}
-                                        <input type="text" name="system.subsubtype" class="short" value="{{system.subsubtype}}" />
-                                    {{/if}}
-                                {{else}}
-                                    <input type="text" class="short" value="{{#if hasSubsubtypes}}{{lookup subsubtypes system.subsubtype}}{{else}}{{system.subsubtype}}{{/if}}" disabled>
-                                {{/if}}
                             </span>
                         </div>
+                    {{else}}
+                        <label class="metatype-header-value" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">{{lookup localizedMetatypes system.metatype}}</label>
                     {{/if}}
                 </div>
             </div>

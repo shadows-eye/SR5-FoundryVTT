@@ -57,11 +57,22 @@
     .metatype-header-meta {
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch;
-        flex: 0 0 16rem;
+        justify-content: center;
+        align-items: flex-end;
+        flex: 0 0 auto;
+        min-width: 8rem;
         gap: vars.$small-distance;
         padding: 0 vars.$large-distance;
+
+        .metatype-header-value {
+            color: vars.$yellow;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: block;
+            text-align: right;
+            padding: 0.15rem 0.3rem;
+            white-space: nowrap;
+        }
 
         .metatype-header-meta-row {
             display: flex;
@@ -70,7 +81,7 @@
             gap: vars.$small-distance;
 
             label {
-                flex: 0 0 6.5rem;
+                flex: 0 0 auto;
                 white-space: nowrap;
                 font-size: 0.85rem;
                 font-weight: bold;

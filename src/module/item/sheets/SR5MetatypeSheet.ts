@@ -64,6 +64,10 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
             template: SheetFlow.templateBase('item/tabs/description'),
             scrollable: ['.scrollable'],
         },
+        footer: {
+            template: SheetFlow.templateBase('item/footer'),
+            scrollable: ['.scrollable'],
+        },
     };
 
     static override TABS = {
@@ -150,6 +154,19 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
                         // ignore broken links
                     }
                 }
+                if (!doc && uuid.startsWith('Compendium.')) {
+                    const parts = uuid.slice(11).split('.');
+                    const packId = `${parts[0]}.${parts[1]}`;
+                    const targetId = parts[parts.length - 1];
+                    const pack = game.packs.get(packId);
+                    if (pack && targetId) {
+                        try {
+                            doc = (await pack.getDocument(targetId)) ?? null;
+                        } catch {
+                            // ignore broken links
+                        }
+                    }
+                }
                 const docName = (doc && 'name' in doc && typeof doc.name === 'string') ? doc.name : uuid;
                 const docImg = (doc && 'img' in doc && typeof doc.img === 'string') ? doc.img : undefined;
                 const docType = (doc && 'type' in doc && typeof doc.type === 'string') ? doc.type : undefined;
@@ -174,39 +191,38 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
     protected override async _onDrop(event: DragEvent) {
         const raw = parseDropData<{ type?: string; uuid?: string }>(event);
         if (!raw || raw.type !== 'Item' || !raw.uuid) return;
-        const item = await SR5Item.fromDropData({ uuid: raw.uuid });
-        if (item) await this._onDropItem(event, item);
-    }
 
-    protected async _onDropItem(event: DragEvent, item: SR5Item) {
-        const uuid = item.uuid;
-        if (!uuid) return;
+        const droppedItem = await fromUuid(raw.uuid);
+        if (!(droppedItem instanceof SR5Item)) return;
 
-        const dropTarget = (event.target as HTMLElement)?.closest<HTMLElement>('[data-drop-category]');
-        const dropCategory = dropTarget?.dataset.dropCategory;
-
-        let category: 'qualities' | 'weapons' | 'items' = 'items';
-        if (dropCategory === 'qualities' || dropCategory === 'weapons' || dropCategory === 'items') {
-            category = dropCategory;
-        } else if (item.isType('quality')) {
+        let category: 'qualities' | 'weapons' | 'items' | null = null;
+        if (droppedItem.isType('quality')) {
             category = 'qualities';
-        } else if (item.isType('weapon')) {
+        } else if (droppedItem.isType('weapon')) {
             category = 'weapons';
+        } else if (droppedItem.isType('equipment', 'device', 'armor', 'ammo')) {
+            category = 'items';
         }
 
-        const system = this.document.system;
-        const currentList = Array.from(new Set([...(system[category] || []), uuid]));
+        if (!category) return;
+
+        const droppedUuid = droppedItem.uuid;
+        if (!droppedUuid) return;
+
+        const currentList: string[] = Array.from(this.document.system[category] || []);
+        if (currentList.includes(droppedUuid)) return;
+
+        currentList.push(droppedUuid);
 
         await this.document.update({
             [`system.${category}`]: currentList,
         });
     }
 
-    static async #onRemoveGrantedUuid(this: SR5MetatypeSheet, event: Event) {
+    static async #onRemoveGrantedUuid(this: SR5MetatypeSheet, event: PointerEvent, target: HTMLElement) {
         event.preventDefault();
-        const button = event.currentTarget as HTMLElement;
-        const category = button?.dataset.category;
-        const uuid = button?.dataset.uuid;
+        const category = target.dataset.category as 'qualities' | 'weapons' | 'items';
+        const uuid = target.dataset.uuid;
 
         if (!category || !uuid) return;
         if (category !== 'qualities' && category !== 'weapons' && category !== 'items') return;
@@ -219,17 +235,44 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
         });
     }
 
-    static async #onOpenGrantedItem(this: SR5MetatypeSheet, event: Event) {
+    static async #onOpenGrantedItem(this: SR5MetatypeSheet, event: PointerEvent, target: HTMLElement) {
         event.preventDefault();
-        const anchor = event.currentTarget as HTMLElement;
-        const uuid = anchor?.dataset.uuid;
+        const uuid = target.dataset.uuid;
         if (!uuid) return;
 
+        // If this metatype is embedded on an actor, open the actor's corresponding item
+        const actor = this.document.actor;
+        if (actor) {
+            // 1. Direct UUID or ID match
+            let actorItem = actor.items.find(i => i.uuid === uuid || i.id === uuid);
+
+            // 2. Match by compendium source / source ID
+            if (!actorItem) {
+                actorItem = actor.items.find(i =>
+                    i._stats?.compendiumSource === uuid ||
+                    i.flags?.core?.sourceId === uuid ||
+                    i.flags?.shadowrun5e?.grantedByMetatype === this.document.id
+                );
+            }
+
+            // 3. Match by name
+            if (!actorItem) {
+                const targetDoc = fromUuidSync(uuid) ?? await fromUuid(uuid);
+                if (targetDoc && 'name' in targetDoc) {
+                    actorItem = actor.items.find(i => i.name === targetDoc.name);
+                }
+            }
+
+            if (actorItem?.sheet) {
+                actorItem.sheet.render(true);
+                return;
+            }
+        }
+
+        // Fallback: Open original document directly
         const doc = await fromUuid(uuid);
         if (doc instanceof SR5Item && doc.sheet) {
             doc.sheet.render(true);
         }
     }
 }
-
-export const SR5RaceSheet = SR5MetatypeSheet;
