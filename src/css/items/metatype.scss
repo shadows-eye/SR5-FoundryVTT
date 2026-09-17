@@ -366,10 +366,11 @@
 
 // Metatype banner shown on actor sheet (bio tab)
 .metatype-banner {
+    margin-top: vars.$large-distance;
     margin-bottom: vars.$medium-distance;
     padding: vars.$small-distance vars.$medium-distance;
     background: vars.$fadedBlack;
-    border: 1px solid vars.$dark;
+    border: none;
     border-radius: vars.$radius;
     display: flex;
     align-items: center;
@@ -379,13 +380,14 @@
         display: flex;
         align-items: center;
         gap: vars.$large-distance;
+        cursor: pointer;
+        flex: 1;
 
         img {
             width: 36px;
             height: 36px;
             border: none;
             object-fit: contain;
-            cursor: pointer;
         }
 
         .metatype-banner-title {
@@ -395,11 +397,18 @@
             align-items: center;
             gap: vars.$small-distance;
             color: vars.$white;
+            transition: color 0.15s ease;
 
             .metatype-base-type {
                 font-size: 0.85em;
                 font-weight: normal;
                 color: vars.$silver;
+            }
+        }
+
+        &:hover {
+            .metatype-banner-title {
+                color: vars.$yellow;
             }
         }
 

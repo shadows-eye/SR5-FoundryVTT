@@ -253,9 +253,18 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         await app.render(true);
     }
 
-    static async #openMetatypeSheet(this: SR5CharacterSheet, event: PointerEvent) {
+    static async #openMetatypeSheet(this: SR5CharacterSheet, event: PointerEvent, target?: HTMLElement) {
         event.preventDefault();
-        const metatypeItem = this.actor.metatypeItem;
+        let metatypeItem = this.actor.metatypeItem;
+        if (!metatypeItem && target) {
+            const itemId = target.closest<HTMLElement>('[data-item-id]')?.dataset.itemId;
+            if (itemId) {
+                const item = this.actor.items.get(itemId);
+                if (item?.isType('metatype')) {
+                    metatypeItem = item;
+                }
+            }
+        }
         if (metatypeItem?.sheet) {
             metatypeItem.sheet.render(true);
         }

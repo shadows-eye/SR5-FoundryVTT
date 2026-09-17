@@ -2,12 +2,12 @@
     {{#if itemType.metatype.length}}
         <div class="metatype-banner">
             {{#each itemType.metatype}}
-                <div class="metatype-banner-info" data-item-id="{{this.id}}">
-                    <img src="{{this.img}}" data-action="openMetatypeSheet" data-tooltip="SR5.EditItem" />
+                <div class="metatype-banner-info" data-action="openMetatypeSheet" data-item-id="{{this.id}}" data-tooltip="SR5.EditItem">
+                    <img src="{{this.img}}" />
                     <div>
                         <div class="metatype-banner-title">
-                            <span>{{this.name}}</span>
-                            {{#if this.system.metatype}}
+                            <span>{{localizeMetatype this}}</span>
+                            {{#if (and this.system.metatype (ne (localizeMetatype this) (localizeTypeOr this.system.metatype @root.config.metatypes)))}}
                                 <span class="metatype-base-type">({{localizeTypeOr this.system.metatype @root.config.metatypes}})</span>
                             {{/if}}
                         </div>
@@ -22,14 +22,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="metatype-banner-actions" data-item-id="{{this.id}}">
-                    <a data-action="openMetatypeSheet" data-tooltip="SR5.EditItem">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a data-action="removeMetatype" data-tooltip="{{localize 'SR5.MetatypeSelector.Title'}}">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                </div>
+                {{#if @root.isEditMode}}
+                    <div class="metatype-banner-actions" data-item-id="{{this.id}}">
+                        <a data-action="removeMetatype" data-tooltip="{{localize 'SR5.MetatypeSelector.Title'}}">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                {{/if}}
             {{/each}}
         </div>
     {{else}}

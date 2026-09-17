@@ -360,6 +360,20 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
 
             assert.isTrue(context.hasCurrentMetatype);
         });
+
+        it('MetatypeFlow.localizeMetatype resolves translation or returns original name', async () => {
+            const worldElf = await factory.createItem(sampleElfData) as SR5Item<'metatype'>;
+            const localizedDoc = MetatypeFlow.localizeMetatype(worldElf);
+            assert.isString(localizedDoc);
+            assert.isNotEmpty(localizedDoc);
+
+            const localizedName = MetatypeFlow.localizeMetatype('Elf');
+            assert.isString(localizedName);
+            assert.isNotEmpty(localizedName);
+
+            const unknown = MetatypeFlow.localizeMetatype('CustomNonExistentMetatype');
+            assert.strictEqual(unknown, 'CustomNonExistentMetatype');
+        });
     });
 };
 

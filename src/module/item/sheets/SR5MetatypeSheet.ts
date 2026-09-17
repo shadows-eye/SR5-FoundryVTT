@@ -5,6 +5,7 @@ import { AttributeRange, Metatype } from '@/module/types/item/Metatype';
 import { SR5 } from '@/module/config';
 import { Helpers } from '@/module/helpers';
 import { parseDropData } from '@/module/utils/sheets';
+import { MetatypeFlow } from '@/module/flows/MetatypeFlow';
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -18,6 +19,7 @@ export interface ResolvedGrantedItem {
 
 export interface SR5MetatypeSheetData extends ItemSheet.RenderContext, SR5ApplicationMixinTypes.RenderContext {
     item: SR5Item<'metatype'>;
+    displayName: string;
     metatypes: Record<string, string>;
     localizedMetatypes: Record<string, string>;
     metaSubtypes: Record<string, string>;
@@ -33,6 +35,10 @@ export interface SR5MetatypeSheetData extends ItemSheet.RenderContext, SR5Applic
 
 export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5MetatypeSheetData> {
     declare document: SR5Item<'metatype'>;
+
+    override get title(): string {
+        return MetatypeFlow.localizeMetatype(this.document) || this.document.name;
+    }
 
     static override DEFAULT_OPTIONS = {
         classes: ['item', 'metatype', 'metatype-sheet', 'named-sheet'],
@@ -83,6 +89,7 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
     override async _prepareContext(options: Parameters<ItemSheet['_prepareContext']>[0]) {
         const context = await super._prepareContext(options) as SR5MetatypeSheetData;
         context.item = this.document;
+        context.displayName = MetatypeFlow.localizeMetatype(this.document) || this.document.name;
 
         const system = this.document.system;
 

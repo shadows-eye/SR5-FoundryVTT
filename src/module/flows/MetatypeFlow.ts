@@ -1,3 +1,4 @@
+import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { MetatypeItemResolver, MetatypeItemFlag } from '../apps/itemImport/helper/MetatypeItemResolver';
@@ -267,4 +268,50 @@ export class MetatypeFlow {
             await actor.update(updateData);
         }
     }
+
+    /**
+     * Localizes a metatype item or name into the user's active language if a translation exists.
+     * Supports Document (SR5Item<'metatype'>), string name (e.g. "Dwarf", "dwarf"),
+     * or fallback value.
+     *
+     * @param nameOrItem The metatype Document, name, or key.
+     * @returns The translated string if available, or the original name.
+     */
+    static localizeMetatype(nameOrItem: string | SR5Item<'metatype'> | null | undefined): string {
+        if (!nameOrItem) return '';
+        const name = typeof nameOrItem === 'string' ? nameOrItem : nameOrItem.name;
+        if (!name) return '';
+
+        const baseType = typeof nameOrItem !== 'string' && nameOrItem.system?.metatype
+            ? nameOrItem.system.metatype.toLowerCase()
+            : name.toLowerCase();
+
+        // 1. Check CONFIG.SR5.metatypes (e.g. dwarf -> 'SR5.Character.Types.Dwarf')
+        const metatypeKey = (CONFIG.SR5?.metatypes as Record<string, string> | undefined)?.[baseType];
+        if (metatypeKey && game.i18n.has(metatypeKey)) {
+            if (name.toLowerCase() === baseType) {
+                return game.i18n.localize(metatypeKey);
+            }
+        }
+
+        // 2. Try 'SR5.Character.Types' via Helpers.localizeName (e.g. "Dwarf" -> SR5.Character.Types.Dwarf)
+        const characterTypeTranslation = Helpers.localizeName(name, 'SR5.Character.Types');
+        if (characterTypeTranslation !== name) {
+            return characterTypeTranslation;
+        }
+
+        // 3. Try 'SR5.Content.Metatypes'
+        const contentTranslation = Helpers.localizeName(name, 'SR5.Content.Metatypes');
+        if (contentTranslation !== name) {
+            return contentTranslation;
+        }
+
+        // 4. Fallback: if baseType matched a config key (e.g. "dwarf"), return it
+        if (metatypeKey && game.i18n.has(metatypeKey)) {
+            return game.i18n.localize(metatypeKey);
+        }
+
+        return name;
+    }
 }
+

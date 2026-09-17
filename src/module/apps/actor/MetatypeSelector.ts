@@ -11,8 +11,9 @@ import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
 export interface MetatypeCardData {
-    uuid: string | null;
+    uuid: string;
     name: string;
+    originalName: string;
     img: string | null;
     karma: number;
     sourceLabel: string;
@@ -73,15 +74,26 @@ export class MetatypeSelector extends HandlebarsApplicationMixin(ApplicationV2)<
             const currentUuid = currentItem?.uuid ?? (this.actor.isType('character') ? this.actor.system.metatypeUuid : null);
             const currentName = currentItem?.name ?? (this.actor.isType('character') ? this.actor.system.metatype : '');
 
-            const match = docs.find(d => (currentUuid && d.uuid === currentUuid) || (currentName && d.name.toLowerCase() === currentName.toLowerCase()));
+            const match = docs.find(d => {
+                if (currentUuid && d.uuid === currentUuid) return true;
+                if (currentName) {
+                    const dName = d.name.toLowerCase();
+                    const cName = currentName.toLowerCase();
+                    if (dName === cName) return true;
+                    if (d.system?.metatype?.toLowerCase() === cName) return true;
+                    if (MetatypeFlow.localizeMetatype(d).toLowerCase() === cName) return true;
+                }
+                return false;
+            });
             if (match?.uuid) {
                 this.selectedUuid = match.uuid;
             }
         }
 
         context.items = docs.map(doc => ({
-            uuid: doc.uuid,
-            name: doc.name,
+            uuid: doc.uuid ?? '',
+            name: MetatypeFlow.localizeMetatype(doc),
+            originalName: doc.name,
             img: doc.img,
             karma: doc.system.karma ?? 0,
             sourceLabel: doc.pack ? 'Compendium' : 'World',
@@ -120,7 +132,8 @@ export class MetatypeSelector extends HandlebarsApplicationMixin(ApplicationV2)<
         let visibleCount = 0;
         for (const card of cards) {
             const text = (card.textContent || '').toLowerCase();
-            const matches = !query || text.includes(query);
+            const originalName = (card.dataset.originalName || '').toLowerCase();
+            const matches = !query || text.includes(query) || originalName.includes(query);
             card.style.display = matches ? '' : 'none';
             if (matches) visibleCount++;
         }

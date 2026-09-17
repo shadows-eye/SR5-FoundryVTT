@@ -1,6 +1,6 @@
 <div>
     <div class="sheet-header metatype-sheet-header">
-        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{#if @root.isEditMode}}{{item.img}}{{else}}{{item.name}}{{/if}}"
+        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{#if @root.isEditMode}}{{item.img}}{{else}}{{displayName}}{{/if}}"
              {{#if @root.isEditMode}}
                  data-edit="img"
                  data-action="editImage"
@@ -15,7 +15,7 @@
                                 {{formInput fields.name value=item.name classes="sheet-name"
                                             placeholder=(localize "SR5.Name") rootId=rootId}}
                             {{else}}
-                                <input type="text" class="sheet-name" value="{{item.name}}" disabled>
+                                <input type="text" class="sheet-name" value="{{displayName}}" disabled>
                             {{/if}}
                         </span>
                     </div>
@@ -42,7 +42,9 @@
                             </span>
                         </div>
                     {{else}}
-                        <label class="metatype-header-value" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">{{lookup localizedMetatypes system.metatype}}</label>
+                        {{#if (ne displayName (lookup localizedMetatypes system.metatype))}}
+                            <label class="metatype-header-value" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">{{lookup localizedMetatypes system.metatype}}</label>
+                        {{/if}}
                     {{/if}}
                 </div>
             </div>
