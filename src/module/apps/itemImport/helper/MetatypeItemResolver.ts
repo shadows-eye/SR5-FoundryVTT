@@ -18,6 +18,20 @@ export interface MetatypeItemFlag {
     type?: string;
 }
 
+/**
+ * Helper to resolve and automatically import linked metatype items into standard import compendiums.
+ *
+ * - **Triggered on World Load & Bulk Import**: In `hooks.ts` during the `ready` hook (only for GMs),
+ *   and in `BulkImporter.ts` after parsing importers, it calls `MetatypeItemResolver.syncMetatypeCompendiumLinkedItems()`.
+ * - **Scans Metatype Compendium**: It inspects the metatype items in `packs/sr5e-metatypes` and extracts
+ *   the items listed in `flags.shadowrun5e.metaTypesItems` (e.g. Low-Light Vision, Thermographic Vision,
+ *   Resistance to Pathogens/Toxins, Dermal Deposits).
+ * - **Checks Target Compendium**: It checks whether each item already exists in the standard
+ *   empty import compendium (`world.sr5trait`). If already present, it skips it.
+ * - **Imports Missing Linked Items via Chummer**: If missing, it resolves the Chummer quality
+ *   definition, runs it through `QualityParser`, assigns the exact `_id` specified in the flag,
+ *   and creates the document in `world.sr5trait` with `{ keepId: true }`.
+ */
 export class MetatypeItemResolver {
     private static fullQualitiesXml: string | null = null;
     private static parsedQualitiesMap: Map<string, Quality> | null = null;
