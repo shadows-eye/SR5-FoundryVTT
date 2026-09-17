@@ -1907,6 +1907,18 @@
             "Submit": "Submit",
             "Title": "Karma Manager"
         },
+        "MetatypeSelector": {
+            "Cancel": "Cancel",
+            "Compendium": "Compendium",
+            "Confirm": "Confirm",
+            "Current": "Current",
+            "NoResults": "No metatypes found matching your search.",
+            "Remove": "Remove Metatype",
+            "RemoveTooltip": "Remove current metatype and its benefits",
+            "Search": "Search metatypes...",
+            "Title": "Select Metatype",
+            "World": "World"
+        },
         "Keybinding": {
             "AddRemoveManyQty": {
                 "Hint": "Add/Remove 20 Qty at a time",

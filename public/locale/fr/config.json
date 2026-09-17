@@ -897,6 +897,18 @@
             "other": "Autre"
         },
         "Karma": "Karma",
+        "MetatypeSelector": {
+            "Cancel": "Annuler",
+            "Compendium": "Compendium",
+            "Confirm": "Confirmer",
+            "Current": "Actuel",
+            "NoResults": "Aucun métatype correspondant à votre recherche.",
+            "Remove": "Retirer le métatype",
+            "RemoveTooltip": "Retirer le métatype actuel et ses avantages",
+            "Search": "Rechercher des métatypes...",
+            "Title": "Sélectionner un métatype",
+            "World": "Monde"
+        },
         "KnockedDown": "Projeté au sol",
         "KnowledgeSkillAcademic": "Connaissances académiques",
         "KnowledgeSkillInterests": "Hobbies",

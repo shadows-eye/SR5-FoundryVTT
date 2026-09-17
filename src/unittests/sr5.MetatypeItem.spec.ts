@@ -1,6 +1,7 @@
 import { SR5TestFactory } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { MetatypeFlow } from '@/module/flows/MetatypeFlow';
+import { MetatypeSelector } from '@/module/apps/actor/MetatypeSelector';
 import { SR5Item } from '@/module/item/SR5Item';
 
 const sampleHumanData: Item.CreateData<'metatype'> = {
@@ -105,7 +106,7 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(ranges.agility.aug_max, 10);
         });
 
-        it('Switching from Troll to Elf resets attributes to 0 and applies Elf attribute changes', async () => {
+        it('Switching from Troll to Elf removes previous metatype values and applies Elf attribute changes, preserving invested points', async () => {
             const character = await factory.createActor({ type: 'character' });
 
             const trollData: Item.CreateData<'metatype'> = {
@@ -153,13 +154,27 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.attributes.agility.base, 1);
             assert.strictEqual(character.system.attributes.charisma.base, 1);
 
-            // 2. Switch to Elf: attributes should reset to 0 and apply Elf minimums
+            // 2. Player invests 2 points into Body (raises from 5 to 7)
+            await character.update({ system: { attributes: { body: { base: 7 } } } });
+            assert.strictEqual(character.system.attributes.body.base, 7);
+
+            // 3. Switch to Elf: removes Troll's benefits and adds Elf's benefits
             await MetatypeFlow.applyMetatypeToActor(character, elfData);
             assert.strictEqual(character.system.metatype, 'Elf');
-            assert.strictEqual(character.system.attributes.body.base, 1, 'Body should reset from Troll 5 to Elf min 1');
-            assert.strictEqual(character.system.attributes.strength.base, 1, 'Strength should reset from Troll 5 to Elf min 1');
-            assert.strictEqual(character.system.attributes.agility.base, 2, 'Agility should update to Elf min 2');
-            assert.strictEqual(character.system.attributes.charisma.base, 3, 'Charisma should update to Elf min 3');
+            // Body: was 7, minus Troll 5 = 2 invested, plus Elf 1 = 3
+            assert.strictEqual(character.system.attributes.body.base, 3, 'Body preserves 2 invested points on top of Elf min 1');
+            assert.strictEqual(character.system.attributes.strength.base, 1, 'Strength resets from Troll 5 to Elf min 1');
+            assert.strictEqual(character.system.attributes.agility.base, 2, 'Agility updates to Elf min 2');
+            assert.strictEqual(character.system.attributes.charisma.base, 3, 'Charisma updates to Elf min 3');
+
+            // 4. Deleting Elf removes Elf's benefits while still preserving the 2 invested points
+            const elfItem = character.items.find(i => i.isType('metatype'));
+            assert.isDefined(elfItem);
+            await elfItem!.delete();
+            assert.strictEqual(character.system.attributes.body.base, 2, 'Body preserves 2 invested points after metatype deletion');
+            assert.strictEqual(character.system.attributes.strength.base, 0);
+            assert.strictEqual(character.system.attributes.agility.base, 0);
+            assert.strictEqual(character.system.attributes.charisma.base, 0);
         });
 
         it('Granted traits (qualities, weapons, items) are stored as UUIDs, granted on actor, and cleaned up on deletion', async () => {
@@ -311,6 +326,39 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             // Ork grunt has body: +3, strength: +2
             assert.strictEqual(grunt.system.attributes.body.value, 4);
             assert.strictEqual(grunt.system.attributes.strength.value, 3);
+        });
+
+        it('MetatypeSelector prepares cards from world and compendium items', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    metatype: 'Elf',
+                },
+            });
+
+            // Create world metatypes
+            const worldElf = await factory.createItem(sampleElfData) as SR5Item<'metatype'>;
+            const worldHuman = await factory.createItem(sampleHumanData) as SR5Item<'metatype'>;
+
+            const selector = new MetatypeSelector(actor);
+            const context = await selector._prepareContext({ isFirstRender: true });
+
+            assert.isArray(context.items);
+            assert.isTrue(context.items.length >= 2, 'Should have at least 2 metatype cards');
+
+            const elfCard = context.items.find(m => m.uuid === worldElf.uuid || m.name === 'Elf');
+            assert.isDefined(elfCard, 'Elf card should exist');
+            assert.strictEqual(elfCard!.karma, 40);
+            assert.strictEqual(elfCard!.sourceLabel, 'World');
+            assert.isTrue(elfCard!.isSelected, 'Current actor metatype should be preselected');
+
+            const humanCard = context.items.find(m => m.uuid === worldHuman.uuid || m.name === 'Human');
+            assert.isDefined(humanCard, 'Human card should exist');
+            assert.strictEqual(humanCard!.karma, 0);
+            assert.strictEqual(humanCard!.sourceLabel, 'World');
+            assert.isFalse(humanCard!.isSelected, 'Non-current metatype should not be preselected');
+
+            assert.isTrue(context.hasCurrentMetatype);
         });
     });
 };

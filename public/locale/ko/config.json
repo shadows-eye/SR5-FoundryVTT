@@ -1849,6 +1849,18 @@
             "Submit": "적용",
             "Title": "카르마 관리"
         },
+        "MetatypeSelector": {
+            "Cancel": "취소",
+            "Compendium": "컴펜디엄",
+            "Confirm": "확인",
+            "Current": "현재",
+            "NoResults": "검색과 일치하는 메타타입이 없습니다.",
+            "Remove": "메타타입 제거",
+            "RemoveTooltip": "현재 메타타입 및 해당 혜택 제거",
+            "Search": "메타타입 검색...",
+            "Title": "메타타입 선택",
+            "World": "월드"
+        },
         "Keybinding": {
             "AddRemoveManyQty": {
                 "Hint": "한번에 20개씩 추가/제거",

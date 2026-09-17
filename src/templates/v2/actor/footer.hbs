@@ -18,9 +18,12 @@
                                     <img src="{{actor.metatypeItem.img}}" width="20" height="20" style="border:none;" />
                                     <strong>{{actor.metatypeItem.name}}</strong>
                                 </a>
-                                <a data-action="removeMetatype" data-tooltip="SR5.Delete"><i class="fa-solid fa-times text-danger"></i></a>
+                                <a data-action="removeMetatype" data-tooltip="{{localize 'SR5.MetatypeSelector.Title'}}"><i class="fa-solid fa-times text-danger"></i></a>
                             {{else}}
-                                <span class="text-muted">{{system.metatype}}</span>
+                                <a data-action="openMetatypeSelector" class="flexrow align-center gap-1" data-tooltip="{{localize 'SR5.MetatypeSelector.Title'}}">
+                                    <span class="text-muted">{{#if system.metatype}}{{system.metatype}}{{else}}{{localize "SR5.MetatypeSelector.Title"}}{{/if}}</span>
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
                             {{/if}}
                         </span>
                     </div>

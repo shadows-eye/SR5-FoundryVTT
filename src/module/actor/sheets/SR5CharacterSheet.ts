@@ -4,6 +4,7 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { NuyenManager } from '@/module/apps/actor/NuyenManager';
 import { KarmaManager } from '@/module/apps/actor/KarmaManager';
 import { ReputationManager } from '@/module/apps/actor/ReputationManager';
+import { MetatypeSelector } from '@/module/apps/actor/MetatypeSelector';
 import { isElementInstance } from '@/module/utils/dom';
 import { SR5Item } from '@/module/item/SR5Item';
 
@@ -72,10 +73,11 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             openReputationManager: SR5CharacterSheet.#openReputationManager,
             manageKarma: SR5CharacterSheet.#openKarmaManager,
             manageReputation: SR5CharacterSheet.#openReputationManager,
+            openMetatypeSelector: SR5CharacterSheet.#openMetatypeSelector,
             openMetatypeSheet: SR5CharacterSheet.#openMetatypeSheet,
-            removeMetatype: SR5CharacterSheet.#removeMetatype,
+            removeMetatype: SR5CharacterSheet.#openMetatypeSelector,
             openRaceSheet: SR5CharacterSheet.#openMetatypeSheet,
-            removeRace: SR5CharacterSheet.#removeMetatype,
+            removeRace: SR5CharacterSheet.#openMetatypeSelector,
         }
     }
 
@@ -245,19 +247,17 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         await app.render(true);
     }
 
+    static async #openMetatypeSelector(this: SR5CharacterSheet, event?: PointerEvent) {
+        event?.preventDefault();
+        const app = new MetatypeSelector(this.actor);
+        await app.render(true);
+    }
+
     static async #openMetatypeSheet(this: SR5CharacterSheet, event: PointerEvent) {
         event.preventDefault();
         const metatypeItem = this.actor.metatypeItem;
         if (metatypeItem?.sheet) {
             metatypeItem.sheet.render(true);
-        }
-    }
-
-    static async #removeMetatype(this: SR5CharacterSheet, event: PointerEvent) {
-        event.preventDefault();
-        const metatypeItem = this.actor.items.find(i => i.isType('metatype'));
-        if (metatypeItem) {
-            await metatypeItem.delete();
         }
     }
 }

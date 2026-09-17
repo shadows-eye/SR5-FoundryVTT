@@ -1900,6 +1900,18 @@
             "Submit": "Bestätigen",
             "Title": "Karma Manager"
         },
+        "MetatypeSelector": {
+            "Cancel": "Abbrechen",
+            "Compendium": "Kompendium",
+            "Confirm": "Bestätigen",
+            "Current": "Aktuell",
+            "NoResults": "Keine passenden Metatypen gefunden.",
+            "Remove": "Metatyp entfernen",
+            "RemoveTooltip": "Aktuellen Metatyp und dessen Boni entfernen",
+            "Search": "Metatypen durchsuchen...",
+            "Title": "Metatyp auswählen",
+            "World": "Welt"
+        },
         "Keybinding": {
             "AddRemoveManyQty": {
                 "Hint": "Füge zu/Enferne 20 Stück pro Klick",

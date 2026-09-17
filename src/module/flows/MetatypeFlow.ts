@@ -2,7 +2,6 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { MetatypeItemResolver, MetatypeItemFlag } from '../apps/itemImport/helper/MetatypeItemResolver';
 import { Constants } from '../apps/itemImport/importer/Constants';
-import { SR5 } from '../config';
 
 const { fromUuid } = foundry.utils;
 
@@ -44,30 +43,21 @@ export class MetatypeFlow {
         // 3. Resolve and create granted items from UUIDs
         await this.grantAndLinkMetatypeItems(actor, newMetatypeItem);
 
-        // 4. Synchronize actor metatype, metatypeUuid, and apply metatype attributes
+        // 4. Synchronize actor metatype, metatypeUuid, and add new metatype attribute values
         const updateData: Record<string, unknown> = {
             'system.metatype': newMetatypeItem.name,
             'system.metatypeUuid': sourceUuid || newMetatypeItem.uuid,
         };
 
-        // When switching metatypes, reset character attributes to 0 before applying the new metatype minimums
         const ranges = newMetatypeItem.system.getActiveAttributeRanges();
-        const attributesToReset = new Set<string>([
-            ...SR5.physicalAttributes,
-            ...SR5.mentalAttributes,
-            'edge',
-            ...Object.keys(ranges),
-        ]);
-
-        for (const attr of attributesToReset) {
-            if (attr !== 'essence' && attr in actor.system.attributes) {
-                updateData[`system.attributes.${attr}.base`] = 0;
-            }
-        }
-
         for (const [attr, range] of Object.entries(ranges)) {
             if (range.min != null && attr in actor.system.attributes) {
-                updateData[`system.attributes.${attr}.base`] = range.min;
+                const attrKey = attr as keyof typeof actor.system.attributes;
+                const attribute = actor.system.attributes[attrKey];
+                if (attribute && typeof attribute === 'object' && 'base' in attribute) {
+                    const currentBase = attribute.base ?? 0;
+                    updateData[`system.attributes.${attr}.base`] = currentBase + range.min;
+                }
             }
         }
 
@@ -253,18 +243,27 @@ export class MetatypeFlow {
 
         await this.cleanupMetatypeGrantedItems(actor, metatypeItem);
 
+        const updateData: Record<string, unknown> = {};
+
         const currentUuid = actor.system.metatypeUuid;
         if (currentUuid === metatypeItem.uuid || actor.system.metatype === metatypeItem.name) {
-            const updateData: Record<string, unknown> = {
-                'system.metatypeUuid': null,
-                'system.metatype': '',
-            };
-            const attributesToReset = [...SR5.physicalAttributes, ...SR5.mentalAttributes, 'edge'];
-            for (const attr of attributesToReset) {
-                if (attr in actor.system.attributes) {
-                    updateData[`system.attributes.${attr}.base`] = 0;
+            updateData['system.metatypeUuid'] = null;
+            updateData['system.metatype'] = '';
+        }
+
+        const ranges = metatypeItem.system.getActiveAttributeRanges();
+        for (const [attr, range] of Object.entries(ranges)) {
+            if (range.min != null && attr in actor.system.attributes) {
+                const attrKey = attr as keyof typeof actor.system.attributes;
+                const attribute = actor.system.attributes[attrKey];
+                if (attribute && typeof attribute === 'object' && 'base' in attribute) {
+                    const currentBase = attribute.base ?? 0;
+                    updateData[`system.attributes.${attr}.base`] = Math.max(0, currentBase - range.min);
                 }
             }
+        }
+
+        if (Object.keys(updateData).length > 0) {
             await actor.update(updateData);
         }
     }

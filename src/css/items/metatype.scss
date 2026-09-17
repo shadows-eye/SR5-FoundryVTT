@@ -435,4 +435,24 @@
             }
         }
     }
+
+    &.metatype-banner-empty {
+        justify-content: center;
+        padding: vars.$medium-distance;
+        border-style: dashed;
+
+        .select-metatype-prompt {
+            color: vars.$yellow;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: vars.$small-distance;
+
+            &:hover {
+                color: vars.$white;
+                text-shadow: 0 0 4px vars.$yellow;
+            }
+        }
+    }
 }

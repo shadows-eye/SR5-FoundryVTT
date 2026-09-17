@@ -26,11 +26,17 @@
                     <a data-action="openMetatypeSheet" data-tooltip="SR5.EditItem">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <a data-action="removeMetatype" data-tooltip="SR5.Delete">
+                    <a data-action="removeMetatype" data-tooltip="{{localize 'SR5.MetatypeSelector.Title'}}">
                         <i class="fas fa-trash"></i>
                     </a>
                 </div>
             {{/each}}
+        </div>
+    {{else}}
+        <div class="metatype-banner metatype-banner-empty">
+            <a data-action="openMetatypeSelector" class="select-metatype-prompt">
+                <i class="fas fa-user-plus"></i> {{localize "SR5.MetatypeSelector.Title"}}
+            </a>
         </div>
     {{/if}}
     <div class="split-container">
