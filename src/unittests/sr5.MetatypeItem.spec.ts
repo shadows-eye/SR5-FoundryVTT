@@ -483,6 +483,58 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(critter.system.special, 'magic');
             assert.strictEqual(critter.system.metatype, 'Barghest');
         });
+
+        it('MetatypeFlow.localizeMetatype preserves specific variant/strain names like Nosferatu instead of overriding with base metatype', async () => {
+            const nosferatuItem = await factory.createItem({
+                name: 'Nosferatu',
+                type: 'metatype',
+                system: {
+                    metatype: 'human',
+                    subtype: 'infected',
+                    subsubtype: 'nosferatu',
+                    karma: 48,
+                    attributes: {},
+                    qualities: [],
+                    weapons: [],
+                    items: [],
+                }
+            }) as SR5Item<'metatype'>;
+
+            const localized = MetatypeFlow.localizeMetatype(nosferatuItem);
+            assert.strictEqual(localized, 'Nosferatu');
+        });
+
+        it('Actor _preCreate automatically embeds metatype item from system.metatypeUuid when missing from items', async () => {
+            const metatypeItem = await factory.createItem({
+                name: 'Nosferatu',
+                type: 'metatype',
+                system: {
+                    metatype: 'human',
+                    subtype: 'infected',
+                    subsubtype: 'nosferatu',
+                    karma: 48,
+                    attributes: {
+                        body: { min: 4, max: 9, aug_max: 13 },
+                    },
+                    qualities: [],
+                    weapons: [],
+                    items: [],
+                }
+            }) as SR5Item<'metatype'>;
+
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    metatype: 'Nosferatu',
+                    metatypeUuid: metatypeItem.uuid,
+                }
+            });
+
+            const embeddedMetatype = actor.items.find(i => i.isType('metatype'));
+            assert.isDefined(embeddedMetatype, 'Actor should auto-embed metatype item from metatypeUuid');
+            assert.strictEqual(embeddedMetatype?.name, 'Nosferatu');
+            assert.strictEqual(actor.metatypeItem?.name, 'Nosferatu');
+        });
     });
 };
 

@@ -395,15 +395,28 @@ export class MetatypeFlow {
             return characterTypeTranslation;
         }
 
-        // 3. Try 'SR5.Content.Metatypes'
+        // 3. Try 'SR5.InfectedTypes' (e.g. "Vampire" -> "Vampir", "Nosferatu" -> "Nosferatu")
+        const infectedTypeTranslation = Helpers.localizeName(name, 'SR5.InfectedTypes');
+        if (infectedTypeTranslation !== name) {
+            return infectedTypeTranslation;
+        }
+
+        // 4. Try 'SR5.MetasapientTypes' (e.g. "Sasquatch" -> "Sasquatch", "Centaur" -> "Zentaur")
+        const metasapientTranslation = Helpers.localizeName(name, 'SR5.MetasapientTypes');
+        if (metasapientTranslation !== name) {
+            return metasapientTranslation;
+        }
+
+        // 5. Try 'SR5.ShapeshifterTypes'
+        const shapeshifterTranslation = Helpers.localizeName(name, 'SR5.ShapeshifterTypes');
+        if (shapeshifterTranslation !== name) {
+            return shapeshifterTranslation;
+        }
+
+        // 6. Try 'SR5.Content.Metatypes'
         const contentTranslation = Helpers.localizeName(name, 'SR5.Content.Metatypes');
         if (contentTranslation !== name) {
             return contentTranslation;
-        }
-
-        // 4. Fallback: if baseType matched a config key (e.g. "dwarf"), return it
-        if (metatypeKey && game.i18n.has(metatypeKey)) {
-            return game.i18n.localize(metatypeKey);
         }
 
         return name;

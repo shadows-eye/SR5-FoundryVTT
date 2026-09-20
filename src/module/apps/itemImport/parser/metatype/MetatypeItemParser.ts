@@ -51,7 +51,30 @@ export class MetatypeItemParser extends Parser<'metatype'> {
             subtype = 'critter';
         }
 
-        system.metatype = matchedMetatype;
+        const infectedBaseMetatypes: Record<string, keyof typeof SR5.metatypes> = {
+            banshee: 'elf',
+            goblin: 'dwarf',
+            gnawer: 'dwarf',
+            wendigo: 'ork',
+            grendel: 'ork',
+            dzoonooqua: 'troll',
+            fomoraig: 'troll',
+            mutaqua: 'troll',
+            bandersnatch: 'troll',
+            nosferatu: 'human',
+            vampire: 'human',
+            loupgarou: 'human',
+            harvester: 'human',
+            sukuyan: 'human',
+            ghoul: 'human',
+        };
+
+        if (subtype === 'infected' && subsubtype && infectedBaseMetatypes[subsubtype]) {
+            system.metatype = infectedBaseMetatypes[subsubtype];
+        } else {
+            system.metatype = matchedMetatype;
+        }
+
         system.subtype = subtype;
         system.subsubtype = subsubtype;
         system.karma = Number(jsonData.karma?._TEXT) || 0;

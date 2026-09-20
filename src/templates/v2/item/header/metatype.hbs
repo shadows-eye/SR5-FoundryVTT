@@ -30,20 +30,22 @@
                     </div>
                 </div>
                 <div class="item-type-container metatype-header-meta">
-                    {{#if @root.isEditMode}}
-                        <div class="metatype-header-meta-row">
-                            <label>{{localize "SR5.Metatype.BaseMetatype"}}</label>
-                            <span>
-                                <select name="system.metatype" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">
-                                    {{#each localizedMetatypes}}
-                                        <option value="{{@key}}" {{#if (eq @key @root.system.metatype)}}selected{{/if}}>{{this}}</option>
-                                    {{/each}}
-                                </select>
-                            </span>
-                        </div>
-                    {{else}}
-                        {{#if (ne displayName (lookup localizedMetatypes system.metatype))}}
-                            <label class="metatype-header-value" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">{{lookup localizedMetatypes system.metatype}}</label>
+                    {{#if (or (eq system.subtype 'metahuman') (eq system.subtype 'infected'))}}
+                        {{#if @root.isEditMode}}
+                            <div class="metatype-header-meta-row">
+                                <label>{{localize "SR5.Metatype.BaseMetatype"}}</label>
+                                <span>
+                                    <select name="system.metatype" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">
+                                        {{#each localizedMetatypes}}
+                                            <option value="{{@key}}" {{#if (eq @key @root.system.metatype)}}selected{{/if}}>{{this}}</option>
+                                        {{/each}}
+                                    </select>
+                                </span>
+                            </div>
+                        {{else}}
+                            {{#if (ne displayName (lookup localizedMetatypes system.metatype))}}
+                                <label class="metatype-header-value" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">{{lookup localizedMetatypes system.metatype}}</label>
+                            {{/if}}
                         {{/if}}
                     {{/if}}
                 </div>

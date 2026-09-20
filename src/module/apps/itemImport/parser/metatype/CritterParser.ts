@@ -115,7 +115,9 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         // Metatype item for this critter
         const metatypeParser = new MetatypeItemParser();
         const metatypeItem = await metatypeParser.Parse(jsonData, 'Metatype') as Item.Source;
-        metatypeItem._id = metatypeId;
+        const embeddedMetatypeId = foundry.utils.randomID();
+        metatypeItem._id = embeddedMetatypeId;
+        delete (metatypeItem as any).folder;
 
         const tagGranted = (items: Item.Source[], category: 'qualities' | 'weapons' | 'items' = 'qualities') => {
             for (const item of items) {
@@ -123,7 +125,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
                     ...(item.flags || {}),
                     shadowrun5e: {
                         ...(item.flags?.shadowrun5e || {}),
-                        grantedByMetatype: metatypeId,
+                        grantedByMetatype: embeddedMetatypeId,
                         grantedCategory: category,
                     },
                 };
@@ -137,10 +139,6 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         ]);
         const grantedQualities = tagGranted(this.getMetatypeItems(allQualities, qualities, { type: 'Quality', critter: critterName }));
         const grantedWeapons = tagGranted(naturalWeapons, 'weapons');
-
-        // Update local item IDs in embedded metatype item
-        (metatypeItem.system as any).qualities = [...grantedPowers, ...grantedQualities].map(i => i._id).filter(Boolean);
-        (metatypeItem.system as any).weapons = grantedWeapons.map(i => i._id).filter(Boolean);
 
         return [
             metatypeItem,

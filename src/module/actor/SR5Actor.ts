@@ -180,6 +180,28 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Abort default item injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
 
+        // Auto-embed metatype item from metatypeUuid if not already embedded
+        if (this.isType('character')) {
+            const hasMetatype = this.items.some(i => i.isType('metatype'));
+            if (!hasMetatype) {
+                const metatypeUuid = this.system.metatypeUuid || (foundry.utils.getProperty(data, 'system.metatypeUuid') as string | undefined);
+                if (metatypeUuid && typeof metatypeUuid === 'string') {
+                    try {
+                        const metatypeDoc = await fromUuid(metatypeUuid);
+                        if (metatypeDoc instanceof SR5Item && metatypeDoc.isType('metatype')) {
+                            const itemData = metatypeDoc.toObject() as Item.Source;
+                            delete (itemData as any)._id;
+                            delete (itemData as any).folder;
+                            const existingItems = this.items.map(i => i.toObject());
+                            this.updateSource({ items: [...existingItems, itemData] });
+                        }
+                    } catch (err) {
+                        console.warn('SR5 | Failed to auto-embed metatype item during actor creation:', err);
+                    }
+                }
+            }
+        }
+
         // Abort if a skillset was already assigned (e.g. during Chummer import)
         if (foundry.utils.getProperty(data, 'system.skillset')) return;
         // Abort when the creation request opted out of default skills
