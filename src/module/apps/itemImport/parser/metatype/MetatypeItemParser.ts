@@ -225,6 +225,25 @@ export class MetatypeItemParser extends Parser<'metatype'> {
             };
         }
 
+        if (!entity.img) {
+            const sys = entity.system as Item.SystemOfType<'metatype'> | undefined;
+            if (sys?.subtype === 'infected') {
+                entity.img = 'systems/shadowrun5e/dist/icons/importer/critter/infected.svg';
+            } else if (sys?.subtype === 'critter') {
+                entity.img = 'systems/shadowrun5e/dist/icons/importer/critter/mundane-critters.svg';
+            } else if (sys?.subtype === 'spirit') {
+                entity.img = 'systems/shadowrun5e/dist/icons/importer/critter/spirits.svg';
+            } else if (sys?.subtype === 'sprite') {
+                entity.img = 'systems/shadowrun5e/dist/icons/importer/critter/sprites.svg';
+            } else if (sys?.subtype === 'metasapient') {
+                entity.img = 'systems/shadowrun5e/dist/icons/importer/critter/protosapients.svg';
+            } else if (sys?.subtype === 'shapeshifter') {
+                entity.img = 'systems/shadowrun5e/dist/icons/importer/critter/paranormal-critters.svg';
+            } else {
+                entity.img = 'systems/shadowrun5e/dist/icons/importer/contact.svg';
+            }
+        }
+
         return entity;
     }
 

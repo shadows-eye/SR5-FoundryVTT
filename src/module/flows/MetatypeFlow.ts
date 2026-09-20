@@ -37,6 +37,17 @@ export class MetatypeFlow {
 
         // 2. Prepare and create new embedded metatype item
         delete sourceData._id;
+        if (!sourceData.img) {
+            const system = sourceData.system as Item.SystemOfType<'metatype'> | undefined;
+            const subtype = system?.subtype;
+            if (subtype === 'infected') sourceData.img = 'systems/shadowrun5e/dist/icons/importer/critter/infected.svg';
+            else if (subtype === 'critter') sourceData.img = 'systems/shadowrun5e/dist/icons/importer/critter/mundane-critters.svg';
+            else if (subtype === 'spirit') sourceData.img = 'systems/shadowrun5e/dist/icons/importer/critter/spirits.svg';
+            else if (subtype === 'sprite') sourceData.img = 'systems/shadowrun5e/dist/icons/importer/critter/sprites.svg';
+            else if (subtype === 'metasapient') sourceData.img = 'systems/shadowrun5e/dist/icons/importer/critter/protosapients.svg';
+            else if (subtype === 'shapeshifter') sourceData.img = 'systems/shadowrun5e/dist/icons/importer/critter/paranormal-critters.svg';
+            else sourceData.img = 'systems/shadowrun5e/dist/icons/importer/contact.svg';
+        }
 
         const [newMetatypeItem] = await actor.createEmbeddedDocuments('Item', [sourceData]);
         if (!newMetatypeItem || !newMetatypeItem.isType('metatype')) return null;
@@ -420,5 +431,52 @@ export class MetatypeFlow {
         }
 
         return name;
+    }
+
+    /**
+     * Localize the metatype subtype (category) into the active language.
+     */
+    static localizeSubtype(itemOrSubtype?: SR5Item<'metatype'> | string | null): string {
+        if (!itemOrSubtype) return '';
+        const subtype = typeof itemOrSubtype === 'string'
+            ? itemOrSubtype
+            : (itemOrSubtype.system?.subtype || '');
+        if (!subtype) return '';
+        const key = `SR5.MetaSubtypes.${subtype}`;
+        if (game.i18n.has(key)) {
+            return game.i18n.localize(key);
+        }
+        return subtype.charAt(0).toUpperCase() + subtype.slice(1);
+    }
+
+    /**
+     * Localize the metatype subsubtype (strain, species, form) into the active language.
+     */
+    static localizeSubsubtype(itemOrSubsubtype?: SR5Item<'metatype'> | string | null): string {
+        if (!itemOrSubsubtype) return '';
+        const subsubtype = typeof itemOrSubsubtype === 'string'
+            ? itemOrSubsubtype
+            : (itemOrSubsubtype.system?.subsubtype || '');
+        if (!subsubtype) return '';
+
+        // 1. Try SR5.InfectedTypes
+        const infectedTranslation = Helpers.localizeName(subsubtype, 'SR5.InfectedTypes');
+        if (infectedTranslation !== subsubtype) return infectedTranslation;
+
+        // 2. Try SR5.MetasapientTypes
+        const metasapientTranslation = Helpers.localizeName(subsubtype, 'SR5.MetasapientTypes');
+        if (metasapientTranslation !== subsubtype) return metasapientTranslation;
+
+        // 3. Try SR5.ShapeshifterTypes
+        const shifterTranslation = Helpers.localizeName(subsubtype, 'SR5.ShapeshifterTypes');
+        if (shifterTranslation !== subsubtype) return shifterTranslation;
+
+        // 4. Try CONFIG.SR5.infectedTypes lookup directly
+        const infectedConfig = (CONFIG.SR5?.infectedTypes as Record<string, string> | undefined)?.[subsubtype.toLowerCase()];
+        if (infectedConfig && game.i18n.has(infectedConfig)) {
+            return game.i18n.localize(infectedConfig);
+        }
+
+        return subsubtype.charAt(0).toUpperCase() + subsubtype.slice(1);
     }
 }

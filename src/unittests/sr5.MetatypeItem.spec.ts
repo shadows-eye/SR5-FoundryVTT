@@ -535,6 +535,46 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(embeddedMetatype?.name, 'Nosferatu');
             assert.strictEqual(actor.metatypeItem?.name, 'Nosferatu');
         });
+
+        it('MetatypeFlow.localizeSubtype and localizeSubsubtype correctly translate or format values', async () => {
+            const nosferatuItem = await factory.createItem({
+                name: 'Nosferatu',
+                type: 'metatype',
+                system: {
+                    metatype: 'human',
+                    subtype: 'infected',
+                    subsubtype: 'nosferatu',
+                    karma: 48,
+                    attributes: {},
+                    qualities: [],
+                    weapons: [],
+                    items: [],
+                }
+            }) as SR5Item<'metatype'>;
+
+            const subtype = MetatypeFlow.localizeSubtype(nosferatuItem);
+            assert.isNotEmpty(subtype);
+
+            const subsubtype = MetatypeFlow.localizeSubsubtype(nosferatuItem);
+            assert.isNotEmpty(subsubtype);
+
+            assert.strictEqual(MetatypeFlow.localizeSubtype('infected'), MetatypeFlow.localizeSubtype(nosferatuItem));
+            assert.strictEqual(MetatypeFlow.localizeSubsubtype('nosferatu'), MetatypeFlow.localizeSubsubtype(nosferatuItem));
+        });
+
+        it('MetatypeItemParser guarantees a valid existing icon path is assigned', async () => {
+            const { MetatypeItemParser } = await import('@/module/apps/itemImport/parser/metatype/MetatypeItemParser');
+            const parser = new MetatypeItemParser();
+            const infectedData = {
+                id: { _TEXT: '11111111-2222-3333-4444-555555555555' },
+                name: { _TEXT: 'Vampire' },
+                category: { _TEXT: 'Infected' },
+                bodmin: { _TEXT: '3' },
+            };
+            const parsed = await parser.Parse(infectedData as any, 'Metatype');
+            assert.isDefined(parsed.img);
+            assert.include(parsed.img, 'critter/infected.svg');
+        });
     });
 };
 

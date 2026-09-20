@@ -118,6 +118,12 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         const embeddedMetatypeId = foundry.utils.randomID();
         metatypeItem._id = embeddedMetatypeId;
         delete (metatypeItem as any).folder;
+        if (!metatypeItem.img) {
+            const subtype = (metatypeItem.system as Item.SystemOfType<'metatype'> | undefined)?.subtype;
+            metatypeItem.img = subtype === 'infected'
+                ? 'systems/shadowrun5e/dist/icons/importer/critter/infected.svg'
+                : 'systems/shadowrun5e/dist/icons/importer/critter/mundane-critters.svg';
+        }
 
         const tagGranted = (items: Item.Source[], category: 'qualities' | 'weapons' | 'items' = 'qualities') => {
             for (const item of items) {
