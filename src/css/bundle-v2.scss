@@ -501,6 +501,17 @@ body.theme-light,
                 flex: 1 1 auto;
                 min-width: 0; /* prevent overflow from long labels */
             }
+
+            .sheet-footer-metatype {
+                display: inline-flex;
+                align-items: center;
+
+                a {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.35rem;
+                }
+            }
         }
 
         &.standard-form, .standard-form {

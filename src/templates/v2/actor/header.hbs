@@ -35,14 +35,11 @@
                         {{/if}}
                         <strong>{{localizeMetatype actor.metatypeItem}}</strong>
                     </a>
-                    {{#if (and actor.metatypeItem.system.metatype (ne (localizeMetatype actor.metatypeItem) (localizeTypeOr actor.metatypeItem.system.metatype config.metatypes)))}}
+                    {{#if (and (not system.is_critter) actor.metatypeItem.system.metatype (ne (localizeMetatype actor.metatypeItem) (localizeTypeOr actor.metatypeItem.system.metatype config.metatypes)))}}
                         <span class="text-muted">({{localizeTypeOr actor.metatypeItem.system.metatype config.metatypes}})</span>
                     {{/if}}
                     {{#if actor.metatypeItem.system.subtype}}
                         <span class="sheet-header-tag text-muted">[{{localizeSubtype actor.metatypeItem}}]</span>
-                    {{/if}}
-                    {{#if (and actor.metatypeItem.system.subsubtype (ne actor.metatypeItem.system.subsubtype ""))}}
-                        <span class="sheet-header-tag text-muted">[{{localizeSubsubtype actor.metatypeItem}}]</span>
                     {{/if}}
                 {{else if system.metatype}}
                     <span class="text-muted">{{localizeMetatype system.metatype}}</span>

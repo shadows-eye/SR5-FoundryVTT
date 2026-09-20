@@ -12,14 +12,11 @@
                                 {{/if}}
                                 <strong>{{localizeMetatype actor.metatypeItem}}</strong>
                             </a>
-                            {{#if (and actor.metatypeItem.system.metatype (ne (localizeMetatype actor.metatypeItem) (localizeTypeOr actor.metatypeItem.system.metatype config.metatypes)))}}
+                            {{#if (and (not system.is_critter) actor.metatypeItem.system.metatype (ne (localizeMetatype actor.metatypeItem) (localizeTypeOr actor.metatypeItem.system.metatype config.metatypes)))}}
                                 <span class="text-muted">({{localizeTypeOr actor.metatypeItem.system.metatype config.metatypes}})</span>
                             {{/if}}
                             {{#if actor.metatypeItem.system.subtype}}
                                 <span class="text-muted">[{{localizeSubtype actor.metatypeItem}}]</span>
-                            {{/if}}
-                            {{#if (and actor.metatypeItem.system.subsubtype (ne actor.metatypeItem.system.subsubtype ""))}}
-                                <span class="text-muted">[{{localizeSubsubtype actor.metatypeItem}}]</span>
                             {{/if}}
                             <a data-action="removeMetatype" data-tooltip="{{localize 'SR5.MetatypeSelector.Title'}}"><i class="fa-solid fa-times text-danger"></i></a>
                         {{else}}
@@ -31,21 +28,18 @@
                     </span>
                 </div>
             {{else}}
-                <label>
+                <label class="sheet-footer-metatype">
                     {{#if actor.metatypeItem}}
                         <a data-action="openMetatypeSheet" class="flexrow align-center gap-1" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}: {{localizeTypeOr actor.metatypeItem.system.metatype config.metatypes}}">
                             {{#if actor.metatypeItem.img}}
                                 <img src="{{actor.metatypeItem.img}}" width="18" height="18" style="border:none;" />
                             {{/if}}
                             <span>{{localizeMetatype actor.metatypeItem}}</span>
-                            {{#if (and actor.metatypeItem.system.metatype (ne (localizeMetatype actor.metatypeItem) (localizeTypeOr actor.metatypeItem.system.metatype config.metatypes)))}}
+                            {{#if (and (not system.is_critter) actor.metatypeItem.system.metatype (ne (localizeMetatype actor.metatypeItem) (localizeTypeOr actor.metatypeItem.system.metatype config.metatypes)))}}
                                 <span class="text-muted">({{localizeTypeOr actor.metatypeItem.system.metatype config.metatypes}})</span>
                             {{/if}}
                             {{#if actor.metatypeItem.system.subtype}}
                                 <span class="text-muted">[{{localizeSubtype actor.metatypeItem}}]</span>
-                            {{/if}}
-                            {{#if (and actor.metatypeItem.system.subsubtype (ne actor.metatypeItem.system.subsubtype ""))}}
-                                <span class="text-muted">[{{localizeSubsubtype actor.metatypeItem}}]</span>
                             {{/if}}
                         </a>
                     {{else}}
