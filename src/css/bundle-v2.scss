@@ -424,6 +424,17 @@ body.theme-light,
                         text-align: center;
                     }
                 }
+
+                .sheet-header-subtype {
+                    box-sizing: border-box;
+                    width: 100%;
+                    text-align: right;
+                    padding-right: 0.5rem;
+                    color: var(--sr5v2-label);
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    line-height: 1.5;
+                }
             }
 
             .sheet-header-labels {

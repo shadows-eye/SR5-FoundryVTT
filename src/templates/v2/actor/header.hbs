@@ -26,31 +26,7 @@
                             placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
             </span>
         </div>
-        {{#if (eq actor.type 'character')}}
-            <div class="sheet-header-metatype flexrow align-center gap-1">
-                {{#if actor.metatypeItem}}
-                    <a data-action="openMetatypeSheet" class="flexrow align-center gap-1" data-tooltip="{{localize 'SR5.EditItem'}}">
-                        {{#if actor.metatypeItem.img}}
-                            <img src="{{actor.metatypeItem.img}}" width="16" height="16" style="border:none;" />
-                        {{/if}}
-                        <strong>{{localizeMetatype actor.metatypeItem}}</strong>
-                    </a>
-                    {{#if (and (not system.is_critter) actor.metatypeItem.system.metatype (ne (localizeMetatype actor.metatypeItem) (localizeTypeOr actor.metatypeItem.system.metatype config.metatypes)))}}
-                        <span class="text-muted">({{localizeTypeOr actor.metatypeItem.system.metatype config.metatypes}})</span>
-                    {{/if}}
-                    {{#if actor.metatypeItem.system.subtype}}
-                        <span class="sheet-header-tag text-muted">[{{localizeSubtype actor.metatypeItem}}]</span>
-                    {{/if}}
-                {{else if system.metatype}}
-                    <span class="text-muted">{{localizeMetatype system.metatype}}</span>
-                {{else if @root.isEditMode}}
-                    <a data-action="openMetatypeSelector" class="text-muted flexrow align-center gap-1" data-tooltip="{{localize 'SR5.MetatypeSelector.Title'}}">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <span>{{localize "SR5.MetatypeSelector.Title"}}</span>
-                    </a>
-                {{/if}}
-            </div>
-        {{/if}}
+
         {{#if @root.isEditMode}}
             <div class="sheet-header-source">
                 {{formInput systemFields.description.fields.source value=source.system.description.source
@@ -128,6 +104,11 @@
                         max=system.attributes.edge.value
                         id="edge" }}
                 {{/if}}
+            {{/if}}
+            {{#if (and actor.metatypeItem.system.subtype (ne actor.metatypeItem.system.subtype 'metahuman'))}}
+                <div class="sheet-header-subtype">
+                    <span>{{localizeSubtype actor.metatypeItem}}</span>
+                </div>
             {{/if}}
             {{#if (eq actor.type 'vehicle')}}
                 <div>
