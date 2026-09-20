@@ -374,6 +374,115 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             const unknown = MetatypeFlow.localizeMetatype('CustomNonExistentMetatype');
             assert.strictEqual(unknown, 'CustomNonExistentMetatype');
         });
+
+        it('Applying an infected metatype unlocks Magic attribute and sets special to magic', async () => {
+            const character = await factory.createActor({ type: 'character' });
+            assert.strictEqual(character.system.special, 'mundane');
+
+            const vampireData: Item.CreateData<'metatype'> = {
+                name: 'Vampire (Human)',
+                type: 'metatype',
+                system: {
+                    metatype: 'human',
+                    subtype: 'infected',
+                    subsubtype: 'vampire',
+                    karma: 27,
+                    attributes: {
+                        body: { min: 2, max: 7, aug_max: 10 },
+                    },
+                    qualities: [],
+                    weapons: [],
+                    items: [],
+                },
+                flags: {
+                    shadowrun5e: {
+                        metaTypesItems: [
+                            { name: 'Dual Natured', power: 'Dual Natured', category: 'power' },
+                            { name: 'Essence Drain', power: 'Essence Drain', category: 'power' },
+                        ]
+                    }
+                }
+            };
+
+            await MetatypeFlow.applyMetatypeToActor(character, vampireData);
+
+            assert.strictEqual(character.system.special, 'magic');
+            assert.isAtLeast(character.system.attributes.magic.base, 1);
+            assert.isTrue(character.isAwakened());
+        });
+
+        it('Applying a natural magician infected metatype sets magic type to magician and initial magic to min(6, Essence)', async () => {
+            const character = await factory.createActor({ type: 'character' });
+            assert.strictEqual(character.system.special, 'mundane');
+
+            const nosferatuData: Item.CreateData<'metatype'> = {
+                name: 'Nosferatu',
+                type: 'metatype',
+                system: {
+                    metatype: 'human',
+                    subtype: 'infected',
+                    subsubtype: 'nosferatu',
+                    karma: 48,
+                    attributes: {
+                        body: { min: 2, max: 7, aug_max: 10 },
+                    },
+                    qualities: [],
+                    weapons: [],
+                    items: [],
+                },
+                flags: {
+                    shadowrun5e: {
+                        metaTypesItems: [
+                            { name: 'Dual Natured', power: 'Dual Natured', category: 'power' },
+                            { name: 'Natural Magician', power: 'Natural Magician', category: 'power' },
+                        ]
+                    }
+                }
+            };
+
+            await MetatypeFlow.applyMetatypeToActor(character, nosferatuData);
+
+            assert.strictEqual(character.system.special, 'magic');
+            assert.strictEqual(character.system.magic.type, 'magician');
+            const expectedMagic = Math.floor(Math.min(6, character.system.attributes.essence.value));
+            assert.strictEqual(character.system.attributes.magic.base, expectedMagic);
+        });
+
+        it('Applying a critter metatype to a critter actor sets attributes directly from range.min', async () => {
+            const critter = await factory.createActor({
+                type: 'character',
+                system: {
+                    is_critter: true,
+                    is_npc: true,
+                }
+            });
+
+            const critterMetatypeData: Item.CreateData<'metatype'> = {
+                name: 'Barghest',
+                type: 'metatype',
+                system: {
+                    metatype: 'human',
+                    subtype: 'critter',
+                    karma: 0,
+                    attributes: {
+                        body: { min: 6, max: 10, aug_max: 14 },
+                        agility: { min: 4, max: 8, aug_max: 12 },
+                        magic: { min: 4, max: 8, aug_max: 12 },
+                    },
+                    qualities: [],
+                    weapons: [],
+                    items: [],
+                }
+            };
+
+            await MetatypeFlow.applyMetatypeToActor(critter, critterMetatypeData);
+
+            assert.strictEqual(critter.system.attributes.body.base, 6);
+            assert.strictEqual(critter.system.attributes.agility.base, 4);
+            assert.strictEqual(critter.system.attributes.magic.base, 4);
+            assert.strictEqual(critter.system.special, 'magic');
+            assert.strictEqual(critter.system.metatype, 'Barghest');
+        });
     });
 };
 

@@ -1,11 +1,13 @@
 import { Parser } from 'xml2js';
 import { ImportHelper as IH } from './ImportHelper';
 import { QualityParser } from '../parser/quality/QualityParser';
+import { CritterPowerParser } from '../parser/powers/CritterPowerParser';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import { SR5Item } from '../../../item/SR5Item';
 import { BulkImporter } from '../apps/BulkImporter';
 import { QualitiesSchema, Quality } from '../schema/QualitiesSchema';
-import { Constants } from '../importer/Constants';
+import { CritterpowersSchema, Power } from '../schema/CritterpowersSchema';
+import { Constants, CompendiumKey } from '../importer/Constants';
 
 const { fromUuid } = foundry.utils;
 
@@ -16,6 +18,8 @@ export interface MetatypeItemFlag {
     category?: string;
     id?: string;
     type?: string;
+    power?: string;
+    select?: string;
 }
 
 /**
@@ -28,12 +32,14 @@ export interface MetatypeItemFlag {
  * - **Checks Target Compendium**: It checks whether each item already exists in the standard
  *   empty import compendium (`world.sr5trait`). If already present, it skips it.
  * - **Imports Missing Linked Items via Chummer**: If missing, it resolves the Chummer quality
- *   definition, runs it through `QualityParser`, assigns the exact `_id` specified in the flag,
- *   and creates the document in `world.sr5trait` with `{ keepId: true }`.
+ *   or critter power definition, runs it through `QualityParser` or `CritterPowerParser`, assigns
+ *   the exact `_id` specified in the flag, and creates the document in `world.sr5trait` with `{ keepId: true }`.
  */
 export class MetatypeItemResolver {
     private static fullQualitiesXml: string | null = null;
     private static parsedQualitiesMap: Map<string, Quality> | null = null;
+    private static fullCritterPowersXml: string | null = null;
+    private static parsedCritterPowersMap: Map<string, Power> | null = null;
 
     public static async syncMetatypeCompendiumLinkedItems(): Promise<void> {
         const metatypePack = game.packs.get('shadowrun5e.sr5e-metatypes')
@@ -49,14 +55,14 @@ export class MetatypeItemResolver {
             if (!items || !Array.isArray(items)) continue;
 
             for (const item of items) {
-                if (!item.foundryUuid) continue;
+                if (!item.foundryUuid && !item.id && !item.chummerId) continue;
                 itemsToResolve.push(item as MetatypeItemFlag);
             }
         }
 
         if (itemsToResolve.length === 0) return;
 
-        const uniqueItems = Array.from(new Map(itemsToResolve.map(i => [i.foundryUuid, i])).values());
+        const uniqueItems = Array.from(new Map(itemsToResolve.map(i => [i.foundryUuid || i.id || i.chummerId, i])).values());
 
         for (const item of uniqueItems) {
             await this.ensureItemImported(item);
@@ -64,7 +70,7 @@ export class MetatypeItemResolver {
     }
 
     public static async ensureItemImported(item: MetatypeItemFlag): Promise<void> {
-        const targetId = item.foundryUuid ? item.foundryUuid.split('.').pop() : item.id;
+        const targetId = item.foundryUuid ? item.foundryUuid.split('.').pop() : (item.id || (item.chummerId ? IH.guidToId(item.chummerId) : undefined));
         if (!targetId) return;
 
         if (item.foundryUuid) {
@@ -76,28 +82,78 @@ export class MetatypeItemResolver {
             }
         }
 
-        const compKey = (item.category === 'weapon' ? 'Weapon' : item.category === 'item' ? 'Gear' : 'Quality');
-        const compConfig = Constants.MAP_COMPENDIUM_KEY[compKey];
-        const compendium = await IH.GetCompendium(compKey);
-        if (compendium.index.has(targetId)) return;
+        const isPowerCategory = item.category === 'power'
+            || item.category === 'optional_power'
+            || item.category === 'natural_weapon'
+            || item.type === 'critter_power';
 
-        const qualityData = await this.getQualityData(item.chummerId, item.name);
-        if (!qualityData) {
-            console.warn(`SR5 | Could not find Chummer data for racial item "${item.name}" (${item.chummerId})`);
+        let powerData: Power | null = null;
+        let qualityData: Quality | null = null;
+
+        if (isPowerCategory) {
+            powerData = await this.getCritterPowerData(item.chummerId, item.power || item.name);
+            if (!powerData && item.category !== 'weapon' && item.category !== 'item') {
+                qualityData = await this.getQualityData(item.chummerId, item.name);
+            }
+        } else {
+            qualityData = await this.getQualityData(item.chummerId, item.name);
+            if (!qualityData && item.category !== 'weapon' && item.category !== 'item') {
+                powerData = await this.getCritterPowerData(item.chummerId, item.power || item.name);
+            }
+        }
+
+        if (powerData) {
+            const compKey: CompendiumKey = 'Critter_Power';
+            const compConfig = Constants.MAP_COMPENDIUM_KEY[compKey];
+            const compendium = await IH.GetCompendium(compKey);
+            if (compendium.index.has(targetId)) return;
+
+            const parser = new CritterPowerParser();
+            const parsedItem = await parser.Parse(powerData, compKey) as Item.CreateData;
+            const createData: Item.CreateData = {
+                ...parsedItem,
+                _id: targetId,
+            };
+            if (item.name) {
+                createData.name = item.name;
+            }
+            if (item.category === 'optional_power' && createData.system) {
+                (createData.system as any).optional = 'optional';
+            }
+            UpdateActionFlow.injectActionTestsIntoChangeData(createData.type, createData, createData);
+            IH.setItem('Critter_Power', powerData.name._TEXT, targetId);
+
+            await SR5Item.create(createData, { pack: `world.${compConfig.pack}`, keepId: true });
+            await compendium.getIndex();
+            console.log(`SR5 | Ingested metatype power "${item.name}" into compendium "world.${compConfig.pack}" with ID "${targetId}"`);
             return;
         }
 
-        const parser = new QualityParser();
-        const parsedItem = await parser.Parse(qualityData, 'Quality') as Item.CreateData;
-        const createData = {
-            ...parsedItem,
-            _id: targetId,
-        };
-        IH.setItem('Quality', qualityData.name._TEXT, targetId);
+        if (qualityData) {
+            const compKey: CompendiumKey = (item.category === 'weapon' ? 'Weapon' : item.category === 'item' ? 'Gear' : 'Quality');
+            const compConfig = Constants.MAP_COMPENDIUM_KEY[compKey];
+            const compendium = await IH.GetCompendium(compKey);
+            if (compendium.index.has(targetId)) return;
 
-        await SR5Item.create(createData, { pack: `world.${compConfig.pack}`, keepId: true });
-        await compendium.getIndex();
-        console.log(`SR5 | Ingested metatype trait "${item.name}" into compendium "world.${compConfig.pack}" with ID "${targetId}"`);
+            const parser = new QualityParser();
+            const parsedItem = await parser.Parse(qualityData, 'Quality') as Item.CreateData;
+            const createData: Item.CreateData = {
+                ...parsedItem,
+                _id: targetId,
+            };
+            if (item.name) {
+                createData.name = item.name;
+            }
+            UpdateActionFlow.injectActionTestsIntoChangeData(createData.type, createData, createData);
+            IH.setItem('Quality', qualityData.name._TEXT, targetId);
+
+            await SR5Item.create(createData, { pack: `world.${compConfig.pack}`, keepId: true });
+            await compendium.getIndex();
+            console.log(`SR5 | Ingested metatype trait "${item.name}" into compendium "world.${compConfig.pack}" with ID "${targetId}"`);
+            return;
+        }
+
+        console.warn(`SR5 | Could not find Chummer data for racial item "${item.name}" (${item.chummerId})`);
     }
 
     private static async parseXml<T>(xmlString: string): Promise<T> {
@@ -140,12 +196,75 @@ export class MetatypeItemResolver {
                 if (chummerId && this.parsedQualitiesMap.has(chummerId)) {
                     return this.parsedQualitiesMap.get(chummerId)!;
                 }
-                if (name && this.parsedQualitiesMap.has(name.toLowerCase())) {
-                    return this.parsedQualitiesMap.get(name.toLowerCase())!;
+                if (name) {
+                    const lowerName = name.toLowerCase();
+                    if (this.parsedQualitiesMap.has(lowerName)) {
+                        return this.parsedQualitiesMap.get(lowerName)!;
+                    }
+                    const baseName = lowerName.split('(')[0].trim();
+                    if (baseName && this.parsedQualitiesMap.has(baseName)) {
+                        return this.parsedQualitiesMap.get(baseName)!;
+                    }
                 }
             }
         } catch (err) {
             console.warn(`SR5 | Failed fetching or parsing qualities.xml from GitHub:`, err);
+        }
+
+        return null;
+    }
+
+    private static async getCritterPowerData(chummerId?: string, name?: string): Promise<Power | null> {
+        try {
+            if (!this.parsedCritterPowersMap) {
+                if (!this.fullCritterPowersXml) {
+                    this.fullCritterPowersXml = await BulkImporter.fetchGitHubFile('Chummer/data/critterpowers.xml') || null;
+                }
+
+                if (this.fullCritterPowersXml) {
+                    const parsed = await this.parseXml<CritterpowersSchema>(this.fullCritterPowersXml);
+                    if (parsed?.categories?.category) {
+                        const rawCategories = parsed.categories.category;
+                        const categories = Array.isArray(rawCategories) ? rawCategories : [rawCategories];
+                        IH.setTranslatedCategory('critterpowers', categories);
+                    }
+                    const rawPowers = parsed?.powers?.power;
+                    const list: Power[] = Array.isArray(rawPowers) ? rawPowers : (rawPowers ? [rawPowers] : []);
+                    this.parsedCritterPowersMap = new Map();
+                    for (const p of list) {
+                        if (p.id?._TEXT) {
+                            this.parsedCritterPowersMap.set(p.id._TEXT, p);
+                        }
+                        if (p.name?._TEXT) {
+                            this.parsedCritterPowersMap.set(p.name._TEXT.toLowerCase(), p);
+                        }
+                    }
+                }
+            }
+
+            if (this.parsedCritterPowersMap) {
+                if (chummerId && this.parsedCritterPowersMap.has(chummerId)) {
+                    return this.parsedCritterPowersMap.get(chummerId)!;
+                }
+                if (name) {
+                    const lowerName = name.toLowerCase();
+                    if (this.parsedCritterPowersMap.has(lowerName)) {
+                        return this.parsedCritterPowersMap.get(lowerName)!;
+                    }
+                    // Try without parenthetical parameters, e.g. "Allergy (Sunlight, Severe)" -> "allergy"
+                    const baseName = lowerName.split('(')[0].trim();
+                    if (baseName && this.parsedCritterPowersMap.has(baseName)) {
+                        return this.parsedCritterPowersMap.get(baseName)!;
+                    }
+                    // Try without colon parameters, e.g. "Infected Bite: DV..." -> "infected bite"
+                    const colonName = lowerName.split(':')[0].trim();
+                    if (colonName && this.parsedCritterPowersMap.has(colonName)) {
+                        return this.parsedCritterPowersMap.get(colonName)!;
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn(`SR5 | Failed fetching or parsing critterpowers.xml from GitHub:`, err);
         }
 
         return null;

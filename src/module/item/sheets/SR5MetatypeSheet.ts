@@ -203,7 +203,7 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
         if (!(droppedItem instanceof SR5Item)) return;
 
         let category: 'qualities' | 'weapons' | 'items' | null = null;
-        if (droppedItem.isType('quality')) {
+        if (droppedItem.isType('quality', 'critter_power')) {
             category = 'qualities';
         } else if (droppedItem.isType('weapon')) {
             category = 'weapons';

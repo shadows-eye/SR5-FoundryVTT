@@ -1879,12 +1879,19 @@
             "Vulpine": "Vulpin"
         },
         "InfectedTypes": {
+            "Bandersnatch": "Bandersnatch",
             "Banshee": "Banshee",
             "DzooNooQua": "Dzoo-Noo-Qua",
             "Fomoraig": "Fomoraig",
             "Ghoul": "Ghul",
+            "Gnawer": "Nager",
             "Goblin": "Goblin",
+            "Grendel": "Grendel",
+            "Harvester": "Ernter",
+            "LoupGarou": "Loup-Garou",
+            "Mutaqua": "Mutaqua",
             "Nosferatu": "Nosferatu",
+            "Sukuyan": "Sukuyan",
             "Vampire": "Vampir",
             "Wendigo": "Wendigo"
         },

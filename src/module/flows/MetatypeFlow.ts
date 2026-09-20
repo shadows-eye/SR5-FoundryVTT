@@ -2,7 +2,7 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { MetatypeItemResolver, MetatypeItemFlag } from '../apps/itemImport/helper/MetatypeItemResolver';
-import { Constants } from '../apps/itemImport/importer/Constants';
+import { Constants, CompendiumKey } from '../apps/itemImport/importer/Constants';
 
 const { fromUuid } = foundry.utils;
 
@@ -17,7 +17,7 @@ export class MetatypeFlow {
         actor: SR5Actor,
         metatypeItemSource: SR5Item<'metatype'> | Item.CreateData<'metatype'>
     ): Promise<SR5Item<'metatype'> | null> {
-        if (!actor.isType('character')) return null;
+        if (!actor.isType('character', 'spirit', 'sprite')) return null;
 
         const isDoc = metatypeItemSource instanceof foundry.abstract.Document;
         const sourceData = (isDoc
@@ -51,15 +51,75 @@ export class MetatypeFlow {
         };
 
         const ranges = newMetatypeItem.system.getActiveAttributeRanges();
+        const isCritter = (actor.system as any).is_critter || actor.isType('spirit', 'sprite');
+
         for (const [attr, range] of Object.entries(ranges)) {
             if (range.min != null && attr in actor.system.attributes) {
                 const attrKey = attr as keyof typeof actor.system.attributes;
                 const attribute = actor.system.attributes[attrKey];
                 if (attribute && typeof attribute === 'object' && 'base' in attribute) {
                     const currentBase = attribute.base ?? 0;
-                    updateData[`system.attributes.${attr}.base`] = currentBase + range.min;
+                    if (isCritter) {
+                        updateData[`system.attributes.${attr}.base`] = range.min;
+                    } else {
+                        updateData[`system.attributes.${attr}.base`] = currentBase + range.min;
+                    }
                 }
             }
+        }
+
+        // Special attributes for critters or if specified in metatype
+        if (ranges.magic?.min != null && ranges.magic.min > 0) {
+            updateData['system.special'] = 'magic';
+            if (isCritter) {
+                updateData['system.attributes.magic.base'] = ranges.magic.min;
+            }
+        }
+        if (ranges.resonance?.min != null && ranges.resonance.min > 0) {
+            updateData['system.special'] = 'resonance';
+            if (isCritter) {
+                updateData['system.attributes.resonance.base'] = ranges.resonance.min;
+            }
+        }
+
+        // 5. Handle Infected, Dual Natured & Natural Magician initialization
+        const isInfected = newMetatypeItem.system.subtype === 'infected';
+        const metaItems = (newMetatypeItem.flags?.shadowrun5e?.metaTypesItems || []) as MetatypeItemFlag[];
+        const subsubtype = (newMetatypeItem.system.subsubtype || '').toLowerCase();
+        const itemName = (newMetatypeItem.name || '').toLowerCase();
+
+        const grantsDualNatured = isInfected || metaItems.some(i =>
+            i.name?.toLowerCase().includes('dual natured') ||
+            i.power?.toLowerCase().includes('dual natured')
+        ) || (newMetatypeItem.system.qualities || []).some(q => q.toLowerCase().includes('dual natured'));
+
+        const isNaturalMagician =
+            subsubtype === 'nosferatu' ||
+            subsubtype === 'wendigo' ||
+            itemName.includes('nosferatu') ||
+            itemName.includes('wendigo') ||
+            metaItems.some(i =>
+                i.name?.toLowerCase().includes('natural magician') ||
+                i.power?.toLowerCase().includes('natural magician')
+            );
+
+        if (grantsDualNatured) {
+            updateData['system.special'] = 'magic';
+            const currentMagicBase = (updateData['system.attributes.magic.base'] as number | undefined)
+                ?? (actor.system.attributes.magic?.base ?? 0);
+            if (currentMagicBase <= 0) {
+                updateData['system.attributes.magic.base'] = 1;
+            }
+        }
+
+        if (isNaturalMagician) {
+            updateData['system.special'] = 'magic';
+            updateData['system.magic.type'] = 'magician';
+            const essenceVal = Number(actor.system.attributes.essence?.value ?? actor.system.attributes.essence?.base ?? 6);
+            const initialMagic = Math.floor(Math.min(6, Math.max(1, essenceVal)));
+            const currentMagicBase = (updateData['system.attributes.magic.base'] as number | undefined)
+                ?? (actor.system.attributes.magic?.base ?? 0);
+            updateData['system.attributes.magic.base'] = Math.max(currentMagicBase, initialMagic);
         }
 
         await actor.update(updateData);
@@ -72,9 +132,22 @@ export class MetatypeFlow {
      * and update the actor's embedded metatype item with the local actor item UUIDs.
      */
     static async grantAndLinkMetatypeItems(actor: SR5Actor, metatypeItem: SR5Item<'metatype'>) {
-        const qualitiesToResolve = metatypeItem.system.qualities || [];
-        const weaponsToResolve = metatypeItem.system.weapons || [];
-        const itemsToResolve = metatypeItem.system.items || [];
+        const qualitiesToResolve = [...(metatypeItem.system.qualities || [])];
+        const weaponsToResolve = [...(metatypeItem.system.weapons || [])];
+        const itemsToResolve = [...(metatypeItem.system.items || [])];
+
+        const metaFlags = (metatypeItem.flags?.shadowrun5e?.metaTypesItems || []) as MetatypeItemFlag[];
+        for (const metaFlag of metaFlags) {
+            if (metaFlag.foundryUuid) {
+                if (metaFlag.category === 'weapon') {
+                    if (!weaponsToResolve.includes(metaFlag.foundryUuid)) weaponsToResolve.push(metaFlag.foundryUuid);
+                } else if (metaFlag.category === 'item') {
+                    if (!itemsToResolve.includes(metaFlag.foundryUuid)) itemsToResolve.push(metaFlag.foundryUuid);
+                } else {
+                    if (!qualitiesToResolve.includes(metaFlag.foundryUuid)) qualitiesToResolve.push(metaFlag.foundryUuid);
+                }
+            }
+        }
 
         const resolveItemData = async (uuid: string, category: 'quality' | 'weapon' | 'item') => {
             if (!uuid) return null;
@@ -99,34 +172,43 @@ export class MetatypeFlow {
                     }
                 }
 
+                const flags = metatypeItem.flags?.shadowrun5e?.metaTypesItems as MetatypeItemFlag[] | undefined;
+                const metaFlag = Array.isArray(flags)
+                    ? flags.find(f => f.foundryUuid === uuid || f.chummerId === uuid)
+                    : undefined;
+
                 // If still not found, check metadata flags or compendium search
-                if (!doc) {
-                    const flags = metatypeItem.flags?.shadowrun5e?.metaTypesItems;
-                    const metaFlag = Array.isArray(flags)
-                        ? flags.find(f => f.foundryUuid === uuid || f.chummerId === uuid)
-                        : undefined;
-
-                    if (metaFlag) {
-                        await MetatypeItemResolver.ensureItemImported(metaFlag as MetatypeItemFlag);
-                        if (metaFlag.foundryUuid) {
-                            const imported = await fromUuid(metaFlag.foundryUuid);
-                            if (imported instanceof SR5Item) {
-                                doc = imported;
-                            }
+                if (!doc && metaFlag) {
+                    await MetatypeItemResolver.ensureItemImported(metaFlag);
+                    if (metaFlag.foundryUuid) {
+                        const imported = await fromUuid(metaFlag.foundryUuid);
+                        if (imported instanceof SR5Item) {
+                            doc = imported;
                         }
+                    }
 
-                        if (!doc && metaFlag.name) {
-                            const compKey = (category === 'weapon' ? 'Weapon' : category === 'item' ? 'Gear' : 'Quality');
-                            const compConfig = Constants.MAP_COMPENDIUM_KEY[compKey];
-                            const pack = game.packs.get(`world.${compConfig.pack}`);
-                            if (pack) {
-                                await pack.getIndex();
-                                const entry = pack.index.find(e => e.name?.toLowerCase() === metaFlag.name.toLowerCase());
-                                if (entry?._id) {
-                                    const entryDoc = await pack.getDocument(entry._id);
-                                    if (entryDoc instanceof SR5Item) {
-                                        doc = entryDoc;
-                                    }
+                    if (!doc && (metaFlag.name || metaFlag.power)) {
+                        const compKey: CompendiumKey = (category === 'weapon' ? 'Weapon' : category === 'item' ? 'Gear' : 'Quality');
+                        const compConfig = Constants.MAP_COMPENDIUM_KEY[compKey];
+                        const pack = game.packs.get(`world.${compConfig.pack}`);
+                        if (pack) {
+                            await pack.getIndex();
+                            const searchNames = [
+                                metaFlag.name?.toLowerCase(),
+                                metaFlag.power?.toLowerCase(),
+                                metaFlag.name?.split('(')[0].trim().toLowerCase(),
+                                metaFlag.name?.split(':')[0].trim().toLowerCase(),
+                            ].filter(Boolean);
+
+                            const entry = pack.index.find(e => {
+                                const eName = e.name?.toLowerCase();
+                                return Boolean(eName && searchNames.includes(eName));
+                            });
+
+                            if (entry?._id) {
+                                const entryDoc = await pack.getDocument(entry._id);
+                                if (entryDoc instanceof SR5Item) {
+                                    doc = entryDoc;
                                 }
                             }
                         }
@@ -136,6 +218,9 @@ export class MetatypeFlow {
                 if (doc instanceof SR5Item) {
                     const data = doc.toObject() as Item.CreateData;
                     delete data._id;
+                    if (metaFlag?.name) {
+                        data.name = metaFlag.name;
+                    }
                     data._stats = {
                         ...(data._stats || {}),
                         compendiumSource: uuid,
@@ -230,7 +315,7 @@ export class MetatypeFlow {
      * Handle updates to a metatype item: synchronizes metatype name if name changed.
      */
     static async onMetatypeUpdated(actor: SR5Actor, metatypeItem: SR5Item<'metatype'>, changed: Record<string, unknown>) {
-        if (!actor.isType('character')) return;
+        if (!actor.isType('character', 'spirit', 'sprite')) return;
         if (typeof changed.name === 'string' && changed.name !== actor.system.metatype) {
             await actor.update({ system: { metatype: changed.name } });
         }
@@ -240,7 +325,7 @@ export class MetatypeFlow {
      * Handle deletion of a metatype item: cleans up its granted items and clears actor metatype link.
      */
     static async onMetatypeDeleted(actor: SR5Actor, metatypeItem: SR5Item<'metatype'>) {
-        if (!actor.isType('character')) return;
+        if (!actor.isType('character', 'spirit', 'sprite')) return;
 
         await this.cleanupMetatypeGrantedItems(actor, metatypeItem);
 
@@ -253,14 +338,24 @@ export class MetatypeFlow {
         }
 
         const ranges = metatypeItem.system.getActiveAttributeRanges();
+        const isCritter = (actor.system as any).is_critter || actor.isType('spirit', 'sprite');
+
         for (const [attr, range] of Object.entries(ranges)) {
             if (range.min != null && attr in actor.system.attributes) {
                 const attrKey = attr as keyof typeof actor.system.attributes;
                 const attribute = actor.system.attributes[attrKey];
                 if (attribute && typeof attribute === 'object' && 'base' in attribute) {
                     const currentBase = attribute.base ?? 0;
-                    updateData[`system.attributes.${attr}.base`] = Math.max(0, currentBase - range.min);
+                    if (!isCritter) {
+                        updateData[`system.attributes.${attr}.base`] = Math.max(0, currentBase - range.min);
+                    }
                 }
+            }
+        }
+
+        if (metatypeItem.system.subtype === 'infected') {
+            if (actor.system.magic?.type === 'magician') {
+                updateData['system.magic.type'] = '';
             }
         }
 
@@ -314,4 +409,3 @@ export class MetatypeFlow {
         return name;
     }
 }
-

@@ -229,7 +229,7 @@ declare module "fvtt-types/configuration" {
                 embeddedItems: Item.Source[];
                 grantedByMetatype?: string;
                 grantedCategory?: string;
-                metaTypesItems?: Array<{ id?: string; name: string; type?: string; chummerId?: string; foundryUuid?: string; category?: string }>;
+                metaTypesItems?: Array<{ id?: string; name: string; type?: string; chummerId?: string; foundryUuid?: string; category?: string; power?: string; select?: string; }>;
             };
         };
         Macro: {
