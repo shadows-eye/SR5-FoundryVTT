@@ -2,6 +2,7 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { MetatypeItemResolver, MetatypeItemFlag } from '../apps/itemImport/helper/MetatypeItemResolver';
+import { NaturalWeaponHelper } from '../apps/itemImport/helper/NaturalWeaponHelper';
 import { Constants, CompendiumKey } from '../apps/itemImport/importer/Constants';
 
 const { fromUuid } = foundry.utils;
@@ -249,6 +250,37 @@ export class MetatypeFlow {
                         },
                     };
                     return { data, category, sourceUuid: uuid };
+                }
+
+                if (!doc && category === 'weapon' && metaFlag?.select) {
+                    const parsed = NaturalWeaponHelper.parseNaturalWeapons([{
+                        _TEXT: metaFlag.power || metaFlag.name || 'Natural Weapon',
+                        $: { select: metaFlag.select },
+                    }]);
+                    if (parsed.length > 0) {
+                        const data = parsed[0] as Item.CreateData;
+                        delete data._id;
+                        if (metaFlag.name) {
+                            data.name = metaFlag.name;
+                        }
+                        data._stats = {
+                            ...(data._stats || {}),
+                            compendiumSource: uuid,
+                        };
+                        data.flags = {
+                            ...(data.flags || {}),
+                            core: {
+                                ...(data.flags?.core || {}),
+                                sourceId: uuid,
+                            },
+                            shadowrun5e: {
+                                ...(data.flags?.shadowrun5e || {}),
+                                grantedByMetatype: metatypeItem.id ?? undefined,
+                                grantedCategory: category,
+                            },
+                        };
+                        return { data, category, sourceUuid: uuid };
+                    }
                 }
             } catch (err) {
                 console.warn(`SR5 | Could not resolve granted item UUID: ${uuid}`, err);

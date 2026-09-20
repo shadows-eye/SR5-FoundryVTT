@@ -8,6 +8,7 @@ import { BulkImporter } from '../apps/BulkImporter';
 import { QualitiesSchema, Quality } from '../schema/QualitiesSchema';
 import { CritterpowersSchema, Power } from '../schema/CritterpowersSchema';
 import { Constants, CompendiumKey } from '../importer/Constants';
+import { NaturalWeaponHelper } from './NaturalWeaponHelper';
 
 const { fromUuid } = foundry.utils;
 
@@ -79,6 +80,19 @@ export class MetatypeItemResolver {
                 if (existing) return;
             } catch {
                 // ignore
+            }
+        }
+
+        if (item.category === 'weapon' || item.category === 'natural_weapon' || NaturalWeaponHelper.isNaturalWeapon({ _TEXT: item.power, $: { select: item.select } })) {
+            if (item.select) {
+                const [weaponData] = NaturalWeaponHelper.parseNaturalWeapons([{
+                    _TEXT: item.power || 'Natural Weapon',
+                    $: { select: item.select }
+                }]);
+                if (weaponData) {
+                    await NaturalWeaponHelper.ensureNaturalWeaponInCompendium(weaponData, targetId);
+                    return;
+                }
             }
         }
 

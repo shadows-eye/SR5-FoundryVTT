@@ -575,6 +575,47 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.isDefined(parsed.img);
             assert.include(parsed.img, 'critter/infected.svg');
         });
+
+        it('MetatypeItemParser dynamically detects powers that are natural weapons and assigns them to weapons', async () => {
+            const { MetatypeItemParser } = await import('@/module/apps/itemImport/parser/metatype/MetatypeItemParser');
+            const { NaturalWeaponHelper } = await import('@/module/apps/itemImport/helper/NaturalWeaponHelper');
+
+            const testPowerEntry = {
+                _TEXT: 'Natural Weapon',
+                $: { select: 'Bite (Infection): DV ({STR})P, AP -1' },
+            };
+            assert.isTrue(NaturalWeaponHelper.isNaturalWeapon(testPowerEntry));
+
+            const parser = new MetatypeItemParser();
+            const vampireData = {
+                id: { _TEXT: '11111111-2222-3333-4444-555555555555' },
+                name: { _TEXT: 'Vampire' },
+                category: { _TEXT: 'Infected' },
+                powers: {
+                    power: [testPowerEntry],
+                },
+            };
+
+            const parsed = await parser.Parse(vampireData as any, 'Metatype');
+            const system = parsed.system as Item.SystemOfType<'metatype'>;
+            const metaFlags = (parsed.flags?.shadowrun5e as any)?.metaTypesItems as Array<{
+                name: string;
+                power: string;
+                select?: string;
+                foundryUuid?: string;
+                category: string;
+            }>;
+
+            // Weapons array must contain the resolved natural weapon UUID
+            assert.isTrue(system.weapons.length > 0, 'Metatype system.weapons should contain the parsed natural weapon');
+            assert.isFalse(system.qualities.some(q => q.includes('Natural Weapon') || q.includes('Bite')),
+                'Natural weapon should not be in system.qualities');
+
+            // Flag should register it under category "weapon"
+            const weaponFlag = metaFlags?.find(f => f.name.includes('Bite') || f.power === 'Natural Weapon');
+            assert.isDefined(weaponFlag, 'metaTypesItems should contain flag entry for natural weapon');
+            assert.strictEqual(weaponFlag?.category, 'weapon', 'Weapon flag should have category weapon');
+        });
     });
 };
 

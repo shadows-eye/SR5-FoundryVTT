@@ -4,6 +4,7 @@ import { CompendiumKey, Constants } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { SR5 } from '@/module/config';
 import { MetatypeItemFlag } from '../../helper/MetatypeItemResolver';
+import { NaturalWeaponHelper } from '../../helper/NaturalWeaponHelper';
 
 export class MetatypeItemParser extends Parser<'metatype'> {
     protected readonly parseType = 'metatype';
@@ -129,6 +130,21 @@ export class MetatypeItemParser extends Parser<'metatype'> {
             const select = p.$?.select;
             const fullName = select ? `${baseName} (${select})` : baseName;
 
+            // Natural weapons belong in weapons, not qualities
+            if (NaturalWeaponHelper.isNaturalWeapon(p)) {
+                let weaponName = baseName;
+                const nameMatch = /^([^:(]+?)[:(]/.exec(select || '');
+                if (nameMatch && !/^DV\b/i.test(nameMatch[1].trim())) {
+                    weaponName = nameMatch[1].trim();
+                }
+                const targetId = IH.nameToId['Weapon']?.[weaponName] || IH.nameToId['Weapon']?.[fullName];
+                if (targetId) {
+                    const uuid = `Compendium.world.${Constants.MAP_COMPENDIUM_CONFIG.Weapon.pack}.Item.${targetId}`;
+                    if (!resolvedWeapons.includes(uuid)) resolvedWeapons.push(uuid);
+                }
+                continue;
+            }
+
             const targetId = IH.nameToId['Critter_Power']?.[baseName]
                 || IH.nameToId['Critter_Power']?.[fullName]
                 || IH.nameToId['Quality']?.[baseName];
@@ -193,6 +209,39 @@ export class MetatypeItemParser extends Parser<'metatype'> {
             const name = p._TEXT;
             if (!name) continue;
             const select = p.$?.select;
+
+            if (NaturalWeaponHelper.isNaturalWeapon(p)) {
+                const parsedWeapons = NaturalWeaponHelper.parseNaturalWeapons([p], { actorName: jsonData.name?._TEXT });
+                for (const w of parsedWeapons) {
+                    let weaponUuid: string | undefined;
+                    const existingTargetId = IH.nameToId['Weapon']?.[w.name];
+                    if (existingTargetId) {
+                        weaponUuid = `Compendium.world.${Constants.MAP_COMPENDIUM_CONFIG.Weapon.pack}.Item.${existingTargetId}`;
+                    } else if (typeof game !== 'undefined' && game.packs) {
+                        try {
+                            const ensuredUuid = await NaturalWeaponHelper.ensureNaturalWeaponInCompendium(w);
+                            if (ensuredUuid) weaponUuid = ensuredUuid;
+                        } catch {
+                            // Fallback if compendium access fails
+                        }
+                    }
+
+                    const sys = entity.system as Item.SystemOfType<'metatype'> | undefined;
+                    if (weaponUuid && sys?.weapons && !sys.weapons.includes(weaponUuid)) {
+                        sys.weapons.push(weaponUuid);
+                    }
+
+                    metaTypesItems.push({
+                        name: w.name,
+                        power: name,
+                        select,
+                        foundryUuid: weaponUuid,
+                        category: 'weapon',
+                    });
+                }
+                continue;
+            }
+
             const targetId = IH.nameToId['Critter_Power']?.[name] || IH.nameToId['Quality']?.[name];
             const foundryUuid = targetId ? `Compendium.world.${Constants.MAP_COMPENDIUM_CONFIG.Trait.pack}.Item.${targetId}` : undefined;
             metaTypesItems.push({
