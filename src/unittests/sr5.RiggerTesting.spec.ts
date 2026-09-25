@@ -377,5 +377,22 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             // Dice pool should include Pilot (3) + Swarm Bonus (2) = 5
             assert.equal(test!.pool.value, 5);
         });
+
+        it('Renders character sheet and vehicle sheet inventory tabs without template missing errors', async () => {
+            const character = await createDriver();
+            const vehicle = await createVehicle();
+
+            const charSheet = character.sheet;
+            assert.ok(charSheet);
+            await charSheet!.render(true);
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await charSheet!.close();
+
+            const vehicleSheet = vehicle.sheet;
+            assert.ok(vehicleSheet);
+            await vehicleSheet!.render(true);
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await vehicleSheet!.close();
+        });
     });
 };
