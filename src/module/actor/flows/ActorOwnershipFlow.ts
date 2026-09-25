@@ -35,7 +35,9 @@ export const ActorOwnershipFlow = {
         if (device === actor) return true;
         const vehicle = device.asType('vehicle');
         if (vehicle) {
-            return vehicle.getVehicleDriver() === actor;
+            if (vehicle.getVehicleDriver() === actor) return true;
+            if (vehicle.master && vehicle.master.actorOwner === actor) return true;
+            return false;
         }
         const sprite = device.asType('sprite');
         if (sprite) {
