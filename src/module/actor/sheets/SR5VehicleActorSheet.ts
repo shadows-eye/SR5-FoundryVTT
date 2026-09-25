@@ -4,6 +4,7 @@ import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { isElementInstance } from '@/module/utils/dom';
@@ -103,6 +104,27 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         data.vehicle = this._prepareVehicleFields();
         data.modifications = this._prepareEquippedModifications();
         data.isVehicle = true;
+
+        const maxSlots = RiggingRules.getMaxAutosoftSlots(this.actor);
+        const runningAutosofts = RiggingRules.getRunningLocalAutosofts(this.actor);
+        const runningCount = runningAutosofts.length;
+
+        data.autosoftInfo = {
+            maxSlots,
+            runningCount,
+            isOverSlots: runningCount > maxSlots,
+            runningAutosofts
+        };
+
+        data.swarmInfo = RiggingRules.getSwarmPilotInfo(this.actor);
+
+        if (data.vehicle.master && data.vehicle.master.isType('device') && data.vehicle.master.system.category === 'rcc') {
+            const info = RiggingRules.getRCCSharingInfo(data.vehicle.master);
+            data.rccInfo = {
+                ...info,
+                loadedAutosofts: RiggingRules.getLoadedRCCAutosofts(data.vehicle.master)
+            };
+        }
 
         return data;
     }
@@ -275,7 +297,6 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         await this.actor.toggleJumpIn();
         void this.render();
     }
-
     static async #toggleProgramEquipped(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;

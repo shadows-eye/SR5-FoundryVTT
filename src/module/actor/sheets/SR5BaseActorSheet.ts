@@ -10,6 +10,7 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
+import { AutosoftConfigManager } from '@/module/apps/actor/AutosoftConfigManager';
 
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
@@ -334,6 +335,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
             repairMatrixDevice: SR5BaseActorSheet.#repairMatrixDevice,
+            openAutosoftConfigManager: SR5BaseActorSheet.#openAutosoftConfigManager,
             toggleDroneStack: SR5BaseActorSheet.#toggleDroneStack,
             openVehicleSheet: SR5BaseActorSheet.#openVehicleSheet,
             moveItem: SR5BaseActorSheet.#moveItem,
@@ -1120,6 +1122,21 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (item) await item.sheet?.render(true, { mode: 'edit' } as any);
     }
 
+    static async #openAutosoftConfigManager(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = SheetFlow.closestItemId(event.target);
+        let item = this.actor.items.get(id);
+        if (!item) {
+            const uuid = SheetFlow.closestUuid(event.target);
+            // @ts-expect-error typing clashes between items.get and fromUuid
+            item = (await fromUuid(uuid)) as SR5Item | null;
+        }
+        if (item && item.isType('program')) {
+            const app = new AutosoftConfigManager(this.actor, item as SR5Item<'program'>);
+            await app.render(true);
+        }
+    }
     static async #toggleDroneStack(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
