@@ -1,6 +1,7 @@
 import { TestCreator } from "@/module/tests/TestCreator";
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import { SR5 } from '@/module/config';
 import { RiggerFlow } from '@/module/flows/RiggerFlow';
 import { RiggingRules } from '@/module/rules/RiggingRules';
 
@@ -375,7 +376,6 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
 
             // Dice pool should include Pilot (3) + Swarm Bonus (2) = 5
             assert.equal(test!.pool.value, 5);
-        });
         });
     });
 };
