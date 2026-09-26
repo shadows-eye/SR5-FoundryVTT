@@ -25,6 +25,7 @@ export interface SwarmConfigManagerData extends SR5ApplicationMixinTypes.RenderC
     selectedLeaderUuid: string;
     selectedCount: number;
     canDeploy: boolean;
+    hasActiveSwarm: boolean;
     swarmStats: {
         swarmPilot: number;
         highestPilot: number;
@@ -67,6 +68,7 @@ export class SwarmConfigManager extends SR5ApplicationMixin(ApplicationV2)<Swarm
             setLeader: SwarmConfigManager.#setLeader,
             saveSwarm: SwarmConfigManager.#saveSwarm,
             deploySwarm: SwarmConfigManager.#deploySwarm,
+            deleteSwarm: SwarmConfigManager.#deleteSwarm,
             cancel: SwarmConfigManager.#cancel,
         }
     };
@@ -141,6 +143,10 @@ export class SwarmConfigManager extends SR5ApplicationMixin(ApplicationV2)<Swarm
         context.selectedLeaderUuid = this.selectedLeaderUuid;
         context.selectedCount = this.selectedMemberUuids.size;
         context.canDeploy = Boolean(canvas.ready && canvas.scene && this.selectedMemberUuids.size >= 2);
+        context.hasActiveSwarm = Boolean(
+            eligible.some(d => Boolean(d.system.swarm?.active)) ||
+            (canvas.ready && canvas.scene?.tokens.some(t => Boolean(t.getFlag('shadowrun5e', 'isSwarmLeader') || t.getFlag('shadowrun5e', 'isSwarmCompanion'))))
+        );
 
         const leaderActor = eligible.find(d => d.uuid === this.selectedLeaderUuid);
         const memberActors = eligible.filter(d => this.selectedMemberUuids.has(d.uuid ?? '') && d.uuid !== this.selectedLeaderUuid);
@@ -230,6 +236,61 @@ export class SwarmConfigManager extends SR5ApplicationMixin(ApplicationV2)<Swarm
         await this.close();
     }
 
+    static async #deleteSwarm(this: SwarmConfigManager, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const eligible = this._getEligibleDrones();
+        const activeSwarmDrones = eligible.filter(d => Boolean(d.system.swarm?.active));
+
+        // 1. Clean up tokens on canvas if scene is ready
+        if (canvas.ready && canvas.scene) {
+            const scene = canvas.scene;
+            const companionTokenIdsToDelete: string[] = [];
+
+            for (const token of scene.tokens) {
+                if (token.getFlag('shadowrun5e', 'isSwarmCompanion')) {
+                    companionTokenIdsToDelete.push(token.id);
+                } else if (token.getFlag('shadowrun5e', 'isSwarmLeader')) {
+                    const compIds = (token.getFlag('shadowrun5e', 'swarmCompanionTokenIds') as string[] | undefined) || [];
+                    companionTokenIdsToDelete.push(...compIds);
+                    await token.unsetFlag('shadowrun5e', 'isSwarmLeader');
+                    await token.unsetFlag('shadowrun5e', 'swarmCompanionTokenIds');
+                }
+            }
+
+            const uniqueIdsToDelete = Array.from(new Set(companionTokenIdsToDelete)).filter(id => scene.tokens.has(id));
+            if (uniqueIdsToDelete.length > 0) {
+                await scene.deleteEmbeddedDocuments('Token', uniqueIdsToDelete);
+            }
+        }
+
+        // 2. Reset swarm status on actors
+        const actorsToReset = new Set<SR5Actor>();
+        for (const drone of activeSwarmDrones) {
+            actorsToReset.add(drone);
+        }
+        for (const uuid of this.selectedMemberUuids) {
+            const actor = fromUuidSync(uuid) as SR5Actor | null;
+            if (actor && actor.isType('vehicle')) {
+                actorsToReset.add(actor);
+            }
+        }
+
+        for (const actor of actorsToReset) {
+            await (actor as any).update({
+                'system.swarm.active': false,
+                'system.swarm.count': 1,
+            });
+        }
+
+        this.selectedMemberUuids.clear();
+        this.selectedLeaderUuid = '';
+
+        ui.notifications?.info(game.i18n.localize('SR5.Swarm.SwarmDeleted'));
+        await this.close();
+    }
+
     static async #deploySwarm(this: SwarmConfigManager, event: Event) {
         event.preventDefault();
         event.stopPropagation();
@@ -248,14 +309,40 @@ export class SwarmConfigManager extends SR5ApplicationMixin(ApplicationV2)<Swarm
         const leaderActor = fromUuidSync(this.selectedLeaderUuid) as SR5Actor | null;
         if (!leaderActor) return;
 
-        // Check if leader token already exists on canvas
-        let leaderToken = scene.tokens.find(t => t.actorId === leaderActor.id);
         const gridSize = canvas.grid?.size || 100;
 
+        // Locate player's token on the active scene to spawn swarm adjacent to player
+        let playerToken: { x: number; y: number; width?: number } | undefined = scene.tokens.find(t => t.actorId === this.actor.id);
+        if (!playerToken && this.actor.isType('vehicle')) {
+            const driver = this.actor.getVehicleDriver();
+            if (driver) {
+                playerToken = scene.tokens.find(t => t.actorId === driver.id);
+            }
+        }
+        if (!playerToken && canvas.tokens?.controlled?.length) {
+            const controlled = canvas.tokens.controlled[0];
+            if (controlled) {
+                playerToken = { x: controlled.x, y: controlled.y, width: controlled.document.width };
+            }
+        }
+        const userCharId = game.user?.character?.id;
+        if (!playerToken && userCharId) {
+            playerToken = scene.tokens.find(t => t.actorId === userCharId);
+        }
+
+        // Calculate spawn position next to the player token (to the right, or fallback to center)
+        const spawnX = playerToken ? playerToken.x + ((playerToken.width || 1) * gridSize) : 500;
+        const spawnY = playerToken ? playerToken.y : 500;
+
+        // Check if leader token already exists on canvas
+        let leaderToken = scene.tokens.find(t => t.actorId === leaderActor.id);
+
         if (!leaderToken) {
-            // Spawn leader token at canvas center
-            const center = canvas.stage?.position ?? { x: 500, y: 500 };
-            const leaderData = await leaderActor.getTokenDocument({ x: center.x, y: center.y });
+            // Spawn leader token next to player token
+            const leaderData = await leaderActor.getTokenDocument({
+                x: spawnX,
+                y: spawnY,
+            });
             const created = await scene.createEmbeddedDocuments('Token', [leaderData.toObject()]);
             leaderToken = created[0];
         }
@@ -263,6 +350,13 @@ export class SwarmConfigManager extends SR5ApplicationMixin(ApplicationV2)<Swarm
         if (!leaderToken) {
             ui.notifications?.error('Failed to resolve or create leader token on scene.');
             return;
+        }
+
+        // Remove any previous companion tokens for this leader token to prevent duplicates
+        const oldCompanionIds = (leaderToken.getFlag('shadowrun5e', 'swarmCompanionTokenIds') as string[] | undefined) || [];
+        const validOldIds = oldCompanionIds.filter(id => scene.tokens.has(id));
+        if (validOldIds.length > 0) {
+            await scene.deleteEmbeddedDocuments('Token', validOldIds);
         }
 
         const companions = Array.from(this.selectedMemberUuids).filter(u => u !== this.selectedLeaderUuid);
@@ -300,11 +394,22 @@ export class SwarmConfigManager extends SR5ApplicationMixin(ApplicationV2)<Swarm
         await leaderToken.setFlag('shadowrun5e', 'isSwarmLeader', true);
         await leaderToken.setFlag('shadowrun5e', 'swarmCompanionTokenIds', companionIds);
 
-        // Update leader actor count
+        // Update leader actor count & active
         await (leaderActor as any).update({
             'system.swarm.active': true,
             'system.swarm.count': companionIds.length + 1
         });
+
+        // Also update all member actors
+        for (const uuid of companions) {
+            const member = fromUuidSync(uuid) as SR5Actor | null;
+            if (member && member.isType('vehicle')) {
+                await (member as any).update({
+                    'system.swarm.active': true,
+                    'system.swarm.count': companionIds.length + 1
+                });
+            }
+        }
 
         ui.notifications?.info(`Deployed swarm of ${companionIds.length + 1} drones around ${leaderActor.name}!`);
         await this.close();

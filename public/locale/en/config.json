@@ -901,6 +901,8 @@
             "SelectMembers": "Select Member Drones",
             "SaveSwarm": "Save Swarm",
             "DeploySwarm": "Deploy to Canvas",
+            "DeleteSwarm": "Delete Swarm",
+            "SwarmDeleted": "Drone swarm was successfully disbanded and companion tokens removed.",
             "Cancel": "Cancel",
             "Stats": {
                 "Title": "Swarm Pooled Capabilities",
