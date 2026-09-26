@@ -56,6 +56,7 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
         img: string;
         isVehicle: boolean;
     };
+    canManageSwarms?: boolean;
     // Matrix ICONs that are owned by this actor
     ownedIcons: MatrixTargetDocument[];
 
@@ -79,6 +80,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         data.matrixRightTabs = this._prepareTabs('matrixRight');
         this._prepareMatrixDevice(data);
         this._prepareJumpedInActor(data);
+        this._prepareSwarmManagerAbility(data);
 
         return data;
     }
@@ -88,6 +90,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             toggleConnectedMatrixIcons: SR5MatrixActorSheet.#toggleConnectedMatrixIcons,
             selectMatrixTarget: SR5MatrixActorSheet.#selectMatrixTarget,
             openNetworkManager: SR5MatrixActorSheet.#manageNetwork,
+            openSwarmManager: SR5MatrixActorSheet.#openSwarmManager,
             rebootPersona: SR5MatrixActorSheet.#rebootPersonaDevice,
             connectToNetwork: SR5MatrixActorSheet.#connectToNetwork,
             disconnectNetwork: SR5MatrixActorSheet.#disconnectNetwork,
@@ -331,6 +334,20 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         }
     }
 
+    _prepareSwarmManagerAbility(data: MatrixActorSheetData) {
+        if (this.actor.isType('vehicle')) {
+            data.canManageSwarms = true;
+            return;
+        }
+        if (this.actor.isType('character')) {
+            const hasRcc = this.actor.items.some(i => i.isType('device') && i.system.category === 'rcc');
+            const hasRig = this.actor.items.some(i => i.isType('cyberware') && (i.name || '').toLowerCase().includes('control rig'));
+            data.canManageSwarms = hasRcc || hasRig;
+            return;
+        }
+        data.canManageSwarms = false;
+    }
+
     _prepareOwnedIcons(data: MatrixActorSheetData) {
         // When target overview is shown, collect all matrix targets.
         const targets = MatrixTargetingFlow.prepareOwnIcons(this.actor);
@@ -460,6 +477,12 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #manageNetwork(this: SR5MatrixActorSheet) {
         const app = new NetworkManager(this.actor);
+        await app.render(true);
+    }
+
+    static async #openSwarmManager(this: SR5MatrixActorSheet) {
+        const { SwarmConfigManager } = await import('@/module/apps/actor/SwarmConfigManager');
+        const app = new SwarmConfigManager(this.actor);
         await app.render(true);
     }
 

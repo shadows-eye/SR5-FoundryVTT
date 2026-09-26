@@ -28,6 +28,16 @@ export class SR5TokenDocument extends TokenDocument {
     #movementInProgress = false;
 
     override async _preUpdate(...args: Parameters<TokenDocument['_preUpdate']>) {
+        const [changes, options] = args;
+        // Companion tokens cannot be moved directly (lockstep sync with leader)
+        const isCompanion = Boolean(this.getFlag('shadowrun5e', 'isSwarmCompanion'));
+        if (isCompanion && (changes.x !== undefined || changes.y !== undefined)) {
+            if (!(options as any)?.swarmSync) {
+                delete changes.x;
+                delete changes.y;
+            }
+        }
+
         this.#movementInProgress = true;
         let result: Awaited<ReturnType<TokenDocument['_preUpdate']>>;
 
@@ -40,12 +50,66 @@ export class SR5TokenDocument extends TokenDocument {
         return result;
     }
 
+    public swarmSyncPromise: Promise<void> | null = null;
+
+    override _onUpdate(...args: Parameters<TokenDocument['_onUpdate']>) {
+        super._onUpdate(...args);
+
+        const [changed, options, userId] = args;
+        if (game.user?.id === userId && (changed.x !== undefined || changed.y !== undefined) && !(options as any)?.swarmSync) {
+            this.swarmSyncPromise = this.syncSwarmCompanions();
+        }
+    }
+
+    public async syncSwarmCompanions(): Promise<void> {
+        const isLeader = Boolean(this.getFlag('shadowrun5e', 'isSwarmLeader'));
+        if (!isLeader || !this.parent) return;
+
+        const companionIds = (this.getFlag('shadowrun5e', 'swarmCompanionTokenIds') as string[] | undefined) || [];
+        if (!companionIds.length) return;
+
+        const scene = this.parent as Scene;
+        const companionTokens: Array<NonNullable<ReturnType<typeof scene.tokens.get>>> = [];
+        for (const id of companionIds) {
+            const token = scene.tokens.get(id);
+            if (token) companionTokens.push(token);
+        }
+        if (!companionTokens.length) return;
+
+        const updates = companionTokens.map(companion => {
+            const offset = (companion.getFlag('shadowrun5e', 'swarmRelativeOffset') as { dx: number; dy: number } | undefined) ?? { dx: 0, dy: 0 };
+            return {
+                _id: companion.id,
+                x: Math.round(this.x + offset.dx),
+                y: Math.round(this.y + offset.dy),
+            };
+        });
+
+        await scene.updateEmbeddedDocuments('Token', updates, { swarmSync: true } as any);
+    }
+
     /**
      * Handles system-specific cleanup before the token document is deleted.
      */
     protected override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
         // Disconnect from any networks before a token actor is deleted (skip visual swarm companions).
         const isSwarmCompanion = Boolean(this.getFlag('shadowrun5e', 'isSwarmCompanion'));
+        if (isSwarmCompanion && this.parent) {
+            const scene = this.parent as Scene;
+            const leaderId = this.getFlag('shadowrun5e', 'swarmLeaderTokenId') as string | undefined;
+            if (leaderId) {
+                const leader = scene.tokens.get(leaderId) as SR5TokenDocument | undefined;
+                if (leader) {
+                    const currentCompanions = (leader.getFlag('shadowrun5e', 'swarmCompanionTokenIds') as string[] | undefined) || [];
+                    const updated = currentCompanions.filter(id => id !== this.id);
+                    await leader.setFlag('shadowrun5e', 'swarmCompanionTokenIds', updated);
+                    if (leader.actor && leader.actor.isType('vehicle') && leader.actor.system.swarm?.active) {
+                        await (leader.actor as any).update({ 'system.swarm.count': Math.max(1, updated.length + 1) });
+                    }
+                }
+            }
+        }
+
         if (this.actor && !isSwarmCompanion) {
             if (this.actor.isType('vehicle')) {
                 const driver = this.actor.getVehicleDriver();

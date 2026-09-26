@@ -52,6 +52,16 @@
                     </button>
                 </div>
             {{/if}}
+            {{#if canManageSwarms}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Swarm.Manager"}}</label>
+                    <button class="icon sr5-icon"
+                            data-action="openSwarmManager"
+                            data-tooltip="SR5.Swarm.ManagerTooltip">
+                        <i class="fas fa-network-wired"></i>
+                    </button>
+                </div>
+            {{/if}}
             {{#if jumpedInActor}}
                 <div class="basic-row jumped-in-indicator"
                      data-action="handleJumpedActorClick"

@@ -25,6 +25,35 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         return super._drawBar(number, bar, data);
     }
 
+    protected override _canControl(user: any, event?: any): boolean {
+        if (this.document.getFlag('shadowrun5e', 'isSwarmCompanion')) {
+            return false;
+        }
+        return super._canControl(user, event);
+    }
+
+    protected override _canDrag(user: any, event?: any): boolean {
+        if (this.document.getFlag('shadowrun5e', 'isSwarmCompanion')) {
+            return false;
+        }
+        return super._canDrag(user, event);
+    }
+
+    override _onClickLeft(event: any) {
+        if (this.document.getFlag('shadowrun5e', 'isSwarmCompanion')) {
+            const leaderId = this.document.getFlag('shadowrun5e', 'swarmLeaderTokenId') || this.document.getFlag('shadowrun5e', 'swarmPrimaryTokenId');
+            if (typeof leaderId === 'string' && canvas.ready && canvas.tokens) {
+                const leaderToken = canvas.tokens.get(leaderId);
+                if (leaderToken && leaderToken.visible) {
+                    leaderToken.control({ releaseOthers: true });
+                    return;
+                }
+            }
+            return;
+        }
+        super._onClickLeft(event);
+    }
+
     override animate(to: any, options?: any) {
         return super.animate(to, options);
     }

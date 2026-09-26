@@ -243,7 +243,11 @@ declare module "fvtt-types/configuration" {
         Token: {
             shadowrun5e: {
                 TokenMovementPhaseMarkers?: MovementPhaseMarker[];
+                isSwarmLeader?: boolean;
                 isSwarmCompanion?: boolean;
+                swarmLeaderTokenId?: string;
+                swarmCompanionTokenIds?: string[];
+                swarmRelativeOffset?: { dx: number; dy: number };
                 swarmPrimaryTokenId?: string;
                 preSwarmTexture?: { scaleX?: number; scaleY?: number; tint?: string | null };
             };
@@ -251,7 +255,11 @@ declare module "fvtt-types/configuration" {
         TokenDocument: {
             shadowrun5e: {
                 TokenUseRoutingLib?: boolean;
+                isSwarmLeader?: boolean;
                 isSwarmCompanion?: boolean;
+                swarmLeaderTokenId?: string;
+                swarmCompanionTokenIds?: string[];
+                swarmRelativeOffset?: { dx: number; dy: number };
                 swarmPrimaryTokenId?: string;
                 preSwarmTexture?: { scaleX?: number; scaleY?: number; tint?: string | null };
             };

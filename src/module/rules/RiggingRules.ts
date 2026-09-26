@@ -243,6 +243,121 @@ export class RiggingRules {
     }
 
     /**
+     * Calculate comprehensive Drone Swarm stats for mixed or uniform drone swarms.
+     * Rules Reference: Rigger 5.0, p. 31 (Swarm Program)
+     */
+    static getSwarmStats(
+        leaderActor: SR5Actor,
+        memberActors: SR5Actor[] = [],
+        rcc?: SR5Item<'device'> | null,
+    ): {
+        swarmPilot: number;
+        highestPilot: number;
+        memberCount: number;
+        bonus: number;
+        highestSensor: number;
+        lowestHandling: number;
+        lowestSpeed: number;
+        lowestAcceleration: number;
+        sharedAutosofts: Array<{
+            name: string;
+            autosoftType: string;
+            rating: number;
+            targetModel?: string;
+            targetWeapon?: string;
+            skill?: string;
+        }>;
+    } {
+        if (!leaderActor.isType('vehicle')) {
+            return {
+                swarmPilot: 0,
+                highestPilot: 0,
+                memberCount: 0,
+                bonus: 0,
+                highestSensor: 0,
+                lowestHandling: 0,
+                lowestSpeed: 0,
+                lowestAcceleration: 0,
+                sharedAutosofts: [],
+            };
+        }
+
+        const validMembers = [leaderActor, ...memberActors.filter(m => m.uuid !== leaderActor.uuid && m.isType('vehicle'))];
+        const count = Math.max(validMembers.length, Number(leaderActor.system.swarm?.count) || 1);
+        const bonus = Math.max(0, count - 1);
+
+        const pilots = validMembers.map(m => m.system.vehicle_stats?.pilot?.base || m.system.vehicle_stats?.pilot?.value || 1);
+        const highestPilot = Math.max(...pilots, 1);
+
+        // RCC Device Rating can act as Swarm Pilot if higher
+        const rccDeviceRating = rcc?.system.technology?.rating || 0;
+        const effectiveBasePilot = Math.max(highestPilot, rccDeviceRating);
+        const swarmPilot = effectiveBasePilot + bonus;
+
+        const sensors = validMembers.map(m => m.system.vehicle_stats?.sensor?.base || m.system.vehicle_stats?.sensor?.value || 0);
+        const highestSensor = Math.max(...sensors, 0);
+
+        const handlings = validMembers.map(m => m.system.vehicle_stats?.handling?.base || m.system.vehicle_stats?.handling?.value || 1);
+        const lowestHandling = Math.min(...handlings);
+
+        const speeds = validMembers.map(m => m.system.vehicle_stats?.speed?.base || m.system.vehicle_stats?.speed?.value || 1);
+        const lowestSpeed = Math.min(...speeds);
+
+        const accelerations = validMembers.map(m => m.system.vehicle_stats?.acceleration?.base || m.system.vehicle_stats?.acceleration?.value || 1);
+        const lowestAcceleration = Math.min(...accelerations);
+
+        // Pool autosofts across all swarm members and RCC
+        const autosoftMap = new Map<string, {
+            name: string;
+            autosoftType: string;
+            rating: number;
+            targetModel?: string;
+            targetWeapon?: string;
+            skill?: string;
+        }>();
+
+        const allAutosofts: SR5Item<'program'>[] = [];
+        for (const member of validMembers) {
+            allAutosofts.push(...this.getRunningLocalAutosofts(member));
+        }
+        if (rcc) {
+            allAutosofts.push(...this.getLoadedRCCAutosofts(rcc));
+        }
+
+        for (const item of allAutosofts) {
+            const type = item.system.autosoftType || 'other';
+            const tm = item.system.targetModel || '';
+            const tw = item.system.targetWeapon || '';
+            const sk = item.system.skill || '';
+            const key = `${type}::${tm}::${tw}::${sk}`;
+            const rating = item.getRating();
+            const existing = autosoftMap.get(key);
+            if (!existing || rating > existing.rating) {
+                autosoftMap.set(key, {
+                    name: item.name || '',
+                    autosoftType: type,
+                    rating,
+                    targetModel: tm || undefined,
+                    targetWeapon: tw || undefined,
+                    skill: sk || undefined,
+                });
+            }
+        }
+
+        return {
+            swarmPilot,
+            highestPilot: effectiveBasePilot,
+            memberCount: count,
+            bonus,
+            highestSensor,
+            lowestHandling,
+            lowestSpeed,
+            lowestAcceleration,
+            sharedAutosofts: Array.from(autosoftMap.values()),
+        };
+    }
+
+    /**
      * Calculate Drone Swarm Pilot info and pool bonus.
      * Formula: Swarm Pilot = Base Pilot + (Count of Drones in Swarm - 1).
      */
@@ -256,16 +371,12 @@ export class RiggingRules {
             return { swarmPilot: 0, highestPilot: 0, memberCount: 0, bonus: 0 };
         }
 
-        const count = Math.max(1, Number(drone.system.swarm.count) || 1);
-        const basePilot = drone.system.vehicle_stats?.pilot?.base || drone.system.vehicle_stats?.pilot?.value || 1;
-
-        if (count <= 1) {
-            return { swarmPilot: basePilot, highestPilot: basePilot, memberCount: 1, bonus: 0 };
-        }
-
-        const bonus = count - 1;
-        const swarmPilot = basePilot + bonus;
-
-        return { swarmPilot, highestPilot: basePilot, memberCount: count, bonus };
+        const stats = RiggingRules.getSwarmStats(drone);
+        return {
+            swarmPilot: stats.swarmPilot,
+            highestPilot: stats.highestPilot,
+            memberCount: stats.memberCount,
+            bonus: stats.bonus,
+        };
     }
 }

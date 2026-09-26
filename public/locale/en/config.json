@@ -893,7 +893,24 @@
             "Label": "Swarm",
             "Toggle": "Toggle Swarm",
             "Drones": "Drones",
-            "Count": "Drone Count"
+            "Count": "Drone Count",
+            "Manager": "Swarm Manager",
+            "ManagerTooltip": "Configure drone swarms and deploy synchronized drone formations",
+            "Title": "Drone Swarm Manager",
+            "SelectLeader": "Designate Swarm Leader",
+            "SelectMembers": "Select Member Drones",
+            "SaveSwarm": "Save Swarm",
+            "DeploySwarm": "Deploy to Canvas",
+            "Cancel": "Cancel",
+            "Stats": {
+                "Title": "Swarm Pooled Capabilities",
+                "Pilot": "Swarm Pilot",
+                "Sensor": "Swarm Sensor",
+                "Speed": "Swarm Speed",
+                "Handling": "Handling",
+                "Bonus": "Swarm Bonus"
+            },
+            "NoDronesAvailable": "No eligible drone or vehicle actors found."
         },
         "RCC": {
             "Sharing": "Sharing",

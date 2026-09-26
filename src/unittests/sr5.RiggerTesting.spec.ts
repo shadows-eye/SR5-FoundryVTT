@@ -481,5 +481,216 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             // Clean up
             await RiggerFlow.jumpOut(driver, vehicle1);
         });
+
+        describe('Drone Swarms', () => {
+            it('Calculates mixed drone swarm stats according to Rigger 5.0 rules', async () => {
+                const drone1 = await factory.createActor({
+                    type: 'vehicle',
+                    name: 'MCT-FlySpy Leader',
+                    system: {
+                        isDrone: true,
+                        vehicleType: 'air',
+                        vehicle_stats: {
+                            pilot: { base: 2 },
+                            sensor: { base: 2 },
+                            handling: { base: 4 },
+                            speed: { base: 3 },
+                            acceleration: { base: 2 }
+                        }
+                    }
+                });
+
+                const drone2 = await factory.createActor({
+                    type: 'vehicle',
+                    name: 'Doberman Companion',
+                    system: {
+                        isDrone: true,
+                        vehicleType: 'ground',
+                        vehicle_stats: {
+                            pilot: { base: 3 },
+                            sensor: { base: 4 },
+                            handling: { base: 3 },
+                            speed: { base: 4 },
+                            acceleration: { base: 1 }
+                        }
+                    }
+                });
+
+                const drone3 = await factory.createActor({
+                    type: 'vehicle',
+                    name: 'Rotodrone Companion',
+                    system: {
+                        isDrone: true,
+                        vehicleType: 'air',
+                        vehicle_stats: {
+                            pilot: { base: 1 },
+                            sensor: { base: 3 },
+                            handling: { base: 5 },
+                            speed: { base: 2 },
+                            acceleration: { base: 3 }
+                        }
+                    }
+                });
+
+                // Test without RCC:
+                // Count = 3
+                // Pilot = highest member pilot (3) + (3 - 1) = 5
+                // Sensor = highest member sensor = 4
+                // Handling = lowest member handling = 3
+                // Speed = lowest member speed = 2
+                // Acceleration = lowest member acceleration = 1
+                const statsWithoutRcc = RiggingRules.getSwarmStats(drone1, [drone1, drone2, drone3], null);
+                assert.equal(statsWithoutRcc.memberCount, 3);
+                assert.equal(statsWithoutRcc.swarmPilot, 5);
+                assert.equal(statsWithoutRcc.highestSensor, 4);
+                assert.equal(statsWithoutRcc.lowestHandling, 3);
+                assert.equal(statsWithoutRcc.lowestSpeed, 2);
+                assert.equal(statsWithoutRcc.lowestAcceleration, 1);
+
+                // Test with RCC: Device Rating 5
+                // Pilot = max(RCC Device Rating (5), highest member pilot (3)) + (3 - 1) = 5 + 2 = 7
+                const rcc = await factory.createItem({
+                    type: 'device',
+                    name: 'Vulcan LiegeLord',
+                    system: {
+                        category: 'rcc',
+                        technology: {
+                            rating: 5,
+                            equipped: true
+                        }
+                    }
+                });
+                const statsWithRcc = RiggingRules.getSwarmStats(drone1, [drone1, drone2, drone3], rcc);
+                assert.equal(statsWithRcc.swarmPilot, 7);
+            });
+
+            it('Pools autosofts across swarm members without duplicates and takes highest rating', async () => {
+                const drone1 = await factory.createActor({
+                    type: 'vehicle',
+                    name: 'Drone 1',
+                    system: { isDrone: true, vehicleType: 'air', vehicle_stats: { pilot: { base: 2 } } }
+                });
+                const drone2 = await factory.createActor({
+                    type: 'vehicle',
+                    name: 'Drone 2',
+                    system: { isDrone: true, vehicleType: 'air', vehicle_stats: { pilot: { base: 2 } } }
+                });
+
+                // Add Clearsight 3 to Drone 1
+                await drone1.createEmbeddedDocuments('Item', [{
+                    name: 'Clearsight 3',
+                    type: 'program',
+                    system: {
+                        type: 'autosoft',
+                        autosoftType: 'clearsight',
+                        technology: { rating: 3, equipped: true }
+                    }
+                }]);
+
+                // Add Clearsight 5 and Maneuvering 4 to Drone 2
+                await drone2.createEmbeddedDocuments('Item', [
+                    {
+                        name: 'Clearsight 5',
+                        type: 'program',
+                        system: {
+                            type: 'autosoft',
+                            autosoftType: 'clearsight',
+                            technology: { rating: 5, equipped: true }
+                        }
+                    },
+                    {
+                        name: 'Maneuvering [Drone 2] 4',
+                        type: 'program',
+                        system: {
+                            type: 'autosoft',
+                            autosoftType: 'maneuvering',
+                            targetModel: 'Drone 2',
+                            technology: { rating: 4, equipped: true }
+                        }
+                    }
+                ]);
+
+                const stats = RiggingRules.getSwarmStats(drone1, [drone1, drone2], null);
+                assert.equal(stats.sharedAutosofts.length, 2);
+
+                const clearsight = stats.sharedAutosofts.find(a => a.autosoftType === 'clearsight');
+                assert.notEqual(clearsight, undefined);
+                assert.equal(clearsight!.rating, 5);
+
+                const maneuvering = stats.sharedAutosofts.find(a => a.autosoftType === 'maneuvering');
+                assert.notEqual(maneuvering, undefined);
+                assert.equal(maneuvering!.rating, 4);
+            });
+
+            it('Synchronizes swarm companion token positions and locks selection/dragging', async () => {
+                const scene = await factory.createScene({ name: 'Swarm Test Scene' });
+                const leaderActor = await factory.createActor({
+                    type: 'vehicle',
+                    name: 'Leader Drone',
+                    system: { isDrone: true, vehicleType: 'air', swarm: { active: true, count: 2 } }
+                });
+                const companionActor = await factory.createActor({
+                    type: 'vehicle',
+                    name: 'Companion Drone',
+                    system: { isDrone: true, vehicleType: 'air' }
+                });
+
+                const [leaderTokenDoc] = await scene.createEmbeddedDocuments('Token', [{
+                    name: 'Leader Token',
+                    actorId: leaderActor.id,
+                    actorLink: true,
+                    x: 100,
+                    y: 100,
+                    flags: {
+                        shadowrun5e: {
+                            isSwarmLeader: true,
+                            swarmCompanionTokenIds: []
+                        }
+                    }
+                }]);
+
+                const [companionTokenDoc] = await scene.createEmbeddedDocuments('Token', [{
+                    name: 'Companion Token',
+                    actorId: companionActor.id,
+                    actorLink: true,
+                    x: 160,
+                    y: 140,
+                    flags: {
+                        shadowrun5e: {
+                            isSwarmCompanion: true,
+                            swarmLeaderTokenId: leaderTokenDoc.id,
+                            swarmRelativeOffset: { dx: 60, dy: 40 }
+                        }
+                    }
+                }]);
+
+                await leaderTokenDoc.setFlag('shadowrun5e', 'swarmCompanionTokenIds', [companionTokenDoc.id]);
+
+                // Check companion token flags and control/drag restrictions
+                assert.isTrue(Boolean(companionTokenDoc.getFlag('shadowrun5e', 'isSwarmCompanion')));
+                if (companionTokenDoc.object) {
+                    assert.isFalse((companionTokenDoc.object as any)._canControl(game.user));
+                    assert.isFalse((companionTokenDoc.object as any)._canDrag(game.user));
+                }
+
+                // Move leader token: from (100, 100) to (300, 200)
+                await leaderTokenDoc.update({ x: 300, y: 200 });
+                if ((leaderTokenDoc as any).swarmSyncPromise) {
+                    await (leaderTokenDoc as any).swarmSyncPromise;
+                }
+
+                // Companion token should follow offset { dx: 60, dy: 40 } -> (360, 240)
+                const updatedCompanion = scene.tokens.get(companionTokenDoc.id);
+                assert.notEqual(updatedCompanion, undefined);
+                assert.equal(updatedCompanion!.x, 360);
+                assert.equal(updatedCompanion!.y, 240);
+
+                // Deleting companion token updates leader's companion list and swarm count
+                await companionTokenDoc.delete();
+                const updatedLeaderCompanions = leaderTokenDoc.getFlag('shadowrun5e', 'swarmCompanionTokenIds') as string[];
+                assert.isFalse(updatedLeaderCompanions.includes(companionTokenDoc.id));
+                assert.equal(leaderActor.system.swarm.count, 1);
+            });
+        });
     });
 };

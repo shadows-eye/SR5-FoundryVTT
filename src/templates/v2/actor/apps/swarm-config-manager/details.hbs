@@ -1,0 +1,61 @@
+<div class="fill-container swarm-config-details" style="display: flex; flex-direction: column; gap: 12px; padding: 8px;">
+    {{#if swarmStats}}
+        <div class="swarm-stats-card" style="background: rgba(0, 150, 255, 0.1); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 6px; padding: 10px;">
+            <div style="font-weight: bold; margin-bottom: 6px; color: #4dabf7; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-network-wired"></i>
+                <span>{{localize "SR5.Swarm.Stats.Title"}}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center;">
+                <div class="stat-pill" style="background: rgba(0, 0, 0, 0.3); padding: 4px 6px; border-radius: 4px;">
+                    <div style="font-size: 0.8em; opacity: 0.8;">{{localize "SR5.Swarm.Stats.Pilot"}}</div>
+                    <div style="font-size: 1.1em; font-weight: bold;">{{swarmStats.swarmPilot}}</div>
+                </div>
+                <div class="stat-pill" style="background: rgba(0, 0, 0, 0.3); padding: 4px 6px; border-radius: 4px;">
+                    <div style="font-size: 0.8em; opacity: 0.8;">{{localize "SR5.Swarm.Stats.Sensor"}}</div>
+                    <div style="font-size: 1.1em; font-weight: bold;">{{swarmStats.highestSensor}}</div>
+                </div>
+                <div class="stat-pill" style="background: rgba(0, 0, 0, 0.3); padding: 4px 6px; border-radius: 4px;">
+                    <div style="font-size: 0.8em; opacity: 0.8;">{{localize "SR5.Swarm.Stats.Speed"}}</div>
+                    <div style="font-size: 1.1em; font-weight: bold;">{{swarmStats.lowestSpeed}}</div>
+                </div>
+                <div class="stat-pill" style="background: rgba(0, 0, 0, 0.3); padding: 4px 6px; border-radius: 4px;">
+                    <div style="font-size: 0.8em; opacity: 0.8;">{{localize "SR5.Swarm.Stats.Bonus"}}</div>
+                    <div style="font-size: 1.1em; font-weight: bold; color: #51cf66;">+{{swarmStats.bonus}}</div>
+                </div>
+            </div>
+        </div>
+    {{/if}}
+
+    <div class="list-item-header" style="font-weight: bold; padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+        <span>{{localize "SR5.Swarm.SelectMembers"}}</span>
+    </div>
+
+    {{#if availableDrones.length}}
+        <div class="drone-selection-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto;">
+            {{#each availableDrones}}
+                <div class="list-item drone-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; background: rgba(0, 0, 0, 0.15); border-radius: 4px; border: 1px solid {{#if this.isLeader}}#4dabf7{{else if this.isSelected}}rgba(255, 255, 255, 0.2){{else}}transparent{{/if}};">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" data-action="toggleMember" data-uuid="{{this.uuid}}" {{#if this.isSelected}}checked{{/if}} />
+                        <img src="{{this.img}}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;" />
+                        <div>
+                            <span style="font-weight: bold;">{{this.name}}</span>
+                            <div style="font-size: 0.8em; opacity: 0.7;">
+                                Pilot: {{this.pilot}} | Sensor: {{this.sensor}} | Speed: {{this.speed}}
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display: flex; align-items: center; gap: 4px; font-size: 0.85em; cursor: pointer;">
+                            <input type="radio" name="swarmLeader" data-action="setLeader" data-uuid="{{this.uuid}}" {{#if this.isLeader}}checked{{/if}} {{#unless this.isSelected}}disabled{{/unless}} />
+                            <span style="{{#if this.isLeader}}color: #4dabf7; font-weight: bold;{{/if}}">{{localize "SR5.Swarm.SelectLeader"}}</span>
+                        </label>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    {{else}}
+        <div style="text-align: center; color: #ff6464; padding: 16px;">
+            {{localize "SR5.Swarm.NoDronesAvailable"}}
+        </div>
+    {{/if}}
+</div>
