@@ -11,9 +11,9 @@ import { SituationModifiersApplication } from '../../apps/SituationModifiersAppl
 import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
 import { AutosoftConfigManager } from '@/module/apps/actor/AutosoftConfigManager';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
-import { RiggingRules } from '@/module/rules/RiggingRules';
 import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
 
 import { LinksHelpers } from '../../utils/links';

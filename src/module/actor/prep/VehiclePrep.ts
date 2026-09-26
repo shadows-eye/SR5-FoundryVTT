@@ -32,6 +32,7 @@ export class VehiclePrep {
         VehiclePrep.prepareAttributesWithBody(system);
         VehiclePrep.prepareAttributeRanges(system);
         
+        VehiclePrep.prepareAutosoftSkills(system, items, actor);
         VehiclePrep.prepareJumpedInDriverData(system, actor);
         SkillsPrep.prepareSkills(system);
 
@@ -199,6 +200,49 @@ export class VehiclePrep {
         }
     }
 
+    /**
+     * Populate and enhance vehicle active skills with running autosoft ratings.
+     * Follows SR5 CRB p. 267: if any local autosoft is running, all RCC shared autosofts are ignored.
+     */
+    static prepareAutosoftSkills(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[], actor?: SR5Actor) {
+        if (!actor) return;
+
+        if (!actor.itemsForType?.get('skill')?.length) {
+            system.skills.active = {};
+        }
+
+        const effectiveAutosofts = RiggingRules.getAllEffectiveAutosofts(actor);
+        if (effectiveAutosofts.length === 0) return;
+
+        for (const autosoft of effectiveAutosofts) {
+            const rating = autosoft.getRating();
+            if (rating <= 0) continue;
+
+            const skillKey = RiggingRules.getSkillForAutosoft(autosoft, actor);
+            if (!skillKey) continue;
+
+            const existingSkill = system.skills.active[skillKey];
+            if (existingSkill) {
+                existingSkill.base = Math.max(existingSkill.base || 0, rating);
+                ModifiableValue.calcTotal(existingSkill);
+            } else {
+                const skillName = SR5.activeSkills[skillKey] || skillKey;
+                const skillField = DataDefaults.createData('skill_field', {
+                    id: autosoft.id || skillKey,
+                    key: skillKey,
+                    name: skillName,
+                    img: autosoft.img || 'icons/svg/item-bag.svg',
+                    label: game.i18n.localize(skillName),
+                    base: rating,
+                    attribute: 'pilot',
+                    canDefault: true,
+                    specs: [],
+                });
+                ModifiableValue.calcTotal(skillField);
+                system.skills.active[skillKey] = skillField;
+            }
+        }
+    }
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, isDrone } = system;
 
