@@ -41,4 +41,16 @@
         padding: 0.5rem;
     }
 
+    .rigger-details,
+    .rigger-interface-details {
+        .list-item-col,
+        .rigger-interface-col {
+            justify-content: flex-start;
+
+            input[type='checkbox'] {
+                margin-left: 0;
+            }
+        }
+    }
+
 }

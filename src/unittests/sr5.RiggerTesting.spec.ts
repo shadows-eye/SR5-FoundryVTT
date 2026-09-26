@@ -394,5 +394,92 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             await new Promise(resolve => setTimeout(resolve, 100));
             await vehicleSheet!.close();
         });
+
+        it('Transfers driver attributes, skills, and control rig modifiers to vehicle on jumpIn and resets on jumpOut', async () => {
+            const driver = await createDriver();
+            const vehicle = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    controlMode: 'autopilot',
+                    vehicleType: 'ground',
+                    isDrone: true,
+                    vehicle_stats: {
+                        handling: { base: 3 },
+                        speed: { base: 3 },
+                        sensor: { base: 4 }
+                    }
+                }
+            });
+
+            // Before jump in
+            assert.equal(vehicle.system.controlMode, 'autopilot');
+            assert.equal(vehicle.system.vehicle_stats.handling.value, 3);
+            assert.equal(vehicle.system.vehicle_stats.speed.value, 3);
+
+            // Jump in
+            await RiggerFlow.jumpIn(driver, vehicle);
+
+            assert.equal(vehicle.system.controlMode, 'rigger');
+            // No ActiveEffects created on vehicle
+            assert.isFalse(vehicle.effects.some(e => e.getFlag('shadowrun5e', 'isJumpedInEffect') === true));
+            // Sheet stats remain base, roll limits get control rig bonus
+            assert.equal(vehicle.system.vehicle_stats.handling.value, 3);
+            assert.equal(vehicle.system.vehicle_stats.speed.value, 3);
+            const rollTest = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_pilot_vehicle', vehicle, testOptions);
+            assert.notEqual(rollTest, undefined);
+            await rollTest!.execute();
+            assert.equal(rollTest!.limit.value, 6);
+            // Driver mental and physical attributes transferred
+            assert.equal(vehicle.system.attributes.logic.value, 5);
+            assert.equal(vehicle.system.attributes.intuition.value, 5);
+            assert.equal(vehicle.system.attributes.reaction.value, 3);
+            assert.equal(vehicle.system.attributes.agility.value, 3);
+            // Driver skills transferred
+            assert.equal(vehicle.system.skills.active.pilot_ground_craft.value, 5);
+            assert.equal(vehicle.system.skills.active.gunnery.value, 5);
+            assert.equal(vehicle.system.skills.active.perception.value, 4);
+
+            // Jump out
+            await RiggerFlow.jumpOut(driver, vehicle);
+
+            assert.equal(vehicle.system.controlMode, 'autopilot');
+            assert.equal(vehicle.system.vehicle_stats.handling.value, 3);
+            assert.equal(vehicle.system.vehicle_stats.speed.value, 3);
+            assert.isTrue(!vehicle.system.skills.active.pilot_ground_craft || vehicle.system.skills.active.pilot_ground_craft.value === 0);
+        });
+
+        it('Sets all other vehicles/drones of the player actor to autopilot when jumping in', async () => {
+            const driver = await createDriver();
+            const vehicle1 = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    controlMode: 'manual',
+                    vehicleType: 'ground',
+                    isDrone: true,
+                    driver: driver.uuid
+                }
+            });
+            const vehicle2 = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    controlMode: 'manual',
+                    vehicleType: 'ground',
+                    isDrone: true,
+                    driver: driver.uuid
+                }
+            });
+
+            assert.equal(vehicle1.system.controlMode, 'manual');
+            assert.equal(vehicle2.system.controlMode, 'manual');
+
+            // Jump into vehicle 1
+            await RiggerFlow.jumpIn(driver, vehicle1);
+
+            assert.equal(vehicle1.system.controlMode, 'rigger');
+            assert.equal(vehicle2.system.controlMode, 'autopilot');
+
+            // Clean up
+            await RiggerFlow.jumpOut(driver, vehicle1);
+        });
     });
 };

@@ -11,6 +11,7 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { RiggingRules } from '@/module/rules/RiggingRules';
 import { NetworkManager } from '@/module/apps/NetworkManager';
+import { SYSTEM_NAME } from '@/module/constants';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import ActorAttribute = Shadowrun.ActorAttribute;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -48,6 +49,13 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
         isOverSharingLimit: boolean;
         loadedAutosofts: SR5Item[];
     };
+    jumpedInActor?: {
+        actor: SR5Actor;
+        uuid: string;
+        name: string;
+        img: string;
+        isVehicle: boolean;
+    };
     // Matrix ICONs that are owned by this actor
     ownedIcons: MatrixTargetDocument[];
 
@@ -61,6 +69,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     selectedMatrixTarget: string | undefined;
     _connectedIconsOpenClose: Record<string, boolean> = {};
     _rccAllocationDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+    static #jumpedActorClickTimer: number | null = null;
 
     override async _prepareContext(options: Parameters<SR5BaseActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
@@ -69,6 +78,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         data.matrixLeftTabs = this._prepareTabs('matrixLeft');
         data.matrixRightTabs = this._prepareTabs('matrixRight');
         this._prepareMatrixDevice(data);
+        this._prepareJumpedInActor(data);
 
         return data;
     }
@@ -90,6 +100,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             toggleJumpInIcon: SR5MatrixActorSheet.#toggleJumpInIcon,
             toggleDroneControlMode: SR5MatrixActorSheet.#toggleDroneControlMode,
             updateRccAllocation: SR5MatrixActorSheet.#updateRccAllocation,
+            handleJumpedActorClick: SR5MatrixActorSheet.#handleJumpedActorClick,
         },
     };
 
@@ -289,6 +300,37 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         }
     }
 
+    _prepareJumpedInActor(data: MatrixActorSheetData) {
+        if (this.actor.isType('character')) {
+            const jumpedInUuid = this.actor.getFlag(SYSTEM_NAME, 'jumpedInVehicleUuid') as string | undefined;
+            if (jumpedInUuid) {
+                const vehicle = fromUuidSync(jumpedInUuid) as SR5Actor | undefined;
+                if (vehicle) {
+                    data.jumpedInActor = {
+                        actor: vehicle,
+                        uuid: vehicle.uuid ?? '',
+                        name: vehicle.name ?? '',
+                        img: (vehicle.img as string) ?? '',
+                        isVehicle: true
+                    };
+                }
+            }
+        } else if (this.actor.isType('vehicle')) {
+            if (this.actor.system.controlMode === 'rigger') {
+                const driver = this.actor.getVehicleDriver();
+                if (driver) {
+                    data.jumpedInActor = {
+                        actor: driver,
+                        uuid: driver.uuid ?? '',
+                        name: driver.name ?? '',
+                        img: (driver.img as string) ?? '',
+                        isVehicle: false
+                    };
+                }
+            }
+        }
+    }
+
     _prepareOwnedIcons(data: MatrixActorSheetData) {
         // When target overview is shown, collect all matrix targets.
         const targets = MatrixTargetingFlow.prepareOwnIcons(this.actor);
@@ -312,14 +354,14 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     _prepareSelectedMatrixTargets(targets: MatrixTargetDocument[]) {
         for (const target of targets) {
             const targetUuid = target.document.uuid;
-            // Collect connected icons, if user wants to see them.
+            // Collect connected wireless icons, if user wants to see them.
             if (targetUuid && this._connectedIconsOpenClose[targetUuid]) {
-                target.icons = MatrixTargetingFlow.getWirelessMatrixIconTargets(target.document as SR5Actor);
+                const wirelessIcons = MatrixTargetingFlow.getWirelessMatrixIconTargets(target.document as SR5Actor);
+                target.icons = [...(target.icons || []), ...wirelessIcons];
+            }
 
-                for (const icon of target.icons) {
-                    // Mark icon as selected.
-                    icon.selected = this.selectedMatrixTarget === icon.document.uuid;
-                }
+            for (const icon of (target.icons || [])) {
+                icon.selected = this.selectedMatrixTarget === icon.document.uuid;
             }
 
             // Mark target as selected.
@@ -377,13 +419,24 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         // Toggle between autopilot (Auto mode) and remote (RCC mode)
         const newMode = currentMode === 'remote' ? 'autopilot' : 'remote';
 
-        // When switching to remote (RCC) mode, if the drone doesn't have an active master,
-        // slave it to the rigger's active equipped RCC if present
+        // When switching to remote (RCC) mode, attach driver and slave to rigger's active equipped RCC if present
         const updateData: Record<string, any> = { 'system.controlMode': newMode };
-        if (newMode === 'remote' && !vehicleActor.system.master) {
+        if (newMode === 'remote') {
+            if (!vehicleActor.system.driver) {
+                updateData['system.driver'] = this.actor.uuid;
+            }
             const rccItem = this.actor.items.find(i => i.isType('device') && i.system.category === 'rcc' && i.isEquipped());
             if (rccItem) {
-                updateData['system.master'] = rccItem.uuid;
+                if (!vehicleActor.system.master) {
+                    updateData['system.master'] = rccItem.uuid;
+                }
+                const rccAutosofts = RiggingRules.getLoadedRCCAutosofts(rccItem);
+                if (rccAutosofts.length > 0) {
+                    const localAutosofts = RiggingRules.getRunningLocalAutosofts(vehicleActor);
+                    for (const auto of localAutosofts) {
+                        await auto.update({ system: { technology: { equipped: false } } });
+                    }
+                }
             }
         }
 
@@ -890,5 +943,68 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             content,
             style: CONST.CHAT_MESSAGE_STYLES.OTHER,
         });
+    }
+
+    override async _onRender(
+        ...[context, options]: Parameters<SR5BaseActorSheet<T>["_onRender"]>
+    ) {
+        await super._onRender(context, options);
+
+        const jumpedIndicators = this.element.querySelectorAll<HTMLElement>('[data-action="handleJumpedActorClick"]');
+        for (const indicator of jumpedIndicators) {
+            indicator.addEventListener('dblclick', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (SR5MatrixActorSheet.#jumpedActorClickTimer) {
+                    window.clearTimeout(SR5MatrixActorSheet.#jumpedActorClickTimer);
+                    SR5MatrixActorSheet.#jumpedActorClickTimer = null;
+                }
+                const uuid = indicator.dataset.uuid;
+                if (!uuid) return;
+                const targetActor = fromUuidSync(uuid) as SR5Actor | undefined;
+                if (targetActor) {
+                    await SR5MatrixActorSheet.#focusActorToken(targetActor);
+                }
+            });
+        }
+    }
+
+    static async #handleJumpedActorClick(this: SR5MatrixActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        const target = SheetFlow.closestAction(event.target);
+        const uuid = target?.dataset?.uuid;
+        if (!uuid) return;
+
+        const targetActor = fromUuidSync(uuid) as SR5Actor | undefined;
+        if (!targetActor) return;
+
+        if (event.detail === 2 || SR5MatrixActorSheet.#jumpedActorClickTimer) {
+            if (SR5MatrixActorSheet.#jumpedActorClickTimer) {
+                window.clearTimeout(SR5MatrixActorSheet.#jumpedActorClickTimer);
+                SR5MatrixActorSheet.#jumpedActorClickTimer = null;
+            }
+            await SR5MatrixActorSheet.#focusActorToken(targetActor);
+            return;
+        }
+
+        SR5MatrixActorSheet.#jumpedActorClickTimer = window.setTimeout(async () => {
+            SR5MatrixActorSheet.#jumpedActorClickTimer = null;
+            await targetActor.sheet?.render(true);
+        }, 250);
+    }
+
+    static async #focusActorToken(actor: SR5Actor) {
+        const tokens = actor.getActiveTokens();
+        if (tokens.length > 0 && canvas?.ready) {
+            const token = tokens[0];
+            token.control({ releaseOthers: true });
+            await (canvas as any).animatePan({
+                x: (token as any).center?.x ?? token.x,
+                y: (token as any).center?.y ?? token.y,
+                duration: 500
+            });
+        } else {
+            await actor.sheet?.render(true);
+        }
     }
 }

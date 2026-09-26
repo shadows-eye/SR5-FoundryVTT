@@ -1712,7 +1712,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     getVehicleDriver(): SR5Actor | undefined {
         if (!this.isType('vehicle') || !this.hasDriver()) return;
 
-        const driver = fromUuidSync(this.system.driver);
+        let driver: any = fromUuidSync(this.system.driver);
+        if (!driver && this.system.driver) {
+            driver = game.actors?.get(this.system.driver) || game.actors?.getName(this.system.driver);
+        }
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
         if (!driver || !(driver instanceof SR5Actor)) return undefined;
         return driver;

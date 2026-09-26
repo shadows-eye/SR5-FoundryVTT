@@ -126,7 +126,6 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'device',
             'equipment',
             'modification',
-            'program',
         ];
     }
 

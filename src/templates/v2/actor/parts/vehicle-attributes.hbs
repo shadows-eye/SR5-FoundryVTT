@@ -89,6 +89,30 @@
             attributeField=systemFields.vehicle_stats.fields.seats
         }}
     {{/unless}}
+    {{#if (eq system.controlMode 'rigger')}}
+        {{#unless @root.isEditMode}}
+            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                attribute=system.attributes.reaction
+                attributeField=systemFields.attributes.fields.reaction
+            }}
+            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                attribute=system.attributes.logic
+                attributeField=systemFields.attributes.fields.logic
+            }}
+            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                attribute=system.attributes.intuition
+                attributeField=systemFields.attributes.fields.intuition
+            }}
+            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                attribute=system.attributes.agility
+                attributeField=systemFields.attributes.fields.agility
+            }}
+            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                attribute=system.attributes.willpower
+                attributeField=systemFields.attributes.fields.willpower
+            }}
+        {{/unless}}
+    {{/if}}
 </div>
 
 {{#if @root.isEditMode}}

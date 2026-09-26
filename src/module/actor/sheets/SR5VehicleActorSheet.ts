@@ -69,7 +69,6 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             toggleChaseEnvironment: SR5VehicleActorSheet.#toggleChaseEnvironment,
             toggleOffRoad: SR5VehicleActorSheet.#toggleOffRoad,
             toggleJumpIn: SR5VehicleActorSheet.#toggleJumpIn,
-            toggleProgramEquipped: SR5VehicleActorSheet.#toggleProgramEquipped,
         }
     }
 
@@ -93,7 +92,6 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             'device',
             'equipment',
             'modification',
-            'program',
         ];
     }
 
@@ -297,22 +295,12 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         await this.actor.toggleJumpIn();
         void this.render();
     }
-    static async #toggleProgramEquipped(this: SR5VehicleActorSheet, event: Event) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-        const itemId = SheetFlow.closestAction(event.target)?.dataset?.itemId;
-        if (!itemId) return;
-        const item = this.actor.items.get(itemId);
-        if (!item || !item.system.technology) return;
 
-        const isCurrentlyEquipped = item.isEquipped();
-        await item.update({
-            system: {
-                technology: {
-                    equipped: !isCurrentlyEquipped
-                }
-            }
+    override async _prepareMatrixActions() {
+        const actions = await super._prepareMatrixActions();
+        return actions.filter(sheetAction => {
+            const name = sheetAction.action?.name;
+            return name === 'Reboot Device' || name === 'Jack Out';
         });
-        void this.render();
     }
 }

@@ -606,7 +606,7 @@
                         </div>
                     </div>
 
-                {{else if (eq system.type 'vehicle')}}
+                {{else if (or (eq system.type 'vehicle') (eq system.type 'drone'))}}
                     <div class="list-item">
                         <div class="list-item-start skinny">
                             <label data-tooltip="{{systemFields.modification_category.hint}}">{{systemFields.modification_category.label}}</label>
@@ -616,18 +616,17 @@
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
-                    <div class="list-item">
-                        <div class="list-item-start skinny">
-                            <label data-tooltip="{{systemFields.slots.hint}}">{{systemFields.slots.label}}</label>
+                    {{#if (or (eq system.modification_category 'cosmetic') (eq system.modification_category 'Cosmetic') (eq source.system.modification_category 'cosmetic') (eq source.system.modification_category 'Cosmetic'))}}
+                        <div class="list-item rigger-details rigger-interface-details">
+                            <div class="list-item-start skinny">
+                                <label data-tooltip="{{systemFields.isRiggerInterface.hint}}">{{systemFields.isRiggerInterface.label}}</label>
+                            </div>
+                            <div class="list-item-col select-col rigger-interface-col">
+                                {{formInput systemFields.isRiggerInterface value=(or source.system.isRiggerInterface system.isRiggerInterface)
+                                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                            </div>
                         </div>
-                        <div class="list-item-col">
-                            {{formInput systemFields.slots value=source.system.slots
-                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                        </div>
-                    </div>
-
-                {{else if (eq system.type 'drone')}}
-
+                    {{/if}}
                     <div class="list-item">
                         <div class="list-item-start skinny">
                             <label data-tooltip="{{systemFields.slots.hint}}">{{systemFields.slots.label}}</label>

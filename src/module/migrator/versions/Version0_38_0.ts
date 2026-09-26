@@ -93,5 +93,30 @@ export class Version0_38_0 extends VersionMigration {
         if (system.damage?.biofeedback === 'none') {
             system.damage.biofeedback = '';
         }
+
+        // Migrate Rigger Interface modification items to system.isRiggerInterface = true
+        if (item.type === 'modification') {
+            const isCosmeticOrPowertrain = system.modification_category === 'cosmetic'
+                || system.category === 'cosmetic'
+                || system.modification_category === 'powertrain'
+                || system.category === 'powertrain'
+                || system.importFlags?.category?.toLowerCase() === 'cosmetic';
+            const name = (item.name || '').toLowerCase();
+            const sourceId = (item.flags?.core?.sourceId || item._stats?.compendiumSource || '').toLowerCase();
+            const isRiggerInterface = (isCosmeticOrPowertrain || !system.modification_category) && (
+                name.includes('rigger interface')
+                || name.includes('riggeranpassung')
+                || name.includes('interface rigger')
+                || name.includes('리거 인터페이스')
+                || sourceId.includes('rigger-interface')
+                || sourceId.includes('rigger_interface')
+            );
+            if (isRiggerInterface) {
+                system.isRiggerInterface = true;
+                if (!system.modification_category) {
+                    system.modification_category = 'cosmetic';
+                }
+            }
+        }
     }
 }

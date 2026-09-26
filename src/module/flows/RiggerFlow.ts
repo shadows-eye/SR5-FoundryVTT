@@ -4,35 +4,17 @@ import { Helpers } from '@/module/helpers';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import type { InitiativeModeOptions } from '@/module/combat/SR5Combatant';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 
 export function isRiggerInterfaceItem(item: any): boolean {
-    if (!item) return false;
+    if (!item || item.type !== 'modification') return false;
 
-    // 1. Explicit item flag (rename and translation independent)
-    if (item.getFlag?.('shadowrun5e', 'isRiggerInterface') === true) return true;
-    if (item.flags?.shadowrun5e?.isRiggerInterface === true) return true;
+    const isVehicleOrDrone = item.system?.type === 'vehicle' || item.system?.type === 'drone';
+    if (!isVehicleOrDrone) return false;
 
-    // 2. Structured schema modification subcategory
-    const subCategory = item.system?.subCategory || item.system?.sub_category;
-    if (subCategory === 'rigger_interface') return true;
-
-    // 3. Compendium source ID / slug matching
-    const sourceId = (item.flags?.core?.sourceId || item._stats?.compendiumSource || '') as string;
-    if (sourceId.toLowerCase().includes('rigger-interface') || sourceId.toLowerCase().includes('rigger_interface')) return true;
-
-    // 4. Dynamic localization match against active system language
-    const localizedName = game.i18n?.localize('SR5.Rigger.RiggerInterface')?.toLowerCase();
-    const itemName = (item.name || '').toLowerCase();
-    if (localizedName && itemName.includes(localizedName)) return true;
-
-    // 5. Powertrain modification name check across all supported system locales
-    const isPowertrain = item.system?.modification_category === 'powertrain' || item.system?.category === 'powertrain';
-    if (isPowertrain) {
-        const canonicalNames = ['rigger interface', 'riggeranpassung', 'interface rigger', '리거 인터페이스', 'interface de rigger'];
-        if (canonicalNames.some(cn => itemName.includes(cn))) return true;
-    }
-
-    return itemName.includes('rigger interface');
+    return item.system?.isRiggerInterface === true
+        || item.getFlag?.('shadowrun5e', 'isRiggerInterface') === true
+        || item.flags?.shadowrun5e?.isRiggerInterface === true;
 }
 
 export function hasRiggerInterface(vehicle: SR5Actor): boolean {
@@ -91,25 +73,10 @@ export const RiggerFlow = {
         // 4. Update vehicle controlMode to 'rigger'
         await vehicle.update({ system: { controlMode: 'rigger' } });
 
-        // Ensure all other vehicles owned/driven by the driver are set to 'autopilot'
-        const otherVehicles = (game.actors?.contents || []).filter(a => a.isType('vehicle') && a.uuid !== vehicle.uuid && ActorOwnershipFlow._isOwnerOfActor(driver, a)) as SR5Actor[];
-        for (const other of otherVehicles) {
-            if (other.system.controlMode !== 'autopilot') {
-                await other.update({ system: { controlMode: 'autopilot' } });
-            }
-        }
-        if (canvas.scene?.tokens) {
-            for (const t of canvas.scene.tokens) {
-                const tokenActor = t.actor as SR5Actor | null;
-                if (tokenActor && tokenActor.isType('vehicle') && tokenActor.uuid !== vehicle.uuid && ActorOwnershipFlow._isOwnerOfActor(driver, tokenActor)) {
-                    if (tokenActor.system.controlMode !== 'autopilot') {
-                        await tokenActor.update({ system: { controlMode: 'autopilot' } });
-                    }
-                }
-            }
-        }
+        // 5. Ensure all other vehicles owned/driven by the driver are set to 'autopilot'
+        await this.resetOtherDriverVehiclesToAutopilot(driver, vehicle);
 
-        // 5. Update driver matrix state to VR & Hot Sim via setInitiativeMode
+        // 6. Update driver matrix state to VR & Hot Sim via setInitiativeMode
         if (driver.isType('character')) {
             const currentPerception = driver.system.initiative?.perception;
             const prevMode: InitiativeModeOptions = currentPerception === 'astral' ? 'astral'
@@ -118,7 +85,7 @@ export const RiggerFlow = {
             await driver.setInitiativeMode('hot_sim');
         }
 
-        // 6. Lock driver token movement and set driver flags
+        // 7. Lock driver token movement and set driver flags
         await TokenLockHooks.setJumpedInState(driver, vehicle, true);
         await driver.setFlag(SYSTEM_NAME, 'jumpedInVehicleUuid', vehicle.uuid ?? '');
 
@@ -139,7 +106,14 @@ export const RiggerFlow = {
         // 1. Update vehicle controlMode to 'autopilot'
         await vehicle.update({ system: { controlMode: 'autopilot' } });
 
-        // 2. Unlock driver token movement & unset flags & restore initiative mode
+        // 2. Defensively clean up any legacy jumped-in Active Effect if present
+        const jumpedInEffects = vehicle.effects.filter(e => e.getFlag('shadowrun5e', 'isJumpedInEffect') === true).map(e => e.id);
+        if (jumpedInEffects.length > 0) {
+            await vehicle.deleteEmbeddedDocuments('ActiveEffect', jumpedInEffects);
+        }
+        await vehicle.unsetFlag(SYSTEM_NAME, 'jumpedInEffectId');
+
+        // 3. Unlock driver token movement & unset flags & restore initiative mode
         if (currentDriver) {
             await TokenLockHooks.setJumpedInState(currentDriver, vehicle, false);
             await currentDriver.unsetFlag(SYSTEM_NAME, 'jumpedInVehicleUuid');
@@ -255,5 +229,55 @@ export const RiggerFlow = {
      */
     getActorInstances(actor: SR5Actor | null): SR5Actor[] {
         return actor ? [actor] : [];
+    },
+
+    /**
+     * Set all other vehicles/drones owned or controlled by the driver to 'autopilot'.
+     * For player actors, this includes all vehicles owned by the player user(s).
+     * For GM/NPC actors, only vehicles explicitly driven by or slaved to this driver are reset.
+     */
+    async resetOtherDriverVehiclesToAutopilot(driver: SR5Actor, currentVehicle: SR5Actor) {
+        if (!driver || !currentVehicle) return;
+
+        const playerOwners = (game.users?.contents || []).filter(u => !u.isGM && driver.testUserPermission(u, 'OWNER'));
+
+        const isOwnedByDriver = (candidate: SR5Actor): boolean => {
+            if (!candidate || !candidate.isType('vehicle') || candidate.uuid === currentVehicle.uuid) return false;
+            // 1. Explicitly driven by this driver
+            if (candidate.system.driver === driver.uuid || candidate.getVehicleDriver()?.uuid === driver.uuid) return true;
+            // 2. Slaved to driver's RCC
+            if (candidate.master?.actorOwner?.uuid === driver.uuid) return true;
+            // 3. ActorOwnershipFlow ownership check
+            if (ActorOwnershipFlow._isOwnerOfActor(driver, candidate)) return true;
+            // 4. Owned by the same player user(s) as the driver
+            if (playerOwners.length > 0 && playerOwners.some(u => candidate.testUserPermission(u, 'OWNER'))) return true;
+            return false;
+        };
+
+        const processedUuids = new Set<string>();
+        const toReset: SR5Actor[] = [];
+
+        for (const actor of (game.actors?.contents || [])) {
+            if (actor.isType('vehicle') && isOwnedByDriver(actor as SR5Actor)) {
+                toReset.push(actor as SR5Actor);
+                processedUuids.add(actor.uuid);
+            }
+        }
+
+        if (canvas?.scene?.tokens) {
+            for (const tokenDoc of canvas.scene.tokens) {
+                const tokenActor = tokenDoc.actor as SR5Actor | null;
+                if (tokenActor && tokenActor.isType('vehicle') && tokenActor.uuid && !processedUuids.has(tokenActor.uuid) && isOwnedByDriver(tokenActor)) {
+                    toReset.push(tokenActor);
+                    processedUuids.add(tokenActor.uuid);
+                }
+            }
+        }
+
+        for (const v of toReset) {
+            if (v.system.controlMode !== 'autopilot') {
+                await v.update({ system: { controlMode: 'autopilot' } });
+            }
+        }
     }
 };
