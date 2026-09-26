@@ -87,7 +87,19 @@ export class SwarmConfigManager extends SR5ApplicationMixin(ApplicationV2)<Swarm
 
         // Initialize from existing swarm configuration if available
         const eligible = this._getEligibleDrones();
-        if (eligible.length > 0) {
+        const activeLeader = eligible.find(d => d.system.swarm?.active);
+        if (activeLeader) {
+            this.selectedLeaderUuid = activeLeader.uuid ?? '';
+            this.selectedMemberUuids.add(this.selectedLeaderUuid);
+            for (const d of eligible) {
+                if (d.system.swarm?.active && d.uuid) {
+                    this.selectedMemberUuids.add(d.uuid);
+                }
+            }
+        } else if (actor.isType('vehicle')) {
+            this.selectedLeaderUuid = actor.uuid ?? '';
+            this.selectedMemberUuids.add(this.selectedLeaderUuid);
+        } else if (eligible.length > 0) {
             this.selectedLeaderUuid = eligible[0].uuid ?? '';
             this.selectedMemberUuids.add(this.selectedLeaderUuid);
         }
@@ -108,7 +120,9 @@ export class SwarmConfigManager extends SR5ApplicationMixin(ApplicationV2)<Swarm
         const eligible = this._getEligibleDrones();
 
         // Ensure leader is selected if empty
-        if (!this.selectedLeaderUuid && eligible.length > 0) {
+        if (!this.selectedLeaderUuid && this.selectedMemberUuids.size > 0) {
+            this.selectedLeaderUuid = Array.from(this.selectedMemberUuids)[0];
+        } else if (!this.selectedLeaderUuid && eligible.length > 0) {
             this.selectedLeaderUuid = eligible[0].uuid ?? '';
             this.selectedMemberUuids.add(this.selectedLeaderUuid);
         }
@@ -140,11 +154,14 @@ export class SwarmConfigManager extends SR5ApplicationMixin(ApplicationV2)<Swarm
         return context;
     }
 
-    static #toggleMember(this: SwarmConfigManager, event: Event) {
-        event.preventDefault();
+    static #getUuid(event: Event, target?: HTMLElement): string | undefined {
+        const actionTarget = target ?? (event.target instanceof HTMLElement ? event.target : null);
+        return actionTarget?.closest<HTMLElement>('[data-uuid]')?.dataset.uuid;
+    }
+
+    static #toggleMember(this: SwarmConfigManager, event: Event, target?: HTMLElement) {
         event.stopPropagation();
-        const target = event.currentTarget as HTMLElement | null;
-        const uuid = target?.dataset?.uuid;
+        const uuid = SwarmConfigManager.#getUuid(event, target);
         if (!uuid) return;
 
         if (this.selectedMemberUuids.has(uuid)) {
@@ -152,19 +169,24 @@ export class SwarmConfigManager extends SR5ApplicationMixin(ApplicationV2)<Swarm
             if (uuid === this.selectedLeaderUuid && this.selectedMemberUuids.size > 1) {
                 const remaining = Array.from(this.selectedMemberUuids).filter(u => u !== uuid);
                 this.selectedLeaderUuid = remaining[0];
+            } else if (uuid === this.selectedLeaderUuid) {
+                this.selectedLeaderUuid = '';
             }
             this.selectedMemberUuids.delete(uuid);
         } else {
             this.selectedMemberUuids.add(uuid);
+            if (!this.selectedLeaderUuid) {
+                this.selectedLeaderUuid = uuid;
+            }
         }
 
         void this.render(false);
     }
 
-    static #setLeader(this: SwarmConfigManager, event: Event) {
+    static #setLeader(this: SwarmConfigManager, event: Event, target?: HTMLElement) {
+        event.preventDefault();
         event.stopPropagation();
-        const target = event.currentTarget as HTMLElement | null;
-        const uuid = target?.dataset?.uuid;
+        const uuid = SwarmConfigManager.#getUuid(event, target);
         if (!uuid) return;
 
         this.selectedLeaderUuid = uuid;

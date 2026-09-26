@@ -34,8 +34,8 @@
         <div class="drone-selection-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto;">
             {{#each availableDrones}}
                 <div class="list-item drone-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; background: rgba(0, 0, 0, 0.15); border-radius: 4px; border: 1px solid {{#if this.isLeader}}#4dabf7{{else if this.isSelected}}rgba(255, 255, 255, 0.2){{else}}transparent{{/if}};">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" data-action="toggleMember" data-uuid="{{this.uuid}}" {{#if this.isSelected}}checked{{/if}} />
+                    <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; flex: 1;" data-action="toggleMember" data-uuid="{{this.uuid}}">
+                        <input type="checkbox" style="pointer-events: none;" {{#if this.isSelected}}checked{{/if}} />
                         <img src="{{this.img}}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;" />
                         <div>
                             <span style="font-weight: bold;">{{this.name}}</span>
@@ -45,10 +45,10 @@
                         </div>
                     </div>
                     <div>
-                        <label style="display: flex; align-items: center; gap: 4px; font-size: 0.85em; cursor: pointer;">
-                            <input type="radio" name="swarmLeader" data-action="setLeader" data-uuid="{{this.uuid}}" {{#if this.isLeader}}checked{{/if}} {{#unless this.isSelected}}disabled{{/unless}} />
+                        <button type="button" class="btn btn-sm" data-action="setLeader" data-uuid="{{this.uuid}}" style="display: flex; align-items: center; gap: 6px; padding: 3px 8px; font-size: 0.85em; cursor: pointer; border-radius: 4px; border: 1px solid {{#if this.isLeader}}#4dabf7{{else}}rgba(255, 255, 255, 0.2){{/if}}; background: {{#if this.isLeader}}rgba(0, 150, 255, 0.25){{else}}rgba(0, 0, 0, 0.25){{/if}};">
+                            <i class="{{#if this.isLeader}}fas fa-crown{{else}}far fa-circle{{/if}}" style="{{#if this.isLeader}}color: #ffd43b;{{/if}}"></i>
                             <span style="{{#if this.isLeader}}color: #4dabf7; font-weight: bold;{{/if}}">{{localize "SR5.Swarm.SelectLeader"}}</span>
-                        </label>
+                        </button>
                     </div>
                 </div>
             {{/each}}
