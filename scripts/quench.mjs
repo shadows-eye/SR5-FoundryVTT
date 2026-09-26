@@ -235,24 +235,9 @@ async function joinWorld(page, user = 'Gamemaster') {
         );
     }
 
-    const userElement = page.locator('select[name=userid], [name=username]');
-    await userElement.waitFor({ timeout: 30000 });
-    const isSelect = await userElement.evaluate((el) => el.tagName.toLowerCase() === 'select');
-    if (isSelect) {
-        await userElement.evaluate((el, targetUser) => {
-            const selectEl = el;
-            const opt = Array.from(selectEl.options).find(
-                (o) => o.text.trim().toLowerCase() === String(targetUser).toLowerCase(),
-            );
-            if (opt) {
-                opt.disabled = false;
-                selectEl.value = opt.value;
-                selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-        }, user);
-    } else {
-        await userElement.fill(user);
-    }
+    const username = page.locator('[name=username]');
+    await username.waitFor({ timeout: 30000 });
+    await username.fill(user);
 
     const password = process.env.FOUNDRY_PASSWORD;
     if (password) {
@@ -499,14 +484,10 @@ async function main() {
     // Keep GPU rendering enabled in headless Chromium because Foundry and PIXI
     // canvas behavior differs when Chromium falls back to software rendering.
     const args = ['--enable-gpu', '--ignore-gpu-blocklist'];
-    const viewport = headless ? { width: 1920, height: 1080 } : null;
+    const viewport = headless ? { width: 1024, height: 768 } : null;
     if (!headless) args.push('--start-maximized');
 
-    const browser = await chromium.launch({
-        headless,
-        args,
-        channel: process.env.FOUNDRY_BROWSER_CHANNEL || 'chrome',
-    });
+    const browser = await chromium.launch({ headless, args, channel: process.env.FOUNDRY_BROWSER_CHANNEL || undefined });
     try {
         const context = await browser.newContext({ baseURL: url, viewport });
         const page = await context.newPage();
