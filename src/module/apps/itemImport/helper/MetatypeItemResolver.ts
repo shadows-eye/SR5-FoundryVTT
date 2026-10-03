@@ -137,8 +137,7 @@ export class MetatypeItemResolver {
             UpdateActionFlow.injectActionTestsIntoChangeData(createData.type, createData, createData);
             IH.setItem('Critter_Power', powerData.name._TEXT, targetId);
 
-            await SR5Item.create(createData, { pack: `world.${compConfig.pack}`, keepId: true });
-            await compendium.getIndex();
+            await IH.createDocumentInCompendium(compKey, createData);
             console.log(`SR5 | Ingested metatype power "${item.name}" into compendium "world.${compConfig.pack}" with ID "${targetId}"`);
             return;
         }
@@ -161,8 +160,7 @@ export class MetatypeItemResolver {
             UpdateActionFlow.injectActionTestsIntoChangeData(createData.type, createData, createData);
             IH.setItem('Quality', qualityData.name._TEXT, targetId);
 
-            await SR5Item.create(createData, { pack: `world.${compConfig.pack}`, keepId: true });
-            await compendium.getIndex();
+            await IH.createDocumentInCompendium(compKey, createData);
             console.log(`SR5 | Ingested metatype trait "${item.name}" into compendium "world.${compConfig.pack}" with ID "${targetId}"`);
             return;
         }
