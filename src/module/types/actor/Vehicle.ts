@@ -49,12 +49,6 @@ const VehicleData = () => ({
         initial: "medium",
         choices: SR5.vehicle.categories,
     }),
-    subCategory: new StringField({
-        required: false,
-        blank: true,
-        initial: "",
-        choices: SR5.vehicle.subCategories,
-    }),
     model: new StringField({
         required: false,
         blank: true,
